@@ -40,8 +40,8 @@ usart_options_t usart_opt = {
 	.paritytype  = USART_NO_PARITY,
 	.stopbits    = USART_1_STOPBIT,
 };
-
-eic_options_t eic_options2 = {
+//eic = External Interrupt Controller
+eic_options_t eic_options2 = {    
 	// Enable level-triggered interrupt.
 	.eic_mode   = EIC_MODE_LEVEL_TRIGGERED,
 	// Interrupt will trigger on low-level.
@@ -70,13 +70,14 @@ static void tc_irq(void)
 	// Clear the interrupt flag. This is a side effect of reading the TC SR.
 	tc_read_sr(EXAMPLE_TC, EXAMPLE_TC_CHANNEL);
 
-	tc_tick++;	
+	tc_tick++;	// contador para controlar el tiempo de las interrupciones
 	
 	if (tc_tick < 20)
 	{
-		gpio_toggle_pin(AVR32_PIN_PB09);
-		gpio_toggle_pin(AVR32_PIN_PA04);
-		gpio_toggle_pin(AVR32_PIN_PA11);
+		// la funcion toggle pin (parece) que pone el pin en 1
+		gpio_toggle_pin(AVR32_PIN_PB09); // PB09 = led 3
+		gpio_toggle_pin(AVR32_PIN_PA04); // PA04 = led 1
+		gpio_toggle_pin(AVR32_PIN_PA11); // PA11 = led 2 
 		return;
 	}
 	
@@ -110,7 +111,8 @@ static void eic_int_handler2(void)
 {
 		// Interrupt Line must be cleared to enable
 		eic_clear_interrupt_line(&AVR32_EIC, AVR32_EIC_INT2);
-	
+		//IRQ2 Pin 26 MCU --> Pin 24 T
+		
 }
 
 #if defined (__GNUC__)
@@ -123,6 +125,7 @@ __interrupt
 // Manejo INTERRUPCION UART
 static void usart_int_handler_RS232(void)
 {
+	// TDW sensor de temperatura -> RX UART2 Pin 24 MCU
 	tc_stop(tc,EXAMPLE_TC_CHANNEL);
 	
 	int c=0;
@@ -138,7 +141,7 @@ static void usart_int_handler_RS232(void)
 	 * unmasked by the CPU.
 	 */
 		
-	if (usart_read_char(&AVR32_USART2, &c) != USART_SUCCESS)
+	if (usart_read_char(&AVR32_USART2, &c) != USART_SUCCESS) //aqui lee el caracter por el puerto uart2
 		return;
 
 	
