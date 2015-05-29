@@ -17,6 +17,6 @@ Pasos
 2- En la consola git:
 (Para la descarga del repositorio)
 
-> git svn clone https://github.com/alesuarez/PF.git
+> git clone git://github.com/alesuarez/PF.git
 
 
