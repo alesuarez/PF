@@ -179,9 +179,10 @@ static void inicializar_interrupciones()
 	 * AVR32_INTC_INT0 is the interrupt priority level to assign to the
 	 * group of this IRQ.
 	 */
-	
+	// interrupcion del RS232 nivel 0
 	INTC_register_interrupt(&usart_int_handler_RS232, AVR32_USART2_IRQ, AVR32_INTC_INT0);
-
+	
+	// interrupcion nivel 2
 	INTC_register_interrupt(&eic_int_handler2, AVR32_EIC_IRQ_2, AVR32_INTC_INT2);
 	
 	// Register the TC interrupt handler to the interrupt controller.
@@ -287,7 +288,7 @@ void spi_init_pins(void)
 		{SPI_SCK_PIN,  SPI_SCK_FUNCTION },  // SPI Clock.
 		{SPI_MISO_PIN, SPI_MISO_FUNCTION},  // MISO.
 		{SPI_MOSI_PIN, SPI_MOSI_FUNCTION},  // MOSI.
-		{SPI_CS_PIN, SPI_CS_FUNCTION}  // CS.
+		{SPI_CS_PIN, SPI_CS_FUNCTION}		// CS.
 	};
 
 	gpio_enable_module( SPI_GPIO_MAP,sizeof (SPI_GPIO_MAP) / sizeof (SPI_GPIO_MAP[0]));
@@ -536,9 +537,6 @@ int main (void)
 	
 	while(true)
 	{
-	
-	
-		
 		if (cola_PC_nr != cola_PC_nw )
 		{
 			if (cola_PC[cola_PC_nr] == 't')
@@ -552,7 +550,6 @@ int main (void)
 			if (cola_PC_nr >= tamano_cola)
 				cola_PC_nr = 0;
 		}
-		
 		delay_ms(10);
 	}
 }
