@@ -1,12 +1,12 @@
-# Proyecto Final
+﻿# Proyecto Final
 Tesis
 
 ¿Como descargar el repositorio?
 
-Requerimientos
+Requerimientos:
 
--Git
--Cuenta en gitHub (solo para hacer commit)
+-Git.
+-Cuenta en gitHub (solo para hacer commit).
 
 Pasos 
 1- En la consola git:
