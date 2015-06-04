@@ -1,0 +1,26 @@
+RELEASE NOTES
+=============
+
+Package: swpm212
+Release: 1.2
+Date:    2009-08-18
+
+Supported Platforms:
+ - Radio Transceiver AT86RF212
+
+Changes to release 1.1
+ - Reworked parameter table in CWPAN section.
+ - Removed AES_GET_MODE.
+ - Replaced CFG_SFD with {SET,GET}_SFD.
+ - In GET_RND_VALUE explicitly enabled the preamble detector.
+ - Fixed minor typos and renamed timers.
+
+Changes to release 1.0
+ - Added CWPAN section.
+ - Adaptation to current data sheet release (timer constants and names).
+ - Incorporated workaround for power on reset errata note.
+ - Configuration of CSMA seed with wake-sleep-wake transition
+ - Updated description for using the random number generator.
+
+ERRATA LIST
+ - none

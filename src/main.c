@@ -364,7 +364,7 @@ void init_rf_pins(void)
 	spi_init_pins();
 
 	//PIN para interrupcion externa RF
-	gpio_configure_pin (AVR32_PIN_PA13, (GPIO_DIR_INPUT | GPIO_PULL_UP));
+	gpio_configure_pin (AVR32_PIN_PA13, (GPIO_DIR_INPUT | GPIO_PULL_UP)); // PA13 IRQ2
 	gpio_enable_module_pin(AVR32_EIC_EXTINT_2_0_PIN, AVR32_EIC_EXTINT_2_0_FUNCTION); // Habilito interrupcion externa con este pin
 	//gpio_enable_pin_interrupt(AT86RFX_IRQ_PIN, GPIO_RISING_EDGE);
 	gpio_clear_pin_interrupt_flag(AT86RFX_IRQ_PIN);
@@ -521,7 +521,7 @@ int main (void)
  		escribir_linea_pc("Modulo RF:\tPASS\r\n");
 	else
 		escribir_linea_pc("Modulo RF:\tFAILED\r\n"); 			
-	
+	escribir_linea_pc(register_value);
 	
 	//Inicializacion del sensor de temp
 	
