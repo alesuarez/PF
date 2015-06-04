@@ -5,7 +5,7 @@ Tesis
 
 Requerimientos:
 
-* Git.
+
 * Cuenta en gitHub (solo para hacer commit).
 
 Pasos 
