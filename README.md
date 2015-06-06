@@ -5,7 +5,7 @@ Tesis
 
 Requerimientos:
 
-* Git.
+
 * Cuenta en gitHub (solo para hacer commit).
 
 Pasos 
@@ -19,4 +19,4 @@ Pasos
 
 > git clone git://github.com/alesuarez/PF.git
 
-
+comentario de erika
