@@ -531,7 +531,7 @@ int main (void)
 	//------------------Fin de conguracion
 	
 	escribir_linea_pc("TESIS TUCUMAN 2015\n\r");
-
+	escribir_linea_pc("- - - B u e n a s - - - \n\r");
 	
 	
 	while(true)
@@ -546,7 +546,7 @@ int main (void)
 				leer_temp(temps);
 				escribir_linea_pc("Temp: ");
 				escribir_linea_pc(temps);
-				escribir_linea_pc("°C\r\n");
+				escribir_linea_pc("*C\r\n");
 			}
 			cola_PC_nr++;
 			if (cola_PC_nr >= tamano_cola)
