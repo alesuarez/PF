@@ -19,7 +19,8 @@
 #include "conf_at86rfx.h"
 #include "definiciones.h"
 #include "ASF/common/components/at86rf212.h"
-
+// include de funciones
+#include "funciones.h"
 
 
 char cola_PC[tamano_cola];

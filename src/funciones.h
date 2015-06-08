@@ -8,3 +8,16 @@ void set_mode()
 	chb_reg_read_mod_write(TRX_CTRL_2, 0x00, 0x3f);                 // 802.15.4-2006, BPSK
 	chb_reg_read_mod_write(RF_CTRL_0, CHB_BPSK_TX_OFFSET, 0x3);     //         
 }
+static U8 get_state()
+{
+	return reg_read(TRX_STATUS) & 0x1f; //falta
+}
+
+/**************************************************************************/
+/*!
+*/
+/**************************************************************************/
+static U8 get_status()
+{
+	return reg_read(TRX_STATE) >> CHB_TRAC_STATUS_POS; //revisar
+}
