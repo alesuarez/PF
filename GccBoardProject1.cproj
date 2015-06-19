@@ -431,13 +431,7 @@
     <None Include="src\config\conf_twim.h">
       <SubType>compile</SubType>
     </None>
-    <Compile Include="src\chb_drvr.c">
-      <SubType>compile</SubType>
-    </Compile>
     <Compile Include="src\definiciones.h">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="src\chb_drvr.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="src\main.h">

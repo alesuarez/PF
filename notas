@@ -42,3 +42,13 @@
 //
 // 0x05 -> 5 -> 914MHz
 //
+//************************************************
+// para leer el canal donde esta transmitiendo
+//************************************************
+//
+// AT86RF212::[ACTIVE]
+// ccband = trx_bit_read(SR_CC_BAND);
+// ASSERT(ccband==0);
+// channel = trx_bit_read(SR_CHANNEL);
+//
+//

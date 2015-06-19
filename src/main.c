@@ -19,8 +19,7 @@
 #include "conf_at86rfx.h"
 #include "definiciones.h"
 #include "ASF/common/components/at86rf212.h"
-// include de funciones
-#include "funciones.h"
+
 
 
 char cola_PC[tamano_cola];
@@ -517,7 +516,7 @@ int main (void)
  	 */	
 	
 	register_value = pal_trx_reg_read(RG_PART_NUM);//pedido de identificacion del modulo. Debe devolver 0x07
-			
+	
 	if (register_value == PART_NUM_AT86RF212) 
  		escribir_linea_pc("Modulo RF:\tPASS\r\n");
 	else
@@ -557,7 +556,5 @@ int main (void)
 		delay_ms(10);
 	}
 }
-	
-
 	
 
