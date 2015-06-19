@@ -20,7 +20,7 @@
 #include "definiciones.h"
 #include "ASF/common/components/at86rf212.h"
 
-
+#define BUFFER_SIZE       (200)
 
 char cola_PC[tamano_cola];
 int cola_PC_nw = 0;
@@ -31,6 +31,8 @@ volatile static uint32_t tc_tick = 1;
 volatile avr32_tc_t *tc = EXAMPLE_TC;
 
 volatile uint8_t resolution = AT30TSE_CONFIG_RES_12_bit;
+
+static uint8_t tx_buffer[BUFFER_SIZE];
 
 usart_options_t usart_opt = {
 	//! Baudrate is set in the conf_example_usart.h file.
@@ -479,6 +481,7 @@ int main (void)
 {
 	char temps[10] = "\0";
 	uint8_t register_value = 0;
+	uint8_t status_AT86 = 0;
 	
 	//board_init();
 	// configuracion del clock del sistema ver archivo "conf_clock.h"	
@@ -514,7 +517,13 @@ int main (void)
  		else
  			escribir_linea_pc("Modulo RF:\tPASS\r\n");
  	 */	
-	
+	tx_buffer[0]='h';
+	tx_buffer[1]='0';
+	tx_buffer[2]='l';
+	tx_buffer[3]='a';
+	status_AT86=pal_trx_reg_read(TRX_STATUS);
+	at86rfx_tx_frame(tx_buffer);
+	status_AT86=pal_trx_reg_read(TRX_STATUS);
 	register_value = pal_trx_reg_read(RG_PART_NUM);//pedido de identificacion del modulo. Debe devolver 0x07
 	
 	if (register_value == PART_NUM_AT86RF212) 
