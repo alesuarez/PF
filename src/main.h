@@ -79,3 +79,4 @@ void at86rfx_tal_rx_frame_cb(uint8_t * rx_frame_array);
 void at86rfx_tal_tx_status_cb(uint8_t status);
 
 
+#endif /* DEFINICIONES_H_ */

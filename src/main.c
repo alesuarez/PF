@@ -34,6 +34,13 @@ volatile uint8_t resolution = AT30TSE_CONFIG_RES_12_bit;
 
 static uint8_t tx_buffer[BUFFER_SIZE];
 
+uint8_t status_AT86 = 0;
+uint8_t register_value = 0;
+uint8_t clocl_ = 0;
+uint8_t transmition_power = 0;
+uint8_t pll = 0;
+uint8_t control_tx = 0;
+uint8_t irq= 0;
 usart_options_t usart_opt = {
 	//! Baudrate is set in the conf_example_usart.h file.
 	.baudrate    = 9600,
@@ -480,8 +487,7 @@ void leer_temp(char* temps)
 int main (void)
 {
 	char temps[10] = "\0";
-	uint8_t register_value = 0;
-	uint8_t status_AT86 = 0;
+	int i=0;
 	
 	//board_init();
 	// configuracion del clock del sistema ver archivo "conf_clock.h"	
@@ -517,15 +523,27 @@ int main (void)
  		else
  			escribir_linea_pc("Modulo RF:\tPASS\r\n");
  	 */	
-	tx_buffer[0]='h';
-	tx_buffer[1]='0';
-	tx_buffer[2]='l';
-	tx_buffer[3]='a';
+	tx_buffer[0]="h";
+	tx_buffer[1]="0";
+	tx_buffer[2]="l";
+	tx_buffer[3]="a";
+	tx_buffer[4]="\0";
 	status_AT86=pal_trx_reg_read(TRX_STATUS);
-	at86rfx_tx_frame(tx_buffer);
-	status_AT86=pal_trx_reg_read(TRX_STATUS);
-	register_value = pal_trx_reg_read(RG_PART_NUM);//pedido de identificacion del modulo. Debe devolver 0x07
+	while(i<400)
+	{
+		pal_trx_frame_write(tx_buffer,4);
+		
+		i++;
+	}
 	
+	
+	
+	register_value = pal_trx_reg_read(RG_PART_NUM);//pedido de identificacion del modulo. Debe devolver 0x07
+	clocl_ = pal_trx_reg_read(TRX_CTRL_0);//pedido de identificacion del modulo. Debe devolver 0x07;
+	transmition_power =pal_trx_reg_read(PHY_TX_PWR);//pedido de identificacion del modulo. Debe devolver 0x07 
+	pll = pal_trx_reg_read(PHY_CC_CCA);//pedido de identificacion del modulo. Debe devolver 0x07
+	control_tx = pal_trx_reg_read(TRX_CTRL_2);//pedido de identificacion del modulo. Debe devolver 0x07
+	irq=pal_trx_reg_read(IRQ);
 	if (register_value == PART_NUM_AT86RF212) 
  		escribir_linea_pc("Modulo RF:\tPASS\r\n");
 	else
