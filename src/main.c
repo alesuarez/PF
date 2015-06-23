@@ -598,7 +598,7 @@ int main (void)
 //
 	pal_trx_reg_write(IRQ_MASK, 8); // 1 en el bit 3
 //
-	irq=pal_trx_reg_read((IRQ_MASK);// (8) leo de nuevo el registro para ver si lo escribe correctamente
+	irq=pal_trx_reg_read(IRQ_MASK);// (8) leo de nuevo el registro para ver si lo escribe correctamente
 //
 //*******************************************************************************************************
 	if (register_value == PART_NUM_AT86RF212) 
