@@ -36,7 +36,7 @@ static uint8_t tx_buffer[BUFFER_SIZE];
 
 uint8_t status_AT86 = 0;
 uint8_t register_value = 0;
-uint8_t clocl_ = 0;
+uint8_t clock = 0;
 uint8_t transmition_power = 0;
 uint8_t pll = 0;
 uint8_t control_tx = 0;
@@ -539,10 +539,56 @@ int main (void)
 	
 	
 	register_value = pal_trx_reg_read(RG_PART_NUM);//pedido de identificacion del modulo. Debe devolver 0x07
-	clocl_ = pal_trx_reg_read(TRX_CTRL_0);//pedido de identificacion del modulo. Debe devolver 0x07;
-	transmition_power =pal_trx_reg_read(PHY_TX_PWR);//pedido de identificacion del modulo. Debe devolver 0x07 
-	pll = pal_trx_reg_read(PHY_CC_CCA);//pedido de identificacion del modulo. Debe devolver 0x07
-	control_tx = pal_trx_reg_read(TRX_CTRL_2);//pedido de identificacion del modulo. Debe devolver 0x07
+//
+// TRX_CTRL_0  PAG 120
+// Bit 7:6 -R/W– PAD_IO -> These register bits set the output driver current of digital output pads, except CLKM 
+//			00= 2mA (minima corriente)
+// Bit 5:4 –R/W- PAD_IO_CLKM -> These register bits set the output driver strength of pin CLKM
+//			01=4mA (minima corriente) <~~~~~~~~~~~ CAMBIAR ~~~~~~~~~~~
+// Bit 3   –R/W- CLKM_SHA_SEL -> The register bit CLKM_SHA_SEL defines whether a new clock rate
+//			1-> CLKM clock rate change appears after SLEEP cycle
+// Bit 2:0 –R/W CLKM_CTRL -> These register bits set the clock rate of pin 17 (CLKM)
+//			1 -> 1 MHz <~~~~~~~~~~~ CAMBIAR ~~~~~~~~~~~
+	clock = pal_trx_reg_read(TRX_CTRL_0);// 25  0001 1001
+//
+// PHY_TX_PWR (R/W) PAG 106
+// Bit 7 – PA_BOOST -> This bit enables the PA boost mode where the TX output power is increased by approximately 5 dB
+//			0 -> the PA linearity is decreased compared to the normal mode
+// Bit 6:5 – GC_PA  -> These register bits control the gain of the PA by changing its bias current.
+//			11(3) -> 0dB
+// Bit 4:0 – TX_PWR -> These register bits control the transmitter output power
+//			0000 -> ~~~~~~~~~~~~~~~~~VER~~~~~~~~~~~~~~~~~~~
+	transmition_power =pal_trx_reg_read(PHY_TX_PWR);// 96 0110 0000
+//
+// PHY_CC_CCA PAG 125 -> contains register bits to set the channel center frequency according to channel page 0 of IEEE 802.15.4-2003/2006
+// Bit 7  -W-  CCA_REQUEST  A manual CCA measurement is initiated by setting CCA_REQUEST = 1. The register bit is automatically 
+//							cleared after requesting a CCA measurement with CCA_REQUEST = 1 
+//				0->
+// Bit 6:5 -R/W- CCA_MODE The CCA mode can be selected using register bits CCA_MODE.
+//				01(1) -> “Energy above threshold”
+// Bit 4:0 -R/W- CHANNEL -> Channel Assignment according to IEEE 802.15.4-2003/2006 
+//				101(5) -> 914 Mhz
+	pll = pal_trx_reg_read(PHY_CC_CCA);//37  0010 0101
+// 
+// TRX_CTRL_2  R/W
+// Bit 7 – RX_SAFE_MODE -> If this bit is set, Dynamic Frame Buffer Protection is enabled.
+//			0-> buffer protection disable
+// Bit 6 – TRX_OFF_AVDD_EN -> If this register bit is set, the analog voltage regulator is turned on (kept on) during
+//                            TRX_OFF, enabling faster RX/TX turn on time. T
+//          0-> disble
+// Bit 5 – OQPSK_SCRAM_EN -> If set to 1 (reset value), the scrambler is enabled for OQPSK_DATA_RATE = 2 and
+//                          BPSK_OQPSK = 1 (O-QPSK is active). Otherwise, the scrambler is disabled.
+//          1-> reset value
+// Bit 4 The bit is relevant for SUB_MODE = 1 and BPSK_OQPSK = 1
+//          0-> If set to 0 (reset value), pulse shaping is half-sine filtering for O-QPSK transmission with 1000 kchip/s
+// Bit 3 – BPSK_OQPSK
+//			0-> If set to 0 (reset value), BPSK transmission and reception is applied
+// Bit 2 – SUB_MODE
+//			1-> If set to 1 (reset value), the chip rate is 1000 kchip/s for BPSK_OQPSK = 1 and 600 kchip/s for BPSK_OQPSK = 0.
+// Bit 1:0 – OQPSK_DATA_RATE
+//			00-> 250 O-QPSK Data Rate [kbit/s] && SUB_MODE ==1
+	control_tx = pal_trx_reg_read(TRX_CTRL_2);// 36 0010 0100
+	
 	irq=pal_trx_reg_read(IRQ);
 	if (register_value == PART_NUM_AT86RF212) 
  		escribir_linea_pc("Modulo RF:\tPASS\r\n");
