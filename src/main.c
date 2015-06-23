@@ -38,7 +38,7 @@ uint8_t status_AT86 = 0;
 uint8_t register_value = 0;
 uint8_t clock = 0;
 uint8_t transmition_power = 0;
-uint8_t pll = 0;
+uint8_t phy_cc = 0;
 uint8_t control_tx = 0;
 uint8_t irq= 0;
 usart_options_t usart_opt = {
@@ -548,7 +548,7 @@ int main (void)
 // Bit 3   –R/W- CLKM_SHA_SEL -> The register bit CLKM_SHA_SEL defines whether a new clock rate
 //			1-> CLKM clock rate change appears after SLEEP cycle
 // Bit 2:0 –R/W CLKM_CTRL -> These register bits set the clock rate of pin 17 (CLKM)
-//			1 -> 1 MHz <~~~~~~~~~~~ CAMBIAR ~~~~~~~~~~~
+//			1 -> 1 MHz <~~~~~~~~~~~ CAMBIAR ~~~~~~~~~~~ pag 121 tabla 7-30 poner a cero
 	clock = pal_trx_reg_read(TRX_CTRL_0);// 25  0001 1001
 //
 // PHY_TX_PWR (R/W) PAG 106
@@ -568,7 +568,7 @@ int main (void)
 //				01(1) -> “Energy above threshold”
 // Bit 4:0 -R/W- CHANNEL -> Channel Assignment according to IEEE 802.15.4-2003/2006 
 //				101(5) -> 914 Mhz
-	pll = pal_trx_reg_read(PHY_CC_CCA);//37  0010 0101
+	phy_cc = pal_trx_reg_read(PHY_CC_CCA);//37  0010 0101
 // 
 // TRX_CTRL_2  R/W
 // Bit 7 – RX_SAFE_MODE -> If this bit is set, Dynamic Frame Buffer Protection is enabled.

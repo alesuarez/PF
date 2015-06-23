@@ -43,24 +43,25 @@
 
 typedef struct
 {
-	uint8_t  phr;   /**< PHY header (frame length field). */
-	uint16_t fcf;   /**< Frame control field */
-	uint8_t  seq;   /**< Frame sequence number. */
-	uint16_t span;  /**< source PAN identifier */
-	uint16_t saddr; /**< source address */
-	char  data[5]; /**< Frame payload */
-	uint16_t crc;   /**< CRC16 field of the frame.  */	
-} app_frame_t;
+	uint8_t  	phr;   		/**< PHY header (frame length field). */
+	uint16_t 	fcf;   		/**< Frame control field */
+	uint8_t  	seq;   		/**< Frame sequence number. */
+	uint16_t 	span;  		/**< source PAN identifier */
+	uint16_t 	saddr; 		/**< source address */
+	char  		data[5]; 	/**< Frame payload */
+	uint16_t 	crc;   		/**< CRC16 field of the frame.  */	
+} 	app_frame_t;
 
 /** Alert to indicate something has gone wrong in the application */
-static void app_alert(void);
-void app_task(void);
+static 	void app_alert(void);
+void 	app_task(void);
 
-bool tx_ready_flag = 1;
-static uint8_t seq_num = 0;
-frame_info_t tx_frame_info;
-app_frame_t tx_frame, rx_frame;
-uint8_t msg[5] = "Hello";
+
+bool 			tx_ready_flag = 1;
+static 			uint8_t seq_num = 0;
+frame_info_t 	tx_frame_info;
+app_frame_t 	tx_frame, rx_frame;
+uint8_t 		msg[5] = "Hello";
 
 int main(void)
 {

@@ -1,0 +1,83 @@
+// notas de distintos registros usados
+
+//AT86RF212B
+//**************************************************
+// 0x03 TRX_CTRL_0
+//**************************************************
+// BIT7:6 - PAD_IO 
+//These register bits set the output driver current of digital output pads, except CLKM
+//
+// 0 - 2mA (hay que tratar de que sea la mas baja posible)
+// 1 - 4mA
+// 2 - 6mA
+// 3 - 8mA
+//
+// BIT5:4 – PAD_IO_CLKM
+// These register bits set the output driver current of pin CLKM
+//
+// 0 - 2mA (hay que tratar de que sea la mas baja posible)
+// 1 - 4mA
+// 2 - 6mA
+// 3 - 8mA
+//
+// Bit 3:0 – CLKM_SHA_SEL, CLKM_CTRL
+//
+// CLKM_SHA_SEL = 0 --> CLKM clock rate change appears immediately
+//
+// CLKM_CTRL = 5 	--> 16 MHz
+//
+//
+//************************************************
+//Register 0x08 (PHY_CC_CCA)
+//************************************************
+//
+//
+// Bit 7 – CCA_REQUEST
+// A manual CCA measurement is initiated by setting CCA_REQUEST = 1. The register bit is automatically cleared after requesting a CCA measurement with CCA_REQUEST = 1.
+//
+// Bit 6:5 – CCA_MODE
+// The CCA mode can be selected using register bits CCA_MODE
+/
+// Bit 4:0 – CHANNEL
+//
+// 0x05 -> 5 -> 914MHz
+//
+//************************************************
+// para leer el canal donde esta transmitiendo
+//************************************************
+//
+// AT86RF212::[ACTIVE]
+// ccband = trx_bit_read(SR_CC_BAND);
+// ASSERT(ccband==0);
+// channel = trx_bit_read(SR_CHANNEL);
+//
+//
+//	8.1  Frame Receive Procedure
+//
+// While being in state RX_ON or RX_AACK_ON, the radio transceiver searches for
+// incoming frames on the selected channel. Assuming the appropriate interrupts are
+// enabled, a detection of an IEEE 802.15.4-2006 compliant frame is indicated by interrupt
+// IRQ_2 (RX_START). When the frame reception is completed, interrupt IRQ_3
+// (TRX_END) is issued
+// 
+// 8.2 Frame Transmit Procedure
+// 
+// A frame transmission comprises of two actions, a Frame Buffer write access and the
+// transmission of the Frame Buffer content. Both actions can be run in parallel if required
+// by critical protocol timing.
+//
+//
+// --> Se podria haber puesto unos led para el control de tx nativa && consejos de reduccion de consumo <--
+//
+// The control of an external RF front-end is done via digital control pins DIG3/DIG4. The
+// function of this pin pair is enabled with register bit PA_EXT_EN (register 0x04,
+// TRX_CTRL_1). While the transmitter is turned off, pin 1 (DIG3) is set to low level and
+// pin 2 (DIG4) to high level. If the radio transceiver starts to transmit, the two pins change
+// the polarity. This differential pin pair can be used to control PA, LNA, and RF switches.
+// If the AT86RF212 is not in a receive or transmit state, it is recommended to disable
+// register bit PA_EXT_EN (register 0x04, TRX_CTRL_1) to reduce the power
+// consumption or avoid leakage current of external RF switches and other building
+// blocks, especially during SLEEP state. If register bits PA_EXT_EN = 0, output pins
+// DIG3/DIG4 are internally connected to analog ground
+//
+//
