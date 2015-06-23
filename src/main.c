@@ -588,8 +588,19 @@ int main (void)
 // Bit 1:0 – OQPSK_DATA_RATE
 //			00-> 250 O-QPSK Data Rate [kbit/s] && SUB_MODE ==1
 	control_tx = pal_trx_reg_read(TRX_CTRL_2);// 36 0010 0100
-	
-	irq=pal_trx_reg_read(IRQ);
+//
+// IRQ_MASK PAG 26 ->The IRQ_MASK register is used to enable or disable individual interrupts
+// Bit 3 - MASK_TRX_END -
+//         0-> disable ~~~~~~~~~~~~~~CAMBIAR a 1 ~~~~~~~~~~~~ 
+	irq=pal_trx_reg_read((IRQ_MASK);// 0000 0000
+//*******************************************************************************************************
+// funcion para escribir un registro en el AT86
+//
+	pal_trx_reg_write(IRQ_MASK, 8); // 1 en el bit 3
+//
+	irq=pal_trx_reg_read((IRQ_MASK);// (8) leo de nuevo el registro para ver si lo escribe correctamente
+//
+//*******************************************************************************************************
 	if (register_value == PART_NUM_AT86RF212) 
  		escribir_linea_pc("Modulo RF:\tPASS\r\n");
 	else
