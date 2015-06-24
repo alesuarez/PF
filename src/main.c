@@ -20,7 +20,7 @@
 #include "definiciones.h"
 #include "ASF/common/components/at86rf212.h"
 
-#define BUFFER_SIZE       (200)
+#define BUFFER_SIZE       (15)
 
 char cola_PC[tamano_cola];
 int cola_PC_nw = 0;
@@ -32,7 +32,7 @@ volatile avr32_tc_t *tc = EXAMPLE_TC;
 
 volatile uint8_t resolution = AT30TSE_CONFIG_RES_12_bit;
 
-static uint8_t tx_buffer[BUFFER_SIZE];
+static uint8_t tx_buffer[BUFFER_SIZE]="esto es un mensaje";
 
 uint8_t status_AT86 = 0;
 uint8_t register_value = 0;
@@ -41,6 +41,7 @@ uint8_t transmition_power = 0;
 uint8_t phy_cc = 0;
 uint8_t control_tx = 0;
 uint8_t irq= 0;
+uint8_t irq_status= 0;
 usart_options_t usart_opt = {
 	//! Baudrate is set in the conf_example_usart.h file.
 	.baudrate    = 9600,
@@ -372,10 +373,10 @@ void init_rf_pins(void)
 	//Configuracion de los pines para SPI
 	spi_init_pins();
 
-	//PIN para interrupcion externa RF
+	//PIN para interrupcion externa RF PA13-> IRQ2
 	gpio_configure_pin (AVR32_PIN_PA13, (GPIO_DIR_INPUT | GPIO_PULL_UP)); // PA13 IRQ2
 	gpio_enable_module_pin(AVR32_EIC_EXTINT_2_0_PIN, AVR32_EIC_EXTINT_2_0_FUNCTION); // Habilito interrupcion externa con este pin
-	//gpio_enable_pin_interrupt(AT86RFX_IRQ_PIN, GPIO_RISING_EDGE);
+//	gpio_enable_pin_interrupt(AT86RFX_IRQ_PIN, GPIO_RISING_EDGE);
 	gpio_clear_pin_interrupt_flag(AT86RFX_IRQ_PIN);
 
 // 	gpio_configure_pin(AT86RFX_RST_PIN, GPIO_DIR_OUTPUT | GPIO_INIT_HIGH);
@@ -482,64 +483,9 @@ void leer_temp(char* temps)
 	else
 		sprintf(temps,"%s","X");
 }
-
-
-int main (void)
+void iniciarAT86(void)
 {
-	char temps[10] = "\0";
-	int i=0;
-	
-	//board_init();
-	// configuracion del clock del sistema ver archivo "conf_clock.h"	
-	sysclk_init();	
-	
-	//Configuracion de los pines para los LEDS 
-	led_init_pins();
-
-	//Configuracion de los pines para el RS-232
-	rs_232_init_pins();
-	
-	//Configuracion pins para RF
-	init_rf_pins();
-	
-	//Inicializacion del SPI
-	spi_init_module();
-	
-	//Inicializacion de la USART	
-	int estado_rs_232 = rs_232_init_usart();
-
-		
-	//Inicializacion de las interrupciones
-	inicializar_interrupciones();
-	
-	// Inicializacion del timer
-	tc_init(tc);
-	
-	//Inicializacion Modulo RF (Depurar!)
-
-	/*if (at86rfx_init() != AT86RFX_SUCCESS) {
- 	 		escribir_linea_pc("Modulo RF:\tFAILED\r\n");
- 	 	}
- 		else
- 			escribir_linea_pc("Modulo RF:\tPASS\r\n");
- 	 */	
-	tx_buffer[0]="h";
-	tx_buffer[1]="0";
-	tx_buffer[2]="l";
-	tx_buffer[3]="a";
-	tx_buffer[4]="\0";
-	status_AT86=pal_trx_reg_read(TRX_STATUS);
-	while(i<400)
-	{
-		pal_trx_frame_write(tx_buffer,4);
-		
-		i++;
-	}
-	
-	
-	
-	register_value = pal_trx_reg_read(RG_PART_NUM);//pedido de identificacion del modulo. Debe devolver 0x07
-//
+	//
 // TRX_CTRL_0  PAG 120
 // Bit 7:6 -R/W– PAD_IO -> These register bits set the output driver current of digital output pads, except CLKM 
 //			00= 2mA (minima corriente)
@@ -550,6 +496,7 @@ int main (void)
 // Bit 2:0 –R/W CLKM_CTRL -> These register bits set the clock rate of pin 17 (CLKM)
 //			1 -> 1 MHz <~~~~~~~~~~~ CAMBIAR ~~~~~~~~~~~ pag 121 tabla 7-30 poner a cero
 	clock = pal_trx_reg_read(TRX_CTRL_0);// 25  0001 1001
+	pal_trx_reg_write(TRX_CTRL_0, 8); // 0000 1000
 //
 // PHY_TX_PWR (R/W) PAG 106
 // Bit 7 – PA_BOOST -> This bit enables the PA boost mode where the TX output power is increased by approximately 5 dB
@@ -592,15 +539,60 @@ int main (void)
 // IRQ_MASK PAG 26 ->The IRQ_MASK register is used to enable or disable individual interrupts
 // Bit 3 - MASK_TRX_END -
 //         0-> disable ~~~~~~~~~~~~~~CAMBIAR a 1 ~~~~~~~~~~~~ 
-	irq=pal_trx_reg_read((IRQ_MASK);// 0000 0000
+	irq=pal_trx_reg_read(IRQ_MASK);// 0000 0000
 //*******************************************************************************************************
 // funcion para escribir un registro en el AT86
 //
-	pal_trx_reg_write(IRQ_MASK, 8); // 1 en el bit 3
+	pal_trx_reg_write(IRQ_MASK, 255); // 1 en el bit 3
 //
 	irq=pal_trx_reg_read(IRQ_MASK);// (8) leo de nuevo el registro para ver si lo escribe correctamente
 //
 //*******************************************************************************************************
+	
+	status_AT86=pal_trx_reg_read(TRX_STATUS);
+}
+
+int main (void)
+{
+	char temps[10] = "\0";
+	int i=0;
+	
+	//board_init();
+	// configuracion del clock del sistema ver archivo "conf_clock.h"	
+	sysclk_init();	
+	
+	//Configuracion de los pines para los LEDS 
+	led_init_pins();
+
+	//Configuracion de los pines para el RS-232
+	rs_232_init_pins();
+	
+	//Configuracion pins para RF
+	init_rf_pins();
+	
+	//Inicializacion del SPI
+	spi_init_module();
+	
+	//Inicializacion de la USART	
+	int estado_rs_232 = rs_232_init_usart();
+
+		
+	//Inicializacion de las interrupciones
+	inicializar_interrupciones();
+	
+	// Inicializacion del timer
+	tc_init(tc);
+	
+	//Inicializacion Modulo RF (Depurar!)
+
+	/*if (at86rfx_init() != AT86RFX_SUCCESS) {
+ 	 		escribir_linea_pc("Modulo RF:\tFAILED\r\n");
+ 	 	}
+ 		else
+ 			escribir_linea_pc("Modulo RF:\tPASS\r\n");
+ 	 */	
+	register_value = pal_trx_reg_read(RG_PART_NUM);//pedido de identificacion del modulo. Debe devolver 0x07
+
 	if (register_value == PART_NUM_AT86RF212) 
  		escribir_linea_pc("Modulo RF:\tPASS\r\n");
 	else
@@ -611,7 +603,7 @@ int main (void)
 	
 	init_i2c_pins();
 	init_i2c_module();
-	
+	iniciarAT86();
 	//------------------Fin de conguracion
 	
 	escribir_linea_pc("TESIS TUCUMAN 2015\n\r");
@@ -620,8 +612,9 @@ int main (void)
 	
 	while(true)
 	{
-	
-	
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          	irq_status=pal_trx_reg_read(IRQ_STATUS);
+	at86rfx_tx_frame(tx_buffer);
+//	irq_status=pal_trx_reg_read(IRQ_STATUS);
 		
 		if (cola_PC_nr != cola_PC_nw )
 		{
@@ -639,6 +632,6 @@ int main (void)
 		
 		delay_ms(10);
 	}
+
 }
-	
 
