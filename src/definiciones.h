@@ -166,9 +166,7 @@ enum
 	CSMA_BE                 = 0x2f
 };
 
-
-
-
+// transceiver commands
 
 
 

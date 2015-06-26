@@ -117,6 +117,8 @@ __interrupt
 #endif
 
 // Manejo INTERRUPCION externa 2 (RF)
+
+// PA13/GPIO 13/GLOC-OUT[0]/GLOC-IN[7]/TC0-A0/SCIF-GCLK[2]/PWMA-PWMA[13]/CAT-SMP/EIC-EXTINT[2]/CAT-CSA[0]/XIN32_2
 static void eic_int_handler2(void)
 {
 		// Interrupt Line must be cleared to enable
@@ -551,7 +553,40 @@ void iniciarAT86(void)
 	
 	status_AT86=pal_trx_reg_read(TRX_STATUS);
 }
+void pal_trx_reg_write_addr(uint8_t addr,uint8_t mask)
+{
+	uint8_t aux;
+	aux=pal_trx_reg_read(addr);
+	aux|=mask;
+	pal_trx_reg_write(addr, aux);
+}
+/*
+void iniciarAT86RF212(void)
+{
+	resetAT86RF212();
+	pal_trx_reg_write(IRQ_MASK, 0); // deshabilitar interrupciones del AT86RF212 mientras lo configuro
+	pal_trx_reg_write_addr(TRX_STATE,CMD_FORCE_TRX_OFF); // forzar al AT86RF212 a estar en estado de off para configurar
+	while ((pal_trx_reg_read(TRX_STATUS)& 0x1F)!=ST_TRX_OFF); // espero al estado de off
+	pal_trx_reg_write_addr(IRQ_MASK,IRQ_RX_START);				// Seteo interrupcion para cuando reciba la trama
+	pal_trx_reg_write_addr(IRQ_MASK,IRQ_TRX_END);				// seteo interrupcion para cuando termine de tx
+	// set mode
+	// set channel
+	// seteo el tran en RX
+	// enable mcu intp pin
+    CFG_CHB_INTP_RISE_EDGE();
 
+    if (chb_get_state() != RX_STATE)
+    {
+    	// ERROR occurred initializing the radio. Print out error message.
+        char buf[50];
+
+        // grab the error message from flash & print it out
+        strcpy_P(buf, chb_err_init);
+       	escribir_linea_pc("ERROR Modulo RF %c \n",buf);
+    }
+}
+
+}*/
 int main (void)
 {
 	char temps[10] = "\0";
@@ -582,15 +617,16 @@ int main (void)
 	
 	// Inicializacion del timer
 	tc_init(tc);
-	
+	// inicializacion de AT86RF212
+	//while (trx_init()!=TRX_SUCCESS);
+	//at86rfx_init();
 	//Inicializacion Modulo RF (Depurar!)
 
-	/*if (at86rfx_init() != AT86RFX_SUCCESS) {
+	while (at86rfx_init() != AT86RFX_SUCCESS) {
  	 		escribir_linea_pc("Modulo RF:\tFAILED\r\n");
  	 	}
- 		else
- 			escribir_linea_pc("Modulo RF:\tPASS\r\n");
- 	 */	
+ 		escribir_linea_pc("Modulo RF:\tPASS\r\n");
+ 	 
 	register_value = pal_trx_reg_read(RG_PART_NUM);//pedido de identificacion del modulo. Debe devolver 0x07
 
 	if (register_value == PART_NUM_AT86RF212) 
@@ -603,7 +639,7 @@ int main (void)
 	
 	init_i2c_pins();
 	init_i2c_module();
-	iniciarAT86();
+	//iniciarAT86();
 	//------------------Fin de conguracion
 	
 	escribir_linea_pc("TESIS TUCUMAN 2015\n\r");
