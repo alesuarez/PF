@@ -581,7 +581,7 @@ void iniciarAT86RF212(void)
 	
 	pal_trx_reg_write(IRQ_MASK, 0); // deshabilitar interrupciones del AT86RF212 mientras lo configuro
 	pal_trx_reg_write(TRX_STATE,3); // forzar al AT86RF212 a estar en estado de off para configurar
-	algo2=pal_trx_reg_read(TRX_STATE);
+	
 	algo=pal_trx_reg_read(TRX_STATUS);
 	while ((pal_trx_reg_read(TRX_STATUS)& 0x1F)!= CMD_TRX_OFF); // espero al estado de off
 	pal_trx_reg_write(IRQ_MASK,12);
@@ -589,7 +589,8 @@ void iniciarAT86RF212(void)
 	//pal_trx_reg_write_addr(IRQ_MASK,IRQ_TRX_END);			// seteo interrupcion para cuando termine de tx
 	// set mode
 	// set channel
-	//pal_trx_reg_write(TRX_STATE,0x06);// seteo el tran en RX
+	pal_trx_reg_write(TRX_STATE,0x06);// seteo el tran en RX
+	algo2=pal_trx_reg_read(TRX_STATE);
 	//while ((pal_trx_reg_read(TRX_STATUS)& 0xF9)!=0xFF);
 	// enable mcu intp pin
    /* CFG_CHB_INTP_RISE_EDGE();
