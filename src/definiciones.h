@@ -167,7 +167,17 @@ enum
 };
 
 // transceiver commands
-
+enum
+{
+	IRQ_PLL_LOCK                = 0,
+	IRQ_PLL_UNLOCK              = 1,
+	IRQ_RX_START                = 2,
+	IRQ_TRX_END                 = 3,
+	IRQ_CCA_ED_READY            = 4,
+	IRQ_AMI                     = 5,
+	IRQ_TRX_UR                  = 6,
+	IRQ_BAT_LOW                 = 7
+};
 
 
 #endif /* DEFINICIONES_H_ */

@@ -42,6 +42,8 @@ uint8_t phy_cc = 0;
 uint8_t control_tx = 0;
 uint8_t irq= 0;
 uint8_t irq_status= 0;
+uint8_t algo=0;
+uint8_t algo2=0;
 usart_options_t usart_opt = {
 	//! Baudrate is set in the conf_example_usart.h file.
 	.baudrate    = 9600,
@@ -124,6 +126,8 @@ static void eic_int_handler2(void)
 		// Interrupt Line must be cleared to enable
 		eic_clear_interrupt_line(&AVR32_EIC, AVR32_EIC_INT2);
 		//IRQ2 Pin 26 MCU --> Pin 24 T
+		algo2=pal_trx_reg_read(IRQ_STATUS);
+		
 		
 }
 
@@ -498,7 +502,7 @@ void iniciarAT86(void)
 // Bit 2:0 –R/W CLKM_CTRL -> These register bits set the clock rate of pin 17 (CLKM)
 //			1 -> 1 MHz <~~~~~~~~~~~ CAMBIAR ~~~~~~~~~~~ pag 121 tabla 7-30 poner a cero
 	clock = pal_trx_reg_read(TRX_CTRL_0);// 25  0001 1001
-	pal_trx_reg_write(TRX_CTRL_0, 8); // 0000 1000
+	//pal_trx_reg_write(TRX_CTRL_0, 8); // 0000 1000
 //
 // PHY_TX_PWR (R/W) PAG 106
 // Bit 7 – PA_BOOST -> This bit enables the PA boost mode where the TX output power is increased by approximately 5 dB
@@ -545,7 +549,7 @@ void iniciarAT86(void)
 //*******************************************************************************************************
 // funcion para escribir un registro en el AT86
 //
-	pal_trx_reg_write(IRQ_MASK, 255); // 1 en el bit 3
+	//pal_trx_reg_write(IRQ_MASK, 255); // 1 en el bit 3
 //
 	irq=pal_trx_reg_read(IRQ_MASK);// (8) leo de nuevo el registro para ver si lo escribe correctamente
 //
@@ -559,21 +563,36 @@ void pal_trx_reg_write_addr(uint8_t addr,uint8_t mask)
 	aux=pal_trx_reg_read(addr);
 	aux|=mask;
 	pal_trx_reg_write(addr, aux);
+	aux=pal_trx_reg_read(addr);
 }
-/*
+
 void iniciarAT86RF212(void)
 {
-	resetAT86RF212();
+	RST_HIGH();
+	SLP_TR_LOW();
+
+	/* Wait typical time. */
+	DELAY_US(P_ON_TO_CLKM_AVAILABLE_TYP_US);
+
+	/* Apply reset pulse */
+	RST_LOW();
+	DELAY_US(RST_PULSE_WIDTH_US);
+	RST_HIGH();
+	
 	pal_trx_reg_write(IRQ_MASK, 0); // deshabilitar interrupciones del AT86RF212 mientras lo configuro
-	pal_trx_reg_write_addr(TRX_STATE,CMD_FORCE_TRX_OFF); // forzar al AT86RF212 a estar en estado de off para configurar
-	while ((pal_trx_reg_read(TRX_STATUS)& 0x1F)!=ST_TRX_OFF); // espero al estado de off
-	pal_trx_reg_write_addr(IRQ_MASK,IRQ_RX_START);				// Seteo interrupcion para cuando reciba la trama
-	pal_trx_reg_write_addr(IRQ_MASK,IRQ_TRX_END);				// seteo interrupcion para cuando termine de tx
+	pal_trx_reg_write(TRX_STATE,3); // forzar al AT86RF212 a estar en estado de off para configurar
+	algo2=pal_trx_reg_read(TRX_STATE);
+	algo=pal_trx_reg_read(TRX_STATUS);
+	while ((pal_trx_reg_read(TRX_STATUS)& 0x1F)!= CMD_TRX_OFF); // espero al estado de off
+	pal_trx_reg_write(IRQ_MASK,12);
+	//pal_trx_reg_write_addr(IRQ_MASK,IRQ_RX_START);				// Seteo interrupcion para cuando reciba la trama
+	//pal_trx_reg_write_addr(IRQ_MASK,IRQ_TRX_END);			// seteo interrupcion para cuando termine de tx
 	// set mode
 	// set channel
-	// seteo el tran en RX
+	//pal_trx_reg_write(TRX_STATE,0x06);// seteo el tran en RX
+	//while ((pal_trx_reg_read(TRX_STATUS)& 0xF9)!=0xFF);
 	// enable mcu intp pin
-    CFG_CHB_INTP_RISE_EDGE();
+   /* CFG_CHB_INTP_RISE_EDGE();
 
     if (chb_get_state() != RX_STATE)
     {
@@ -583,10 +602,10 @@ void iniciarAT86RF212(void)
         // grab the error message from flash & print it out
         strcpy_P(buf, chb_err_init);
        	escribir_linea_pc("ERROR Modulo RF %c \n",buf);
-    }
+    }*/
 }
 
-}*/
+
 int main (void)
 {
 	char temps[10] = "\0";
@@ -622,11 +641,13 @@ int main (void)
 	//at86rfx_init();
 	//Inicializacion Modulo RF (Depurar!)
 
-	while (at86rfx_init() != AT86RFX_SUCCESS) {
+	/*while (at86rfx_init() != AT86RFX_SUCCESS) {
  	 		escribir_linea_pc("Modulo RF:\tFAILED\r\n");
  	 	}
  		escribir_linea_pc("Modulo RF:\tPASS\r\n");
- 	 
+ 	 */
+	iniciarAT86RF212();
+	iniciarAT86();
 	register_value = pal_trx_reg_read(RG_PART_NUM);//pedido de identificacion del modulo. Debe devolver 0x07
 
 	if (register_value == PART_NUM_AT86RF212) 
@@ -651,7 +672,7 @@ int main (void)
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           	irq_status=pal_trx_reg_read(IRQ_STATUS);
 	at86rfx_tx_frame(tx_buffer);
 //	irq_status=pal_trx_reg_read(IRQ_STATUS);
-		
+		iniciarAT86();
 		if (cola_PC_nr != cola_PC_nw )
 		{
 			if (cola_PC[cola_PC_nr] == 't')
