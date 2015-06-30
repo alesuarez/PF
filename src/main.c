@@ -34,16 +34,17 @@ volatile uint8_t resolution = AT30TSE_CONFIG_RES_12_bit;
 
 static uint8_t tx_buffer[BUFFER_SIZE]="esto es un mensaje";
 
-uint8_t status_AT86 = 0;
+uint8_t TRX_STATUS = 0;
 uint8_t register_value = 0;
-uint8_t clock = 0;
-uint8_t transmition_power = 0;
-uint8_t phy_cc = 0;
-uint8_t control_tx = 0;
-uint8_t irq= 0;
+uint8_t TRX_CTRL_0 = 0;
+uint8_t PHY_TX_PWR = 0;
+uint8_t PHY_CC_CCA = 0;
+
+uint8_t IRQ_MASK= 0;
 uint8_t irq_status= 0;
 uint8_t algo=0;
 uint8_t algo2=0;
+uint8_t TRX_CTRL_2=0;
 usart_options_t usart_opt = {
 	//! Baudrate is set in the conf_example_usart.h file.
 	.baudrate    = 9600,
@@ -501,7 +502,7 @@ void iniciarAT86(void)
 //			1-> CLKM clock rate change appears after SLEEP cycle
 // Bit 2:0 –R/W CLKM_CTRL -> These register bits set the clock rate of pin 17 (CLKM)
 //			1 -> 1 MHz <~~~~~~~~~~~ CAMBIAR ~~~~~~~~~~~ pag 121 tabla 7-30 poner a cero
-	clock = pal_trx_reg_read(RG_TRX_CTRL_0);// 25  0001 1001
+	TRX_CTRL_0 = pal_trx_reg_read(RG_TRX_CTRL_0);// 25  0001 1001
 	//pal_trx_reg_write(TRX_CTRL_0, 8); // 0000 1000
 //
 // PHY_TX_PWR (R/W) PAG 106
@@ -511,7 +512,7 @@ void iniciarAT86(void)
 //			11(3) -> 0dB
 // Bit 4:0 – TX_PWR -> These register bits control the transmitter output power
 //			0000 -> ~~~~~~~~~~~~~~~~~VER~~~~~~~~~~~~~~~~~~~
-	transmition_power =pal_trx_reg_read(RG_PHY_TX_PWR);// 96 0110 0000
+	PHY_TX_PWR =pal_trx_reg_read(RG_PHY_TX_PWR);// 96 0110 0000
 //
 // PHY_CC_CCA PAG 125 -> contains register bits to set the channel center frequency according to channel page 0 of IEEE 802.15.4-2003/2006
 // Bit 7  -W-  CCA_REQUEST  A manual CCA measurement is initiated by setting CCA_REQUEST = 1. The register bit is automatically 
@@ -521,7 +522,7 @@ void iniciarAT86(void)
 //				01(1) -> “Energy above threshold”
 // Bit 4:0 -R/W- CHANNEL -> Channel Assignment according to IEEE 802.15.4-2003/2006 
 //				101(5) -> 914 Mhz
-	phy_cc = pal_trx_reg_read(RG_PHY_CC_CCA);//37  0010 0101
+	PHY_CC_CCA = pal_trx_reg_read(RG_PHY_CC_CCA);//37  0010 0101
 // 
 // TRX_CTRL_2  R/W
 // Bit 7 – RX_SAFE_MODE -> If this bit is set, Dynamic Frame Buffer Protection is enabled.
@@ -540,22 +541,22 @@ void iniciarAT86(void)
 //			1-> If set to 1 (reset value), the chip rate is 1000 kchip/s for BPSK_OQPSK = 1 and 600 kchip/s for BPSK_OQPSK = 0.
 // Bit 1:0 – OQPSK_DATA_RATE
 //			00-> 250 O-QPSK Data Rate [kbit/s] && SUB_MODE ==1
-	control_tx = pal_trx_reg_read(RG_TRX_CTRL_2);// 36 0010 0100
+	TRX_CTRL_2= pal_trx_reg_read(RG_TRX_CTRL_2);// 36 0010 0100
 //
 // IRQ_MASK PAG 26 ->The IRQ_MASK register is used to enable or disable individual interrupts
 // Bit 3 - MASK_TRX_END -
 //         0-> disable ~~~~~~~~~~~~~~CAMBIAR a 1 ~~~~~~~~~~~~ 
-	irq=pal_trx_reg_read(RG_IRQ_MASK);// 0000 0000
+	IRQ_MASK=pal_trx_reg_read(RG_IRQ_MASK);// 0000 0000
 //*******************************************************************************************************
 // funcion para escribir un registro en el AT86
 //
 	//pal_trx_reg_write(IRQ_MASK, 255); // 1 en el bit 3
 //
-	irq=pal_trx_reg_read(RG_IRQ_MASK);// (8) leo de nuevo el registro para ver si lo escribe correctamente
+	
 //
 //*******************************************************************************************************
 	
-	status_AT86=pal_trx_reg_read(RG_TRX_STATUS);
+	TRX_STATUS=pal_trx_reg_read(RG_TRX_STATUS);
 }
 void pal_trx_reg_write_addr(uint8_t addr,uint8_t mask)
 {
@@ -568,6 +569,7 @@ void pal_trx_reg_write_addr(uint8_t addr,uint8_t mask)
 
 void iniciarAT86RF212(void)
 {
+	uint8_t aux;
 	RST_HIGH();
 	SLP_TR_LOW();
 
@@ -582,17 +584,22 @@ void iniciarAT86RF212(void)
 	pal_trx_reg_write(RG_IRQ_MASK, CMD_NOP); // deshabilitar interrupciones del AT86RF212 mientras lo configuro
 	pal_trx_reg_write(RG_TRX_STATE,CMD_TRX_OFF); // off o force off -forzar al AT86RF212 a estar en estado de off para configurar
 	PAL_WAIT_1_US();
-		while ((pal_trx_reg_read(RG_TRX_STATUS)&0x1F)!= CMD_TRX_OFF); // espero al estado de off
+		while ((pal_trx_reg_read(RG_TRX_STATUS)&0x1F)!= CMD_TRX_OFF)// espero al estado de off
+		{
+			DELAY_US(300);
+			pal_trx_reg_write(RG_TRX_STATE,CMD_FORCE_TRX_OFF);
+		}
 	
-	pal_trx_reg_write(RG_IRQ_MASK,TRX_IRQ_TRX_END||TRX_IRQ_RX_START);  // IRQ_RX_START && IRQ_TRX_END
+	pal_trx_reg_write(RG_IRQ_MASK,0x0C);  // IRQ_RX_START && IRQ_TRX_END
 	// set mode
-	pal_trx_reg_write(RG_TRX_CTRL_0, PAD_CLKM_2_MA||CLKM_1MHZ); 
+	aux=PAD_CLKM_2_MA||CLKM_1MHZ;
+	pal_trx_reg_write(RG_TRX_CTRL_0, aux); 
 	
 	// set channel ->
-	//pal_trx_reg_write(RG_PHY_CC_CCA,||SR_SUB_MODE); // 914Mhz
+//	pal_trx_reg_write(RG_PHY_CC_CCA,||SR_SUB_MODE); // 914Mhz
 	PAL_WAIT_1_US();
 	pal_trx_reg_write(RG_TRX_STATE,CMD_RX_ON);// seteo el tran en RX
-	inicializar_interrupciones();// enable mcu intp pin
+	//interrupcions micro
    /* CFG_CHB_INTP_RISE_EDGE();
 
     if (chb_get_state() != RX_STATE)
@@ -605,6 +612,7 @@ void iniciarAT86RF212(void)
        	escribir_linea_pc("ERROR Modulo RF %c \n",buf);
     }*/
    while ((pal_trx_reg_read(RG_TRX_STATUS)&0x1F)!=CMD_RX_ON);
+   cpu_irq_enable();
 }
 
 
@@ -634,7 +642,7 @@ int main (void)
 
 		
 	//Inicializacion de las interrupciones
-	
+	inicializar_interrupciones();
 	
 	// Inicializacion del timer
 	tc_init(tc);
@@ -642,12 +650,11 @@ int main (void)
 	//while (trx_init()!=TRX_SUCCESS);
 	//at86rfx_init();
 	//Inicializacion Modulo RF (Depurar!)
-
 	/*while (at86rfx_init() != AT86RFX_SUCCESS) {
  	 		escribir_linea_pc("Modulo RF:\tFAILED\r\n");
  	 	}
- 		escribir_linea_pc("Modulo RF:\tPASS\r\n");
- 	 */
+ 		escribir_linea_pc("Modulo RF:\tPASS\r\n");*/
+ 	 inicializar_interrupciones();// enable mcu intp pin
 	iniciarAT86RF212();
 	iniciarAT86();
 	register_value = pal_trx_reg_read(RG_PART_NUM);//pedido de identificacion del modulo. Debe devolver 0x07
@@ -671,8 +678,9 @@ int main (void)
 	
 	while(true)
 	{
-	irq_status=pal_trx_reg_read(RG_IRQ_STATUS);
+	//irq_status=pal_trx_reg_read(RG_IRQ_STATUS);
 	at86rfx_tx_frame(tx_buffer);
+	//irq_status=pal_trx_reg_read(RG_IRQ_STATUS);
 //	irq_status=pal_trx_reg_read(IRQ_STATUS);
 		iniciarAT86();
 		if (cola_PC_nr != cola_PC_nw )

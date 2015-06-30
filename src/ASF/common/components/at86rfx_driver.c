@@ -227,7 +227,7 @@ void at86rfx_task(void)
 
 at86rfx_retval_t at86rfx_init(void)
 {
-	//pal_trx_init();
+	pal_trx_init();
 
 	if (tal_init() != TRX_SUCCESS) {
 		return AT86RFX_FAILURE;
