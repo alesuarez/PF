@@ -2,7 +2,7 @@
 
 //AT86RF212B
 //**************************************************
-// 0x03 TRX_CTRL_0
+// Register 0x03 (TRX_CTRL_0) -> 0x01 [PAD_IO=2mA,PAD_IO_CLKM=2mA,CLKM_SHA_SEL=0,CLKM_CTRL=(1)1Mhz]
 //**************************************************
 // BIT7:6 - PAD_IO 
 //These register bits set the output driver current of digital output pads, except CLKM
@@ -27,8 +27,15 @@
 // CLKM_CTRL = 5 	--> 16 MHz
 //
 //
+//
 //************************************************
-//Register 0x08 (PHY_CC_CCA)
+// Register 0x05 (PHY_TX_PWR) -> 0x60 [PA_BOOST=0,GC_PA=3(11)0db,TX_PWR=0]
+//************************************************
+//
+// falta reserch :)
+//
+//************************************************
+//Register 0x08 (PHY_CC_CCA) -> 0x25 [CCA_REQUEST=0,CCA_MODE=01,CHANNEL=0x05(914MHz)]
 //************************************************
 //
 //
@@ -41,6 +48,10 @@
 // Bit 4:0 – CHANNEL
 //
 // 0x05 -> 5 -> 914MHz
+//
+
+//
+//
 //
 //************************************************
 // para leer el canal donde esta transmitiendo
@@ -81,3 +92,11 @@
 // DIG3/DIG4 are internally connected to analog ground
 //
 //
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//	INTERRUPCIONES
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// If an interrupt is enabled, it is recommended to read the interrupt status register 0x0F
+// (IRQ_STATUS) first to clear the history (ONLY READ)

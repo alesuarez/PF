@@ -116,18 +116,27 @@
 
 
 
-// transceiver commands
-enum
-{
-	IRQ_PLL_LOCK                = 0,
-	IRQ_PLL_UNLOCK              = 1,
-	IRQ_RX_START                = 2,
-	IRQ_TRX_END                 = 3,
-	IRQ_CCA_ED_READY            = 4,
-	IRQ_AMI                     = 5,
-	IRQ_TRX_UR                  = 6,
-	IRQ_BAT_LOW                 = 7
+// radio statuses
+enum{
+	RADIO_SUCCESS = 0x40,                       /**< The requested service was performed successfully. */
+	RADIO_UNSUPPORTED_DEVICE,                   /**< The connected device is not an Atmel AT86RF212. */
+	RADIO_INVALID_ARGUMENT,                     /**< One or more of the supplied function arguments are invalid. */
+	RADIO_TIMED_OUT,                            /**< The requested service timed out. */
+	RADIO_WRONG_STATE,                          /**< The end-user tried to do an invalid state transition. */
+	RADIO_BUSY_STATE,                           /**< The radio transceiver is busy receiving or transmitting. */
+	RADIO_STATE_TRANSITION_FAILED,              /**< The requested state transition could not be completed. */
+	RADIO_CCA_IDLE,                             /**< Channel is clear, available to transmit a new frame. */
+	RADIO_CCA_BUSY,                             /**< Channel busy. */
+	RADIO_TRX_BUSY,                             /**< Transceiver is busy receiving or transmitting data. */
+	RADIO_BAT_LOW,                              /**< Measured battery voltage is lower than voltage threshold. */
+	RADIO_BAT_OK,                               /**< Measured battery voltage is above the voltage threshold. */
+	RADIO_CRC_FAILED,                           /**< The CRC failed for the actual frame. */
+	RADIO_CHANNEL_ACCESS_FAILURE,               /**< The channel access failed during the auto mode. */
+	RADIO_NO_ACK,                               /**< No acknowledge frame was received. */
 };
+// funciones
 
-
+void escribir_linea_pc (char*);
+static void inicializar_interrupciones();
+void spi_init_pins(void);
 #endif /* DEFINICIONES_H_ */

@@ -32,7 +32,7 @@ volatile avr32_tc_t *tc = EXAMPLE_TC;
 
 volatile uint8_t resolution = AT30TSE_CONFIG_RES_12_bit;
 
-static uint8_t tx_buffer[BUFFER_SIZE]="esto es un mensaje";
+uint8_t tx_buffer[5]="hola";
 
 uint8_t TRX_STATUS = 0;
 uint8_t register_value = 0;
@@ -45,6 +45,7 @@ uint8_t irq_status= 0;
 uint8_t algo=0;
 uint8_t algo2=0;
 uint8_t TRX_CTRL_2=0;
+uint8_t aux2=0;
 usart_options_t usart_opt = {
 	//! Baudrate is set in the conf_example_usart.h file.
 	.baudrate    = 9600,
@@ -558,9 +559,54 @@ void iniciarAT86(void)
 	
 	TRX_STATUS=pal_trx_reg_read(RG_TRX_STATUS);
 }
-uint8_t getState(void)
+uint8_t getStateAT86RF212(void)
 {
 	return pal_trx_reg_read(TRX_STATUS) & 0x1F;
+}
+void txTrama(uint8_t *hdr, uint8_t *data, uint8_t len)
+{
+	uint8_t state = getStateAT86RF212();
+	//pcb_t *pcb = chb_get_pcb();
+
+	if ((state == BUSY_TX) || (state == BUSY_TX_ARET))
+	{
+		return RADIO_WRONG_STATE;
+	}
+
+	// TODO: check why we need to transition to the off state before we go to tx_aret_on
+	pal_trx_reg_write(RG_TRX_STATE,CMD_TRX_OFF); // off o force off -forzar al AT86RF212 a estar en estado de off para configurar
+	PAL_WAIT_1_US();
+	while ((pal_trx_reg_read(RG_TRX_STATUS)&0x1F)!= CMD_TRX_OFF)// espero al estado de off
+	{
+		DELAY_US(300);
+		pal_trx_reg_write(RG_TRX_STATE,CMD_FORCE_TRX_OFF);
+	}
+	/////////
+	pal_trx_reg_write(RG_TRX_STATE,CMD_TX_ARET_ON); // off o force off -forzar al AT86RF212 a estar en estado de off para configurar
+	while ((pal_trx_reg_read(RG_TRX_STATUS)&0x1F)!=CMD_TX_ARET_ON)// espero al estado de off
+	{
+		DELAY_US(300);
+		pal_trx_reg_write(RG_TRX_STATE,CMD_TX_ARET_ON);
+	}
+	
+	/*chb_set_state(CHB_TX_ARET_ON);*/
+	/////////////////////////////////////
+	
+	// TODO: try and start the frame transmission by writing TX_START command instead of toggling
+	// sleep pin...i just feel like it's kind of weird...
+
+	// write frame to buffer. first write header into buffer (add 1 for len byte), then data.
+// 	chb_frame_write(hdr, CHB_HDR_SZ + 1, data, len); // -------------------------
+// 
+// 	//Do frame transmission.
+// 	pal_trx_reg_write(RG_TRX_STATE,CMD_TX_START);
+// 	
+// 	// wait for the transmission to end, signalled by the TRX END flag
+// 	while (!pcb->tx_end);
+// 	pcb->tx_end = false;
+// 
+// 	// check the status of the transmission
+// 	return chb_get_status();
 }
 void pal_trx_reg_write_addr(uint8_t addr,uint8_t mask)
 {
@@ -573,7 +619,7 @@ void pal_trx_reg_write_addr(uint8_t addr,uint8_t mask)
 
 void iniciarAT86RF212(void)
 {
-	uint8_t aux;
+	
 	RST_HIGH();
 	SLP_TR_LOW();
 
@@ -596,8 +642,8 @@ void iniciarAT86RF212(void)
 	
 	pal_trx_reg_write(RG_IRQ_MASK,0x0C);  // IRQ_RX_START && IRQ_TRX_END
 	// set mode
-	aux=PAD_CLKM_2_MA||CLKM_1MHZ;
-	pal_trx_reg_write(RG_TRX_CTRL_0, aux); 
+	//aux=PAD_CLKM_2_MA||CLKM_1MHZ;
+	//pal_trx_reg_write(RG_TRX_CTRL_0, aux); 
 	
 	// set channel ->
 //	pal_trx_reg_write(RG_PHY_CC_CCA,||SR_SUB_MODE); // 914Mhz
