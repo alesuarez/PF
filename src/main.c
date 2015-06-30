@@ -558,6 +558,10 @@ void iniciarAT86(void)
 	
 	TRX_STATUS=pal_trx_reg_read(RG_TRX_STATUS);
 }
+uint8_t getState(void)
+{
+	return pal_trx_reg_read(TRX_STATUS) & 0x1F;
+}
 void pal_trx_reg_write_addr(uint8_t addr,uint8_t mask)
 {
 	uint8_t aux;
