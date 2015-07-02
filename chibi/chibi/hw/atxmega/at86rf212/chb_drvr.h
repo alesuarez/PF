@@ -255,24 +255,7 @@ enum
 };
 
 // transceiver states
-enum
-{
-    CHB_P_ON               = 0,
-    CHB_BUSY_RX            = 1,
-    CHB_BUSY_TX            = 2,
-    CHB_RX_ON              = 6,
-    CHB_TRX_OFF            = 8,
-    CHB_PLL_ON             = 9,
-    CHB_SLEEP              = 15,
-    CHB_BUSY_RX_AACK       = 17,
-    CHB_BUSY_TX_ARET       = 18,
-    CHB_RX_AACK_ON         = 22,
-    CHB_TX_ARET_ON         = 25,
-    CHB_RX_ON_NOCLK        = 28,
-    CHB_RX_AACK_ON_NOCLK   = 29,
-    CHB_BUSY_RX_AACK_NOCLK = 30,
-    CHB_TRANS_IN_PROG      = 31
-};
+IRQ_RX_START
 
 // transceiver interrupt register
 enum 
