@@ -57,8 +57,7 @@
   .global _start
   .type _start, @function
 _start:
-  // Jump to the C runtime startup routine.
-  lda.w   pc, _stext
+  // Jump to the C runtime startup routine.  lda.w   pc, _stext
 
 
   // _stext is placed outside the .reset section so that the program entry point

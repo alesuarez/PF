@@ -46,6 +46,7 @@ uint8_t algo=0;
 uint8_t algo2=0;
 uint8_t TRX_CTRL_2=0;
 uint8_t aux2=0;
+static pcb_t pcb;
 usart_options_t usart_opt = {
 	//! Baudrate is set in the conf_example_usart.h file.
 	.baudrate    = 9600,
@@ -640,13 +641,12 @@ void iniciarAT86RF212(void)
 			pal_trx_reg_write(RG_TRX_STATE,CMD_FORCE_TRX_OFF);
 		}
 	
-	pal_trx_reg_write(RG_IRQ_MASK,0x0C);  // IRQ_RX_START && IRQ_TRX_END
-	// set mode
-	//aux=PAD_CLKM_2_MA||CLKM_1MHZ;
-	//pal_trx_reg_write(RG_TRX_CTRL_0, aux); 
+	
+	pal_trx_reg_write(RG_TRX_CTRL_0, CMD_NOP); 
 	
 	// set channel ->
 //	pal_trx_reg_write(RG_PHY_CC_CCA,||SR_SUB_MODE); // 914Mhz
+	pal_trx_reg_write(RG_IRQ_MASK,0x0C);  // IRQ_RX_START && IRQ_TRX_END
 	PAL_WAIT_1_US();
 	pal_trx_reg_write(RG_TRX_STATE,CMD_RX_ON);// seteo el tran en RX
 	//interrupcions micro
@@ -662,7 +662,7 @@ void iniciarAT86RF212(void)
        	escribir_linea_pc("ERROR Modulo RF %c \n",buf);
     }*/
    while ((pal_trx_reg_read(RG_TRX_STATUS)&0x1F)!=CMD_RX_ON);
-   cpu_irq_enable();
+  cpu_irq_enable();
 }
 
 
@@ -700,11 +700,11 @@ int main (void)
 	//while (trx_init()!=TRX_SUCCESS);
 	//at86rfx_init();
 	//Inicializacion Modulo RF (Depurar!)
-	/*while (at86rfx_init() != AT86RFX_SUCCESS) {
- 	 		escribir_linea_pc("Modulo RF:\tFAILED\r\n");
- 	 	}
- 		escribir_linea_pc("Modulo RF:\tPASS\r\n");*/
- 	 inicializar_interrupciones();// enable mcu intp pin
+// 	while (at86rfx_init() != AT86RFX_SUCCESS) {
+//  	 		escribir_linea_pc("Modulo RF:\tFAILED\r\n");
+//  	 	}
+//  		escribir_linea_pc("Modulo RF:\tPASS\r\n");
+ 
 	iniciarAT86RF212();
 	iniciarAT86();
 	register_value = pal_trx_reg_read(RG_PART_NUM);//pedido de identificacion del modulo. Debe devolver 0x07
@@ -729,26 +729,39 @@ int main (void)
 	while(true)
 	{
 	//irq_status=pal_trx_reg_read(RG_IRQ_STATUS);
-	at86rfx_tx_frame(tx_buffer);
+	//txTrama(0xff,tx_buffer,8);
+// 	if (getStateAT86RF212()==CMD_PLL_ON)
+// 	{
+		
+		at86rfx_tx_frame(tx_buffer);
+		pal_trx_reg_write(RG_TRX_STATE,CMD_TX_START);
+		while(getStateAT86RF212()!=CMD_TX_START);
+		pal_trx_reg_write(RG_TRX_STATE,CMD_RX_ON);
+	/*}*/
+// 	else
+// 	{
+		
+		//iniciarAT86();
+/*	}*/
 	//irq_status=pal_trx_reg_read(RG_IRQ_STATUS);
 //	irq_status=pal_trx_reg_read(IRQ_STATUS);
-		iniciarAT86();
-		if (cola_PC_nr != cola_PC_nw )
-		{
-			if (cola_PC[cola_PC_nr] == 't')
-			{
-				leer_temp(temps);
-				escribir_linea_pc("Temp: ");
-				escribir_linea_pc(temps);
-				escribir_linea_pc("*C\r\n");
-			}
-			cola_PC_nr++;
-			if (cola_PC_nr >= tamano_cola)
-				cola_PC_nr = 0;
-		}
-		
-		delay_ms(10);
-	}
+//		iniciarAT86();
+// 		if (cola_PC_nr != cola_PC_nw )
+// 		{
+// 			if (cola_PC[cola_PC_nr] == 't')
+// 			{
+// 				leer_temp(temps);
+// 				escribir_linea_pc("Temp: ");
+// 				escribir_linea_pc(temps);
+// 				escribir_linea_pc("*C\r\n");
+// 			}
+// 			cola_PC_nr++;
+// 			if (cola_PC_nr >= tamano_cola)
+// 				cola_PC_nr = 0;
+// 		}
+// 		
+// 		delay_ms(10);
+ 	}
 
 }
 

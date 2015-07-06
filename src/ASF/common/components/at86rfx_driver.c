@@ -227,7 +227,7 @@ void at86rfx_task(void)
 
 at86rfx_retval_t at86rfx_init(void)
 {
-	pal_trx_init();
+	//pal_trx_init();
 
 	if (tal_init() != TRX_SUCCESS) {
 		return AT86RFX_FAILURE;
@@ -280,6 +280,6 @@ void at86rfx_tx_frame(uint8_t * frame_tx)
 	 * - 2 octets FCS. Shall be added automatically
 	 */
 	pal_trx_frame_write(frame_tx, frame_tx[0] - LENGTH_FIELD_LEN);
-
+	
 	ENABLE_TRX_IRQ();
 }
