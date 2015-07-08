@@ -25,36 +25,47 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   ALLOC
  10 .comment      00000030  00000000  00000000  0000442e  2**0
                   CONTENTS, READONLY
- 11 .debug_aranges 000006c0  00000000  00000000  00004460  2**3
+ 11 .debug_aranges 000006c8  00000000  00000000  00004460  2**3
                   CONTENTS, READONLY, DEBUGGING
- 12 .debug_pubnames 00000ff9  00000000  00000000  00004b20  2**0
+ 12 .debug_pubnames 00001006  00000000  00000000  00004b28  2**0
                   CONTENTS, READONLY, DEBUGGING
- 13 .debug_info   00013f64  00000000  00000000  00005b19  2**0
+ 13 .debug_info   00013f7d  00000000  00000000  00005b2e  2**0
                   CONTENTS, READONLY, DEBUGGING
- 14 .debug_abbrev 00001fcf  00000000  00000000  00019a7d  2**0
+ 14 .debug_abbrev 00001fd9  00000000  00000000  00019aab  2**0
                   CONTENTS, READONLY, DEBUGGING
- 15 .debug_line   000074f4  00000000  00000000  0001ba4c  2**0
+ 15 .debug_line   00007510  00000000  00000000  0001ba84  2**0
                   CONTENTS, READONLY, DEBUGGING
- 16 .debug_frame  00000fb8  00000000  00000000  00022f40  2**2
+ 16 .debug_frame  00000fcc  00000000  00000000  00022f94  2**2
                   CONTENTS, READONLY, DEBUGGING
- 17 .debug_str    0000361a  00000000  00000000  00023ef8  2**0
+ 17 .debug_str    00003617  00000000  00000000  00023f60  2**0
                   CONTENTS, READONLY, DEBUGGING
- 18 .debug_loc    00002b9e  00000000  00000000  00027512  2**0
+ 18 .debug_loc    00002b96  00000000  00000000  00027577  2**0
                   CONTENTS, READONLY, DEBUGGING
- 19 .debug_macinfo 0084ac86  00000000  00000000  0002a0b0  2**0
+ 19 .debug_macinfo 0084ac86  00000000  00000000  0002a10d  2**0
                   CONTENTS, READONLY, DEBUGGING
  20 .stack        00001000  00003000  00003000  00000000  2**0
                   ALLOC
- 21 .debug_ranges 00000780  00000000  00000000  00874d36  2**0
+ 21 .debug_ranges 00000788  00000000  00000000  00874d93  2**0
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .reset:
 
 80000000 <_start>:
+
+  .global _trampoline
+  .type _trampoline, @function
+_trampoline:
+  // Jump to program start.
+  rjmp    program_start
 80000000:	e0 8f 10 00 	bral	80002000 <program_start>
 	...
 
 80002000 <program_start>:
+
+  .org  PROGRAM_START_OFFSET
+program_start:
+  // Jump to the C runtime startup routine.
+  lda.w   pc, _stext
 80002000:	fe cf f3 34 	sub	pc,pc,-3276
 
 Disassembly of section .text:
@@ -2715,7 +2726,18 @@ udata_clear_loop:
 80002d06:	d7 03       	nop
 
 80002d08 <switch_pll_on>:
+
+	return TRX_SUCCESS;
+}
+
+static void switch_pll_on(void)
+{
 80002d08:	eb cd 40 e0 	pushm	r5-r7,lr
+	trx_irq_reason_t irq_status;
+	uint8_t poll_counter = 0;
+
+	/* Check if trx is in TRX_OFF; only from PLL_ON the following procedure is applicable */
+	if (pal_trx_bit_read(SR_TRX_STATUS) != TRX_OFF) {
 80002d0c:	30 0a       	mov	r10,0
 80002d0e:	31 fb       	mov	r11,31
 80002d10:	30 1c       	mov	r12,1
@@ -2723,34 +2745,95 @@ udata_clear_loop:
 80002d16:	30 88       	mov	r8,8
 80002d18:	f0 0c 18 00 	cp.b	r12,r8
 80002d1c:	c2 a1       	brne	80002d70 <switch_pll_on+0x68>
+		Assert("Switch PLL_ON failed, because trx is not in TRX_OFF" ==
+				0);
+		return;
+	}
+
+	pal_trx_reg_read(RG_IRQ_STATUS);	/* clear PLL lock bit */
 80002d1e:	30 fc       	mov	r12,15
 80002d20:	f0 1f 00 16 	mcall	80002d78 <switch_pll_on+0x70>
+
+	/* Switch PLL on */
+	pal_trx_reg_write(RG_TRX_STATE, CMD_PLL_ON);
 80002d24:	30 9b       	mov	r11,9
 80002d26:	30 2c       	mov	r12,2
 80002d28:	f0 1f 00 15 	mcall	80002d7c <switch_pll_on+0x74>
 80002d2c:	30 07       	mov	r7,0
+
+	/* Check if PLL has been locked. */
+	do {
+		irq_status = (trx_irq_reason_t) pal_trx_reg_read(RG_IRQ_STATUS);
 80002d2e:	30 f5       	mov	r5,15
+
+		/* Wait a time interval of typical value for state change. */
+		DELAY_US(TRX_OFF_TO_PLL_ON_TIME_US);
+
+		poll_counter++;
+	} while (poll_counter < PLL_LOCK_ATTEMPTS);
 80002d30:	30 36       	mov	r6,3
+	/* Switch PLL on */
+	pal_trx_reg_write(RG_TRX_STATE, CMD_PLL_ON);
+
+	/* Check if PLL has been locked. */
+	do {
+		irq_status = (trx_irq_reason_t) pal_trx_reg_read(RG_IRQ_STATUS);
 80002d32:	0a 9c       	mov	r12,r5
 80002d34:	f0 1f 00 11 	mcall	80002d78 <switch_pll_on+0x70>
+
+		if (irq_status & TRX_IRQ_PLL_LOCK) {
 80002d38:	f9 dc c0 01 	bfextu	r12,r12,0x0,0x1
 80002d3c:	c1 a1       	brne	80002d70 <switch_pll_on+0x68>
+ * \param  delay:   (input) delay in CPU cycles before timeout.
+ * \param  cpu_time: (output) internal information used by the timer API.
+ */
+__always_inline static void cpu_set_timeout(unsigned long delay, t_cpu_time *cpu_time)
+{
+  cpu_time->delay_start_cycle = Get_system_register(AVR32_COUNT);
 80002d3e:	e1 b8 00 42 	mfsr	r8,0x108
+  cpu_time->delay_end_cycle   = cpu_time->delay_start_cycle + delay;
 80002d42:	f0 ca ff e9 	sub	r10,r8,-23
+ *
+ * \return true if timeout occurred, otherwise false.
+ */
+__always_inline static unsigned long cpu_is_timeout(t_cpu_time *cpu_time)
+{
+  unsigned long current_cycle_count = Get_system_register(AVR32_COUNT);
 80002d46:	e1 b9 00 42 	mfsr	r9,0x108
+  // Test if the timeout as already occurred.
+  else if (cpu_time->timer_state == CPU_TIMER_STATE_REACHED)
+    return true;
+
+  // If the ending cycle count of this timeout is wrapped, ...
+  else if (cpu_time->delay_start_cycle > cpu_time->delay_end_cycle)
 80002d4a:	14 38       	cp.w	r8,r10
 80002d4c:	e0 88 00 08 	brls	80002d5c <switch_pll_on+0x54>
+  {
+    if (current_cycle_count < cpu_time->delay_start_cycle && current_cycle_count > cpu_time->delay_end_cycle)
 80002d50:	12 38       	cp.w	r8,r9
 80002d52:	fe 98 ff fa 	brls	80002d46 <switch_pll_on+0x3e>
 80002d56:	12 3a       	cp.w	r10,r9
 80002d58:	c0 73       	brcs	80002d66 <switch_pll_on+0x5e>
 80002d5a:	cf 6b       	rjmp	80002d46 <switch_pll_on+0x3e>
+    }
+    return false;
+  }
+  else
+  {
+    if (current_cycle_count < cpu_time->delay_start_cycle || current_cycle_count > cpu_time->delay_end_cycle)
 80002d5c:	12 38       	cp.w	r8,r9
 80002d5e:	e0 8b 00 04 	brhi	80002d66 <switch_pll_on+0x5e>
 80002d62:	12 3a       	cp.w	r10,r9
 80002d64:	cf 12       	brcc	80002d46 <switch_pll_on+0x3e>
+		}
+
+		/* Wait a time interval of typical value for state change. */
+		DELAY_US(TRX_OFF_TO_PLL_ON_TIME_US);
+
+		poll_counter++;
 80002d66:	2f f7       	sub	r7,-1
 80002d68:	5c 57       	castu.b	r7
+	} while (poll_counter < PLL_LOCK_ATTEMPTS);
 80002d6a:	ec 07 18 00 	cp.b	r7,r6
 80002d6e:	ce 21       	brne	80002d32 <switch_pll_on+0x2a>
 80002d70:	e3 cd 80 e0 	ldm	sp++,r5-r7,pc
@@ -2762,14 +2845,27 @@ udata_clear_loop:
 80002d7e:	2f b0       	sub	r0,-5
 
 80002d80 <set_trx_state>:
+	/* The TRX_END interrupt of the transceiver is enabled. */
+	pal_trx_reg_write(RG_IRQ_MASK, TRX_IRQ_DEFAULT);
+}
+
+static tal_trx_status_t set_trx_state(trx_cmd_t trx_cmd)
+{
 80002d80:	eb cd 40 f8 	pushm	r3-r7,lr
 80002d84:	18 97       	mov	r7,r12
+	tal_trx_status = (tal_trx_status_t) pal_trx_bit_read(SR_TRX_STATUS);
 80002d86:	30 0a       	mov	r10,0
 80002d88:	31 fb       	mov	r11,31
 80002d8a:	30 1c       	mov	r12,1
 80002d8c:	f0 1f 00 4e 	mcall	80002ec4 <set_trx_state+0x144>
 80002d90:	4c e8       	lddpc	r8,80002ec8 <set_trx_state+0x148>
 80002d92:	b0 8c       	st.b	r8[0x0],r12
+	/*
+	 * State transition is handled among FORCE_TRX_OFF, RX_ON and PLL_ON.
+	 * These are the essential states required for a basic transmission
+	 * and reception.
+	 */
+	switch (trx_cmd) {	/* requested state */
 80002d94:	30 68       	mov	r8,6
 80002d96:	f0 07 18 00 	cp.b	r7,r8
 80002d9a:	c4 a0       	breq	80002e2e <set_trx_state+0xae>
@@ -2779,107 +2875,277 @@ udata_clear_loop:
 80002da4:	30 38       	mov	r8,3
 80002da6:	f0 07 18 00 	cp.b	r7,r8
 80002daa:	c7 d1       	brne	80002ea4 <set_trx_state+0x124>
+	case CMD_FORCE_TRX_OFF:
+		/* Handling FORCE_TRX_OFF state */
+		switch (tal_trx_status) {
 80002dac:	30 88       	mov	r8,8
 80002dae:	f0 0c 18 00 	cp.b	r12,r8
 80002db2:	c7 90       	breq	80002ea4 <set_trx_state+0x124>
+		case TRX_OFF:
+			/* Do nothing - maintain the previous state */
+			break;
+
+		default:
+			pal_trx_reg_write(RG_TRX_STATE, CMD_FORCE_TRX_OFF);
 80002db4:	30 3b       	mov	r11,3
 80002db6:	30 2c       	mov	r12,2
 80002db8:	f0 1f 00 45 	mcall	80002ecc <set_trx_state+0x14c>
+ * \param  delay:   (input) delay in CPU cycles before timeout.
+ * \param  cpu_time: (output) internal information used by the timer API.
+ */
+__always_inline static void cpu_set_timeout(unsigned long delay, t_cpu_time *cpu_time)
+{
+  cpu_time->delay_start_cycle = Get_system_register(AVR32_COUNT);
 80002dbc:	e1 b8 00 42 	mfsr	r8,0x108
+  cpu_time->delay_end_cycle   = cpu_time->delay_start_cycle + delay;
 80002dc0:	f0 ca ff ff 	sub	r10,r8,-1
+ *
+ * \return true if timeout occurred, otherwise false.
+ */
+__always_inline static unsigned long cpu_is_timeout(t_cpu_time *cpu_time)
+{
+  unsigned long current_cycle_count = Get_system_register(AVR32_COUNT);
 80002dc4:	e1 b9 00 42 	mfsr	r9,0x108
+  // Test if the timeout as already occurred.
+  else if (cpu_time->timer_state == CPU_TIMER_STATE_REACHED)
+    return true;
+
+  // If the ending cycle count of this timeout is wrapped, ...
+  else if (cpu_time->delay_start_cycle > cpu_time->delay_end_cycle)
 80002dc8:	14 38       	cp.w	r8,r10
 80002dca:	e0 88 00 08 	brls	80002dda <set_trx_state+0x5a>
+  {
+    if (current_cycle_count < cpu_time->delay_start_cycle && current_cycle_count > cpu_time->delay_end_cycle)
 80002dce:	12 38       	cp.w	r8,r9
 80002dd0:	fe 98 ff fa 	brls	80002dc4 <set_trx_state+0x44>
 80002dd4:	12 3a       	cp.w	r10,r9
 80002dd6:	c6 73       	brcs	80002ea4 <set_trx_state+0x124>
 80002dd8:	cf 6b       	rjmp	80002dc4 <set_trx_state+0x44>
+    }
+    return false;
+  }
+  else
+  {
+    if (current_cycle_count < cpu_time->delay_start_cycle || current_cycle_count > cpu_time->delay_end_cycle)
 80002dda:	12 38       	cp.w	r8,r9
 80002ddc:	e0 8b 00 64 	brhi	80002ea4 <set_trx_state+0x124>
 80002de0:	12 3a       	cp.w	r10,r9
 80002de2:	c6 13       	brcs	80002ea4 <set_trx_state+0x124>
 80002de4:	cf 0b       	rjmp	80002dc4 <set_trx_state+0x44>
+		}
+		break;
+
+	case CMD_PLL_ON:
+		/* Handling PLL_ON state */
+		switch (tal_trx_status) {
 80002de6:	30 68       	mov	r8,6
 80002de8:	f0 0c 18 00 	cp.b	r12,r8
 80002dec:	c0 80       	breq	80002dfc <set_trx_state+0x7c>
 80002dee:	30 88       	mov	r8,8
 80002df0:	f0 0c 18 00 	cp.b	r12,r8
 80002df4:	c5 81       	brne	80002ea4 <set_trx_state+0x124>
+		case PLL_ON:
+			/* Do nothing - maintain the previous state */
+			break;
+
+		case TRX_OFF:
+			switch_pll_on();
 80002df6:	f0 1f 00 37 	mcall	80002ed0 <set_trx_state+0x150>
+			break;
 80002dfa:	c5 58       	rjmp	80002ea4 <set_trx_state+0x124>
+
+		case RX_ON:
+			pal_trx_reg_write(RG_TRX_STATE, CMD_PLL_ON);
 80002dfc:	30 9b       	mov	r11,9
 80002dfe:	30 2c       	mov	r12,2
 80002e00:	f0 1f 00 33 	mcall	80002ecc <set_trx_state+0x14c>
+ * \param  delay:   (input) delay in CPU cycles before timeout.
+ * \param  cpu_time: (output) internal information used by the timer API.
+ */
+__always_inline static void cpu_set_timeout(unsigned long delay, t_cpu_time *cpu_time)
+{
+  cpu_time->delay_start_cycle = Get_system_register(AVR32_COUNT);
 80002e04:	e1 b8 00 42 	mfsr	r8,0x108
+  cpu_time->delay_end_cycle   = cpu_time->delay_start_cycle + delay;
 80002e08:	f0 ca ff ff 	sub	r10,r8,-1
+ *
+ * \return true if timeout occurred, otherwise false.
+ */
+__always_inline static unsigned long cpu_is_timeout(t_cpu_time *cpu_time)
+{
+  unsigned long current_cycle_count = Get_system_register(AVR32_COUNT);
 80002e0c:	e1 b9 00 42 	mfsr	r9,0x108
+  // Test if the timeout as already occurred.
+  else if (cpu_time->timer_state == CPU_TIMER_STATE_REACHED)
+    return true;
+
+  // If the ending cycle count of this timeout is wrapped, ...
+  else if (cpu_time->delay_start_cycle > cpu_time->delay_end_cycle)
 80002e10:	14 38       	cp.w	r8,r10
 80002e12:	e0 88 00 08 	brls	80002e22 <set_trx_state+0xa2>
+  {
+    if (current_cycle_count < cpu_time->delay_start_cycle && current_cycle_count > cpu_time->delay_end_cycle)
 80002e16:	12 38       	cp.w	r8,r9
 80002e18:	fe 98 ff fa 	brls	80002e0c <set_trx_state+0x8c>
 80002e1c:	12 3a       	cp.w	r10,r9
 80002e1e:	c4 33       	brcs	80002ea4 <set_trx_state+0x124>
 80002e20:	cf 6b       	rjmp	80002e0c <set_trx_state+0x8c>
+    }
+    return false;
+  }
+  else
+  {
+    if (current_cycle_count < cpu_time->delay_start_cycle || current_cycle_count > cpu_time->delay_end_cycle)
 80002e22:	12 38       	cp.w	r8,r9
 80002e24:	e0 8b 00 40 	brhi	80002ea4 <set_trx_state+0x124>
 80002e28:	12 3a       	cp.w	r10,r9
 80002e2a:	c3 d3       	brcs	80002ea4 <set_trx_state+0x124>
 80002e2c:	cf 0b       	rjmp	80002e0c <set_trx_state+0x8c>
+		}
+		break;
+
+	case CMD_RX_ON:
+		/* Handling the RX_ON state */
+		switch (tal_trx_status) {
 80002e2e:	30 88       	mov	r8,8
 80002e30:	f0 0c 18 00 	cp.b	r12,r8
 80002e34:	c1 e0       	breq	80002e70 <set_trx_state+0xf0>
 80002e36:	30 98       	mov	r8,9
 80002e38:	f0 0c 18 00 	cp.b	r12,r8
 80002e3c:	c3 41       	brne	80002ea4 <set_trx_state+0x124>
+		case RX_ON:
+			/* Do nothing - maintain the previous state */
+			break;
+
+		case PLL_ON:
+			pal_trx_reg_write(RG_TRX_STATE, CMD_RX_ON);
 80002e3e:	30 6b       	mov	r11,6
 80002e40:	30 2c       	mov	r12,2
 80002e42:	f0 1f 00 23 	mcall	80002ecc <set_trx_state+0x14c>
+ * \param  delay:   (input) delay in CPU cycles before timeout.
+ * \param  cpu_time: (output) internal information used by the timer API.
+ */
+__always_inline static void cpu_set_timeout(unsigned long delay, t_cpu_time *cpu_time)
+{
+  cpu_time->delay_start_cycle = Get_system_register(AVR32_COUNT);
 80002e46:	e1 b8 00 42 	mfsr	r8,0x108
+  cpu_time->delay_end_cycle   = cpu_time->delay_start_cycle + delay;
 80002e4a:	f0 ca ff ff 	sub	r10,r8,-1
+ *
+ * \return true if timeout occurred, otherwise false.
+ */
+__always_inline static unsigned long cpu_is_timeout(t_cpu_time *cpu_time)
+{
+  unsigned long current_cycle_count = Get_system_register(AVR32_COUNT);
 80002e4e:	e1 b9 00 42 	mfsr	r9,0x108
+  // Test if the timeout as already occurred.
+  else if (cpu_time->timer_state == CPU_TIMER_STATE_REACHED)
+    return true;
+
+  // If the ending cycle count of this timeout is wrapped, ...
+  else if (cpu_time->delay_start_cycle > cpu_time->delay_end_cycle)
 80002e52:	14 38       	cp.w	r8,r10
 80002e54:	e0 88 00 08 	brls	80002e64 <set_trx_state+0xe4>
+  {
+    if (current_cycle_count < cpu_time->delay_start_cycle && current_cycle_count > cpu_time->delay_end_cycle)
 80002e58:	12 38       	cp.w	r8,r9
 80002e5a:	fe 98 ff fa 	brls	80002e4e <set_trx_state+0xce>
 80002e5e:	12 3a       	cp.w	r10,r9
 80002e60:	c2 23       	brcs	80002ea4 <set_trx_state+0x124>
 80002e62:	cf 6b       	rjmp	80002e4e <set_trx_state+0xce>
+    }
+    return false;
+  }
+  else
+  {
+    if (current_cycle_count < cpu_time->delay_start_cycle || current_cycle_count > cpu_time->delay_end_cycle)
 80002e64:	12 38       	cp.w	r8,r9
 80002e66:	e0 8b 00 1f 	brhi	80002ea4 <set_trx_state+0x124>
 80002e6a:	12 3a       	cp.w	r10,r9
 80002e6c:	c1 c3       	brcs	80002ea4 <set_trx_state+0x124>
 80002e6e:	cf 0b       	rjmp	80002e4e <set_trx_state+0xce>
+			PAL_WAIT_1_US();
+			break;
+
+		case TRX_OFF:
+			switch_pll_on();
 80002e70:	f0 1f 00 18 	mcall	80002ed0 <set_trx_state+0x150>
+			pal_trx_reg_write(RG_TRX_STATE, CMD_RX_ON);
 80002e74:	30 6b       	mov	r11,6
 80002e76:	30 2c       	mov	r12,2
 80002e78:	f0 1f 00 15 	mcall	80002ecc <set_trx_state+0x14c>
+ * \param  delay:   (input) delay in CPU cycles before timeout.
+ * \param  cpu_time: (output) internal information used by the timer API.
+ */
+__always_inline static void cpu_set_timeout(unsigned long delay, t_cpu_time *cpu_time)
+{
+  cpu_time->delay_start_cycle = Get_system_register(AVR32_COUNT);
 80002e7c:	e1 b8 00 42 	mfsr	r8,0x108
+  cpu_time->delay_end_cycle   = cpu_time->delay_start_cycle + delay;
 80002e80:	f0 ca ff ff 	sub	r10,r8,-1
+ *
+ * \return true if timeout occurred, otherwise false.
+ */
+__always_inline static unsigned long cpu_is_timeout(t_cpu_time *cpu_time)
+{
+  unsigned long current_cycle_count = Get_system_register(AVR32_COUNT);
 80002e84:	e1 b9 00 42 	mfsr	r9,0x108
+  // Test if the timeout as already occurred.
+  else if (cpu_time->timer_state == CPU_TIMER_STATE_REACHED)
+    return true;
+
+  // If the ending cycle count of this timeout is wrapped, ...
+  else if (cpu_time->delay_start_cycle > cpu_time->delay_end_cycle)
 80002e88:	14 38       	cp.w	r8,r10
 80002e8a:	e0 88 00 08 	brls	80002e9a <set_trx_state+0x11a>
+  {
+    if (current_cycle_count < cpu_time->delay_start_cycle && current_cycle_count > cpu_time->delay_end_cycle)
 80002e8e:	12 38       	cp.w	r8,r9
 80002e90:	fe 98 ff fa 	brls	80002e84 <set_trx_state+0x104>
 80002e94:	12 3a       	cp.w	r10,r9
 80002e96:	c0 73       	brcs	80002ea4 <set_trx_state+0x124>
 80002e98:	cf 6b       	rjmp	80002e84 <set_trx_state+0x104>
+    }
+    return false;
+  }
+  else
+  {
+    if (current_cycle_count < cpu_time->delay_start_cycle || current_cycle_count > cpu_time->delay_end_cycle)
 80002e9a:	12 38       	cp.w	r8,r9
 80002e9c:	e0 8b 00 04 	brhi	80002ea4 <set_trx_state+0x124>
 80002ea0:	12 3a       	cp.w	r10,r9
 80002ea2:	cf 12       	brcc	80002e84 <set_trx_state+0x104>
+		break;
+	}
+
+	/* Hold till the state transition is complete */
+	do {
+		tal_trx_status = (tal_trx_status_t)
 80002ea4:	30 06       	mov	r6,0
 80002ea6:	31 f5       	mov	r5,31
 80002ea8:	30 14       	mov	r4,1
 80002eaa:	48 83       	lddpc	r3,80002ec8 <set_trx_state+0x148>
+				pal_trx_bit_read(SR_TRX_STATUS);
+	} while (tal_trx_status == STATE_TRANSITION_IN_PROGRESS);
 80002eac:	31 f7       	mov	r7,31
+		break;
+	}
+
+	/* Hold till the state transition is complete */
+	do {
+		tal_trx_status = (tal_trx_status_t)
 80002eae:	0c 9a       	mov	r10,r6
 80002eb0:	0a 9b       	mov	r11,r5
 80002eb2:	08 9c       	mov	r12,r4
 80002eb4:	f0 1f 00 04 	mcall	80002ec4 <set_trx_state+0x144>
 80002eb8:	a6 8c       	st.b	r3[0x0],r12
+				pal_trx_bit_read(SR_TRX_STATUS);
+	} while (tal_trx_status == STATE_TRANSITION_IN_PROGRESS);
 80002eba:	ee 0c 18 00 	cp.b	r12,r7
 80002ebe:	cf 80       	breq	80002eae <set_trx_state+0x12e>
+
+	return tal_trx_status;
+}
 80002ec0:	e3 cd 80 f8 	ldm	sp++,r3-r7,pc
 80002ec4:	80 00       	ld.sh	r0,r0[0x0]
 80002ec6:	30 90       	mov	r0,9
@@ -2891,22 +3157,49 @@ udata_clear_loop:
 80002ed2:	2d 08       	sub	r8,-48
 
 80002ed4 <tx_frame_config>:
+	 */
+	set_trx_state(CMD_RX_ON);
+}
+
+void tx_frame_config(void)
+{
 80002ed4:	eb cd 40 c0 	pushm	r6-r7,lr
+	tal_trx_status_t trx_status;
+
+	/* Set trx to PLL_ON state to initiate transmission procedure */
+	do {
+		trx_status = set_trx_state(CMD_PLL_ON);
 80002ed8:	30 96       	mov	r6,9
+	} while (trx_status != PLL_ON);
 80002eda:	30 97       	mov	r7,9
+{
+	tal_trx_status_t trx_status;
+
+	/* Set trx to PLL_ON state to initiate transmission procedure */
+	do {
+		trx_status = set_trx_state(CMD_PLL_ON);
 80002edc:	0c 9c       	mov	r12,r6
 80002ede:	f0 1f 00 0a 	mcall	80002f04 <tx_frame_config+0x30>
+	} while (trx_status != PLL_ON);
 80002ee2:	ee 0c 18 00 	cp.b	r12,r7
 80002ee6:	cf b1       	brne	80002edc <tx_frame_config+0x8>
+
+	tal_state = TAL_TX_AUTO;
 80002ee8:	30 19       	mov	r9,1
 80002eea:	48 88       	lddpc	r8,80002f08 <tx_frame_config+0x34>
 80002eec:	b0 89       	st.b	r8[0x0],r9
+
+	/* Toggle the SLP_TR pin triggering transmission. */
+	SLP_TR_HIGH();
 80002eee:	31 3c       	mov	r12,19
 80002ef0:	f0 1f 00 07 	mcall	80002f0c <tx_frame_config+0x38>
+	WAIT_65_NS();
 80002ef4:	d7 03       	nop
 80002ef6:	d7 03       	nop
+	SLP_TR_LOW();
 80002ef8:	31 3c       	mov	r12,19
 80002efa:	f0 1f 00 06 	mcall	80002f10 <tx_frame_config+0x3c>
+}
 80002efe:	e3 cd 80 c0 	ldm	sp++,r6-r7,pc
 80002f02:	00 00       	add	r0,r0
 80002f04:	80 00       	ld.sh	r0,r0[0x0]
@@ -3519,9 +3812,9 @@ void iniciarAT86(void)
 {
 80003194:	d4 01       	pushm	lr
 //			01=4mA (minima corriente) <~~~~~~~~~~~ CAMBIAR ~~~~~~~~~~~
-// Bit 3   –R/W- CLKM_SHA_SEL -> The register bit CLKM_SHA_SEL defines whether a new clock rate
+// Bit 3   â€“R/W- CLKM_SHA_SEL -> The register bit CLKM_SHA_SEL defines whether a new clock rate
 //			1-> CLKM clock rate change appears after SLEEP cycle
-// Bit 2:0 –R/W CLKM_CTRL -> These register bits set the clock rate of pin 17 (CLKM)
+// Bit 2:0 â€“R/W CLKM_CTRL -> These register bits set the clock rate of pin 17 (CLKM)
 //			1 -> 1 MHz <~~~~~~~~~~~ CAMBIAR ~~~~~~~~~~~ pag 121 tabla 7-30 poner a cero
 	TRX_CTRL_0 = pal_trx_reg_read(RG_TRX_CTRL_0);// 25  0001 1001
 80003196:	30 3c       	mov	r12,3
@@ -3529,9 +3822,9 @@ void iniciarAT86(void)
 8000319c:	48 f8       	lddpc	r8,800031d8 <iniciarAT86+0x44>
 8000319e:	b0 8c       	st.b	r8[0x0],r12
 //			0 -> the PA linearity is decreased compared to the normal mode
-// Bit 6:5 – GC_PA  -> These register bits control the gain of the PA by changing its bias current.
+// Bit 6:5 â€“ GC_PA  -> These register bits control the gain of the PA by changing its bias current.
 //			11(3) -> 0dB
-// Bit 4:0 – TX_PWR -> These register bits control the transmitter output power
+// Bit 4:0 â€“ TX_PWR -> These register bits control the transmitter output power
 //			0000 -> ~~~~~~~~~~~~~~~~~VER~~~~~~~~~~~~~~~~~~~
 	PHY_TX_PWR =pal_trx_reg_read(RG_PHY_TX_PWR);// 96 0110 0000
 800031a0:	30 5c       	mov	r12,5
@@ -3540,7 +3833,7 @@ void iniciarAT86(void)
 800031a8:	b0 8c       	st.b	r8[0x0],r12
 //				0->
 // Bit 6:5 -R/W- CCA_MODE The CCA mode can be selected using register bits CCA_MODE.
-//				01(1) -> “Energy above threshold”
+//				01(1) -> â€œEnergy above thresholdâ€
 // Bit 4:0 -R/W- CHANNEL -> Channel Assignment according to IEEE 802.15.4-2003/2006 
 //				101(5) -> 914 Mhz
 	PHY_CC_CCA = pal_trx_reg_read(RG_PHY_CC_CCA);//37  0010 0101
@@ -3549,9 +3842,9 @@ void iniciarAT86(void)
 800031b0:	48 c8       	lddpc	r8,800031e0 <iniciarAT86+0x4c>
 800031b2:	b0 8c       	st.b	r8[0x0],r12
 //			0-> If set to 0 (reset value), BPSK transmission and reception is applied
-// Bit 2 – SUB_MODE
+// Bit 2 â€“ SUB_MODE
 //			1-> If set to 1 (reset value), the chip rate is 1000 kchip/s for BPSK_OQPSK = 1 and 600 kchip/s for BPSK_OQPSK = 0.
-// Bit 1:0 – OQPSK_DATA_RATE
+// Bit 1:0 â€“ OQPSK_DATA_RATE
 //			00-> 250 O-QPSK Data Rate [kbit/s] && SUB_MODE ==1
 	TRX_CTRL_2= pal_trx_reg_read(RG_TRX_CTRL_2);// 36 0010 0100
 800031b4:	30 cc       	mov	r12,12
