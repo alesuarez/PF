@@ -116,7 +116,6 @@
 
 /* definiciones */
 
-#define TIME_ALL_STATES_TRX_OFF 1
 
 // radio statuses
 enum{

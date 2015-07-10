@@ -617,7 +617,7 @@ uint8_t setState(uint8_t state)
 		if (curr_state == TX_ARET_ON)
 		{
 			/* First do intermediate state transition to RX_ON, then to RX_AACK_ON. */
-			reg_read_mod_write(TRX_STATE, CMD_PLL_ON, 0x1f);
+			reg_read_mod_write(RG_TRX_STATE, CMD_PLL_ON, 0x1f);
 			DELAY_US(TIME_ALL_STATES_TRX_OFF); // 
 		}
 		break;
@@ -636,7 +636,6 @@ uint8_t setState(uint8_t state)
 		return RADIO_SUCCESS;
 	}
 	return RADIO_TIMED_OUT;
-}
 }
 uint8_t txTrama(uint8_t *data)
 {

@@ -25,36 +25,47 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   ALLOC
  10 .comment      00000030  00000000  00000000  0000402e  2**0
                   CONTENTS, READONLY
- 11 .debug_aranges 00000680  00000000  00000000  00004060  2**3
+ 11 .debug_aranges 00000688  00000000  00000000  00004060  2**3
                   CONTENTS, READONLY, DEBUGGING
- 12 .debug_pubnames 00000fb2  00000000  00000000  000046e0  2**0
+ 12 .debug_pubnames 00000fc9  00000000  00000000  000046e8  2**0
                   CONTENTS, READONLY, DEBUGGING
- 13 .debug_info   000134b5  00000000  00000000  00005692  2**0
+ 13 .debug_info   00013782  00000000  00000000  000056b1  2**0
                   CONTENTS, READONLY, DEBUGGING
- 14 .debug_abbrev 00001d02  00000000  00000000  00018b47  2**0
+ 14 .debug_abbrev 00001d05  00000000  00000000  00018e33  2**0
                   CONTENTS, READONLY, DEBUGGING
- 15 .debug_line   00006a95  00000000  00000000  0001a849  2**0
+ 15 .debug_line   00006b18  00000000  00000000  0001ab38  2**0
                   CONTENTS, READONLY, DEBUGGING
- 16 .debug_frame  00000ef4  00000000  00000000  000212e0  2**2
+ 16 .debug_frame  00000f28  00000000  00000000  00021650  2**2
                   CONTENTS, READONLY, DEBUGGING
- 17 .debug_str    00003314  00000000  00000000  000221d4  2**0
+ 17 .debug_str    0000347e  00000000  00000000  00022578  2**0
                   CONTENTS, READONLY, DEBUGGING
- 18 .debug_loc    0000285c  00000000  00000000  000254e8  2**0
+ 18 .debug_loc    000029be  00000000  00000000  000259f6  2**0
                   CONTENTS, READONLY, DEBUGGING
- 19 .debug_macinfo 00797133  00000000  00000000  00027d44  2**0
+ 19 .debug_macinfo 00797133  00000000  00000000  000283b4  2**0
                   CONTENTS, READONLY, DEBUGGING
  20 .stack        00001000  00003000  00003000  00000000  2**0
                   ALLOC
- 21 .debug_ranges 00000640  00000000  00000000  007bee77  2**0
+ 21 .debug_ranges 00000648  00000000  00000000  007bf4e7  2**0
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .reset:
 
 80000000 <_start>:
+
+  .global _trampoline
+  .type _trampoline, @function
+_trampoline:
+  // Jump to program start.
+  rjmp    program_start
 80000000:	e0 8f 10 00 	bral	80002000 <program_start>
 	...
 
 80002000 <program_start>:
+
+  .org  PROGRAM_START_OFFSET
+program_start:
+  // Jump to the C runtime startup routine.
+  lda.w   pc, _stext
 80002000:	fe cf f2 fc 	sub	pc,pc,-3332
 
 Disassembly of section .text:
@@ -3368,7 +3379,7 @@ void iniciarAT86(void)
 80002fb4:	00 00       	add	r0,r0
 80002fb6:	01 3e       	ld.ub	lr,r0++
 80002fb8:	00 00       	add	r0,r0
-80002fba:	01 41       	ld.w	r1,--r0
+80002fba:	01 40       	ld.w	r0,--r0
 80002fbc:	00 00       	add	r0,r0
 80002fbe:	01 3f       	ld.ub	pc,r0++
 
@@ -3453,7 +3464,7 @@ static void tc_irq(void)
 80003024:	80 00       	ld.sh	r0,r0[0x0]
 80003026:	29 da       	sub	r10,-99
 80003028:	00 00       	add	r0,r0
-8000302a:	00 24       	rsub	r4,r0
+8000302a:	00 18       	sub	r8,r0
 8000302c:	80 00       	ld.sh	r0,r0[0x0]
 8000302e:	25 c8       	sub	r8,92
 
@@ -3490,9 +3501,9 @@ static void eic_int_handler2(void)
 80003054:	80 00       	ld.sh	r0,r0[0x0]
 80003056:	2e 10       	sub	r0,-31
 80003058:	00 00       	add	r0,r0
-8000305a:	01 40       	ld.w	r0,--r0
+8000305a:	01 36       	ld.ub	r6,r0++
 8000305c:	00 00       	add	r0,r0
-8000305e:	01 42       	ld.w	r2,--r0
+8000305e:	01 41       	ld.w	r1,--r0
 
 80003060 <usart_int_handler_RS232>:
 #endif
@@ -3558,7 +3569,7 @@ static void usart_int_handler_RS232(void)
 800030ac:	d4 02       	popm	lr
 800030ae:	d6 03       	rete
 800030b0:	00 00       	add	r0,r0
-800030b2:	00 20       	rsub	r0,r0
+800030b2:	00 14       	sub	r4,r0
 800030b4:	80 00       	ld.sh	r0,r0[0x0]
 800030b6:	29 c8       	sub	r8,-100
 800030b8:	80 00       	ld.sh	r0,r0[0x0]
@@ -3917,9 +3928,9 @@ __always_inline static void cpu_set_timeout(unsigned long delay, t_cpu_time *cpu
 80003232:	2d a4       	sub	r4,-38
 
 80003234 <txTrama>:
-bool setState(uint8_t state)
-{
-	return false;
+		return RADIO_SUCCESS;
+	}
+	return RADIO_TIMED_OUT;
 }
 uint8_t txTrama(uint8_t *data)
 {
@@ -4233,7 +4244,7 @@ __always_inline static unsigned long cpu_is_timeout(t_cpu_time *cpu_time)
 8000338c:	80 00       	ld.sh	r0,r0[0x0]
 8000338e:	2f 4c       	sub	r12,-12
 80003390:	00 00       	add	r0,r0
-80003392:	01 42       	ld.w	r2,--r0
+80003392:	01 41       	ld.w	r1,--r0
 80003394:	80 00       	ld.sh	r0,r0[0x0]
 80003396:	26 54       	sub	r4,101
 80003398:	80 00       	ld.sh	r0,r0[0x0]
@@ -4290,7 +4301,7 @@ int rs_232_init_usart()
 800033d0:	80 00       	ld.sh	r0,r0[0x0]
 800033d2:	33 a8       	mov	r8,58
 800033d4:	00 00       	add	r0,r0
-800033d6:	00 0c       	add	r12,r0
+800033d6:	00 1c       	sub	r12,r0
 800033d8:	80 00       	ld.sh	r0,r0[0x0]
 800033da:	2c 38       	sub	r8,-61
 
@@ -4327,7 +4338,7 @@ void rs_232_init_pins(void)
 800033fc:	d8 02       	popm	pc
 800033fe:	00 00       	add	r0,r0
 80003400:	80 00       	ld.sh	r0,r0[0x0]
-80003402:	3b 18       	mov	r8,-79
+80003402:	3b 2c       	mov	r12,-78
 80003404:	80 00       	ld.sh	r0,r0[0x0]
 80003406:	24 7c       	sub	r12,71
 
@@ -4365,7 +4376,7 @@ void init_i2c_pins(void)
 80003428:	d8 02       	popm	pc
 8000342a:	00 00       	add	r0,r0
 8000342c:	80 00       	ld.sh	r0,r0[0x0]
-8000342e:	3b f8       	mov	r8,-65
+8000342e:	3b d8       	mov	r8,-67
 80003430:	80 00       	ld.sh	r0,r0[0x0]
 80003432:	24 7c       	sub	r12,71
 
@@ -4412,7 +4423,7 @@ void spi_init_pins(void)
 80003468:	2f 8d       	sub	sp,-32
 8000346a:	d8 02       	popm	pc
 8000346c:	80 00       	ld.sh	r0,r0[0x0]
-8000346e:	3b 30       	mov	r0,-77
+8000346e:	3b e8       	mov	r8,-66
 80003470:	80 00       	ld.sh	r0,r0[0x0]
 80003472:	24 7c       	sub	r12,71
 
@@ -4563,11 +4574,11 @@ static inline void sysclk_enable_pba_module(unsigned int index)
 8000351c:	80 00       	ld.sh	r0,r0[0x0]
 8000351e:	22 30       	sub	r0,35
 80003520:	80 00       	ld.sh	r0,r0[0x0]
-80003522:	3b 5c       	mov	r12,-75
+80003522:	3b 48       	mov	r8,-76
 80003524:	80 00       	ld.sh	r0,r0[0x0]
 80003526:	34 c4       	mov	r4,76
 80003528:	80 00       	ld.sh	r0,r0[0x0]
-8000352a:	3b 70       	mov	r0,-73
+8000352a:	3b 5c       	mov	r12,-75
 
 8000352c <spi_init_module>:
 	};
@@ -4697,7 +4708,7 @@ static inline void spi_set_delay(volatile avr32_spi_t *spi, uint8_t delay)
 800035ba:	e3 cd 80 e0 	ldm	sp++,r5-r7,pc
 800035be:	00 00       	add	r0,r0
 800035c0:	80 00       	ld.sh	r0,r0[0x0]
-800035c2:	3b e4       	mov	r4,-66
+800035c2:	3b 18       	mov	r8,-79
 800035c4:	80 00       	ld.sh	r0,r0[0x0]
 800035c6:	2e 94       	sub	r4,-23
 800035c8:	80 00       	ld.sh	r0,r0[0x0]
@@ -5005,15 +5016,15 @@ __always_inline static unsigned long cpu_is_timeout(t_cpu_time *cpu_time)
 80003740:	80 00       	ld.sh	r0,r0[0x0]
 80003742:	23 c2       	sub	r2,60
 80003744:	00 00       	add	r0,r0
-80003746:	00 20       	rsub	r0,r0
+80003746:	00 14       	sub	r4,r0
 80003748:	80 00       	ld.sh	r0,r0[0x0]
-8000374a:	3b 28       	mov	r8,-78
+8000374a:	3b d0       	mov	r0,-67
 8000374c:	80 00       	ld.sh	r0,r0[0x0]
 8000374e:	29 1a       	sub	r10,-111
 80003750:	80 00       	ld.sh	r0,r0[0x0]
 80003752:	29 ec       	sub	r12,-98
 80003754:	80 00       	ld.sh	r0,r0[0x0]
-80003756:	3b f4       	mov	r4,-65
+80003756:	3b 28       	mov	r8,-78
 80003758:	80 00       	ld.sh	r0,r0[0x0]
 8000375a:	2a 20       	sub	r0,-94
 8000375c:	80 00       	ld.sh	r0,r0[0x0]
@@ -5027,23 +5038,23 @@ __always_inline static unsigned long cpu_is_timeout(t_cpu_time *cpu_time)
 8000376c:	00 00       	add	r0,r0
 8000376e:	01 35       	ld.ub	r5,r0++
 80003770:	80 00       	ld.sh	r0,r0[0x0]
-80003772:	3b 88       	mov	r8,-72
+80003772:	3b 74       	mov	r4,-73
 80003774:	80 00       	ld.sh	r0,r0[0x0]
 80003776:	34 c4       	mov	r4,76
 80003778:	80 00       	ld.sh	r0,r0[0x0]
-8000377a:	3b 9c       	mov	r12,-71
+8000377a:	3b 88       	mov	r8,-72
 8000377c:	80 00       	ld.sh	r0,r0[0x0]
 8000377e:	34 08       	mov	r8,64
 80003780:	80 00       	ld.sh	r0,r0[0x0]
 80003782:	34 d8       	mov	r8,77
 80003784:	80 00       	ld.sh	r0,r0[0x0]
-80003786:	3b b0       	mov	r0,-69
+80003786:	3b 9c       	mov	r12,-71
 80003788:	80 00       	ld.sh	r0,r0[0x0]
-8000378a:	3b c8       	mov	r8,-68
+8000378a:	3b b4       	mov	r4,-69
 8000378c:	80 00       	ld.sh	r0,r0[0x0]
 8000378e:	25 ac       	sub	r12,90
 80003790:	00 00       	add	r0,r0
-80003792:	00 18       	sub	r8,r0
+80003792:	00 0c       	add	r12,r0
 80003794:	80 00       	ld.sh	r0,r0[0x0]
 80003796:	32 34       	mov	r4,35
 80003798:	80 00       	ld.sh	r0,r0[0x0]
