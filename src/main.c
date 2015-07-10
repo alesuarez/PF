@@ -46,7 +46,7 @@ uint8_t algo=0;
 uint8_t algo2=0;
 uint8_t TRX_CTRL_2=0;
 uint8_t aux2=0;
-
+uint8_t tx_end=0;
 usart_options_t usart_opt = {
 	//! Baudrate is set in the conf_example_usart.h file.
 	.baudrate    = 9600,
@@ -130,6 +130,7 @@ static void eic_int_handler2(void)
 		eic_clear_interrupt_line(&AVR32_EIC, AVR32_EIC_INT2);
 		//IRQ2 Pin 26 MCU --> Pin 24 T
 		algo2=pal_trx_reg_read(RG_IRQ_STATUS);
+		tx_end=1;
 		
 		
 }
@@ -572,7 +573,7 @@ uint8_t txTrama(uint8_t *data)
 {
 	uint8_t state = getStateAT86RF212();
 	//pcb_t *pcb = chb_get_pcb();
-
+	tx_end=0;
 	if ((state == BUSY_TX) || (state == BUSY_TX_ARET))
 	{
 		return RADIO_WRONG_STATE;
@@ -580,7 +581,7 @@ uint8_t txTrama(uint8_t *data)
 	DISABLE_TRX_IRQ();
 	// TODO: check why we need to transition to the off state before we go to tx_aret_on
 	pal_trx_reg_write(RG_TRX_STATE,CMD_TRX_OFF); // off o force off -forzar al AT86RF212 a estar en estado de off para configurar
-	PAL_WAIT_1_US();
+	DELAY_US(RST_PULSE_WIDTH_NS); //tTR10
 	while ((pal_trx_reg_read(RG_TRX_STATUS)&0x1F)!= CMD_TRX_OFF)// espero al estado de off
 	{
 		DELAY_US(300);
@@ -588,6 +589,7 @@ uint8_t txTrama(uint8_t *data)
 	}
 	/////////
 	pal_trx_reg_write(RG_TRX_STATE,CMD_TX_ARET_ON); // off o force off -forzar al AT86RF212 a estar en estado de off para configurar
+	DELAY_US(TRX_OFF_TO_PLL_ON_TIME_US);
 	while ((pal_trx_reg_read(RG_TRX_STATUS)&0x1F)!=CMD_TX_ARET_ON)// espero al estado de off
 	{
 		DELAY_US(300);
@@ -616,6 +618,7 @@ uint8_t txTrama(uint8_t *data)
 	//while (); ciclo para esperar la interrupcion e podria actualizar el estado
 	
 	ENABLE_TRX_IRQ();
+	while (tx_end!=0);
 	return getStateAT86RF212();
 }
 void pal_trx_reg_write_addr(uint8_t addr,uint8_t mask)
@@ -642,9 +645,10 @@ void iniciarAT86RF212(void)
 	RST_HIGH();
 	
 	pal_trx_reg_write(RG_IRQ_MASK, CMD_NOP); // deshabilitar interrupciones del AT86RF212 mientras lo configuro
+	while ((pal_trx_reg_read(RG_IRQ_STATUS))!= CMD_NOP);// espero al estado de off
 	pal_trx_reg_write(RG_TRX_STATE,CMD_TRX_OFF); // off o force off -forzar al AT86RF212 a estar en estado de off para configurar
-	PAL_WAIT_1_US();
-		while ((pal_trx_reg_read(RG_TRX_STATUS)&0x1F)!= CMD_TRX_OFF)// espero al estado de off
+	DELAY_US(RST_PULSE_WIDTH_NS); //tTR10
+	while ((pal_trx_reg_read(RG_TRX_STATUS)&0x1F)!= CMD_TRX_OFF)// espero al estado de off
 		{
 			DELAY_US(300);
 			pal_trx_reg_write(RG_TRX_STATE,CMD_FORCE_TRX_OFF);
@@ -733,6 +737,9 @@ int main (void)
 	
 	escribir_linea_pc("TESIS TUCUMAN 2015\n\r");
 	escribir_linea_pc("- - - B u e n a s - - - \n\r");
+	gpio_clr_gpio_pin(LED_1);
+	gpio_clr_gpio_pin(LED_2);
+	gpio_clr_gpio_pin(LED_3);
 	
 	
 	while(true)
@@ -741,11 +748,12 @@ int main (void)
 	//txTrama(0xff,tx_buffer,8);
 // 	if (getStateAT86RF212()==CMD_PLL_ON)
 // 	{
+	txTrama(tx_buffer);
 		
-		at86rfx_tx_frame(tx_buffer);
-		pal_trx_reg_write(RG_TRX_STATE,CMD_TX_START);
-		while(getStateAT86RF212()!=CMD_TX_START);
-		pal_trx_reg_write(RG_TRX_STATE,CMD_RX_ON);
+// 		at86rfx_tx_frame(tx_buffer);
+// 		pal_trx_reg_write(RG_TRX_STATE,CMD_TX_START);
+// 		while(getStateAT86RF212()!=CMD_TX_START);
+// 		pal_trx_reg_write(RG_TRX_STATE,CMD_RX_ON);
 	/*}*/
 // 	else
 // 	{
@@ -769,7 +777,9 @@ int main (void)
 // 				cola_PC_nr = 0;
 // 		}
 // 		
-// 		delay_ms(10);
+		gpio_set_gpio_pin(LED_1);
+ 		delay_ms(4000);
+		gpio_clr_gpio_pin(LED_1);
  	}
 
 }
