@@ -565,9 +565,78 @@ uint8_t getStateAT86RF212(void)
 {
 	return pal_trx_reg_read(TRX_STATUS) & 0x1F;
 }
-bool setState(uint8_t state)
+void reg_read_mod_write(U8 addr, U8 val, U8 mask)
 {
-	return false;
+	uint8_t tmp;
+
+	tmp = pal_trx_reg_read(addr);
+	val &= mask;                // mask off stray bits from val
+	tmp &= ~mask;               // mask off bits in reg val
+	tmp |= val;                 // copy val into reg val
+	pal_trx_reg_write(addr, tmp);   // write back to reg
+}
+uint8_t setState(uint8_t state)
+{
+	uint8_t curr_state, delay;
+
+	// if we're sleeping then don't allow transition
+// 	if (CHB_SLPTR_PORT & _BV(CHB_SLPTR_PIN))
+// 	{
+// 		return RADIO_WRONG_STATE;
+// 	}
+
+	// if we're in a transition state, wait for the state to become stable
+	curr_state = getStateAT86RF212();
+	if ((curr_state == BUSY_TX_ARET) || (curr_state == BUSY_RX_AACK) || (curr_state == BUSY_RX) || (curr_state == BUSY_TX))
+	{
+		while (getStateAT86RF212() == curr_state);
+	}
+
+	// At this point it is clear that the requested new_state is:
+	// TRX_OFF, RX_ON, PLL_ON, RX_AACK_ON or TX_ARET_ON.
+	// we need to handle some special cases before we transition to the new state
+	switch (state)
+	{
+		case CMD_TRX_OFF:
+			/* Go to TRX_OFF from any state. */
+			SLP_TR_LOW();		
+			reg_read_mod_write(RG_TRX_STATE, CMD_FORCE_TRX_OFF, 0x1f);
+			DELAY_US(TIME_ALL_STATES_TRX_OFF); // 
+		break;
+
+		case CMD_TX_ARET_ON:
+		if (curr_state == RX_AACK_ON)
+		{
+			/* First do intermediate state transition to PLL_ON, then to TX_ARET_ON. */
+			reg_read_mod_write(RG_TRX_STATE, CMD_PLL_ON, 0x1f);
+			DELAY_US(TIME_ALL_STATES_TRX_OFF); // 
+		}
+		break;
+
+		case CMD_RX_AACK_ON:
+		if (curr_state == TX_ARET_ON)
+		{
+			/* First do intermediate state transition to RX_ON, then to RX_AACK_ON. */
+			reg_read_mod_write(TRX_STATE, CMD_PLL_ON, 0x1f);
+			DELAY_US(TIME_ALL_STATES_TRX_OFF); // 
+		}
+		break;
+	}
+
+	/* Now we're okay to transition to any new state. */
+	reg_read_mod_write(RG_TRX_STATE, state, 0x1f);
+
+	/* When the PLL is active most states can be reached in 1us. However, from */
+	/* TRX_OFF the PLL needs time to activate. */
+	delay = (curr_state == TRX_OFF) ? TIME_TRX_OFF_PLL_ON : TIME_RX_ON_PLL_ON; 
+	DELAY_US(delay);
+
+	if (getStateAT86RF212() == state)
+	{
+		return RADIO_SUCCESS;
+	}
+	return RADIO_TIMED_OUT;
+}
 }
 uint8_t txTrama(uint8_t *data)
 {

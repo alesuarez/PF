@@ -114,7 +114,9 @@
 /* Read only bits */
 #define AT30TSE_CONFIG_NVRBSY       (1 << 0)
 
+/* definiciones */
 
+#define TIME_ALL_STATES_TRX_OFF 1
 
 // radio statuses
 enum{
@@ -135,7 +137,24 @@ enum{
 	RADIO_NO_ACK,                               /**< No acknowledge frame was received. */
 };
 // funciones
-
+enum{
+	TIME_RST_PULSE_WIDTH        = 1,
+	TIME_P_ON_TO_CLKM_AVAIL     = 380,
+	TIME_SLEEP_TO_TRX_OFF       = 240,
+	TIME_TRX_OFF_TO_SLEEP       = 35,
+	TIME_PLL_ON_TRX_OFF         = 1,
+	TIME_TRX_OFF_RX_ON          = 110,
+	TIME_RX_ON_TRX_OFF          = 1,
+	TIME_PLL_ON_RX_ON           = 1,
+	TIME_RX_ON_PLL_ON           = 1,
+	TIME_PLL_LOCK_TIME          = 110,
+	TIME_BUSY_TX_PLL_ON         = 32,
+	TIME_ALL_STATES_TRX_OFF     = 1,
+	TIME_RESET_TRX_OFF          = 26,
+	TIME_TRX_IRQ_DELAY          = 9,
+	TIME_TRX_OFF_PLL_ON         = 110,
+	TIME_IRQ_PROCESSING_DLY     = 32
+};
 void escribir_linea_pc (char*);
 static void inicializar_interrupciones();
 void spi_init_pins(void);
