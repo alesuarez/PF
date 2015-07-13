@@ -600,7 +600,7 @@ uint8_t setState(uint8_t state)
 		case CMD_TRX_OFF:
 			/* Go to TRX_OFF from any state. */
 			SLP_TR_LOW();		
-			reg_read_mod_write(RG_TRX_STATE, CMD_FORCE_TRX_OFF, 0x1f);
+			pal_trx_reg_write(RG_TRX_STATE, CMD_FORCE_TRX_OFF);
 			DELAY_US(TIME_ALL_STATES_TRX_OFF); // 
 		break;
 
@@ -608,7 +608,7 @@ uint8_t setState(uint8_t state)
 		if (curr_state == RX_AACK_ON)
 		{
 			/* First do intermediate state transition to PLL_ON, then to TX_ARET_ON. */
-			reg_read_mod_write(RG_TRX_STATE, CMD_PLL_ON, 0x1f);
+			pal_trx_reg_write(RG_TRX_STATE, CMD_PLL_ON);
 			DELAY_US(TIME_ALL_STATES_TRX_OFF); // 
 		}
 		break;
@@ -617,14 +617,14 @@ uint8_t setState(uint8_t state)
 		if (curr_state == TX_ARET_ON)
 		{
 			/* First do intermediate state transition to RX_ON, then to RX_AACK_ON. */
-			reg_read_mod_write(RG_TRX_STATE, CMD_PLL_ON, 0x1f);
+			pal_trx_reg_write(RG_TRX_STATE, CMD_PLL_ON);
 			DELAY_US(TIME_ALL_STATES_TRX_OFF); // 
 		}
 		break;
 	}
 
 	/* Now we're okay to transition to any new state. */
-	reg_read_mod_write(RG_TRX_STATE, state, 0x1f);
+	pal_trx_reg_write(RG_TRX_STATE, state);
 
 	/* When the PLL is active most states can be reached in 1us. However, from */
 	/* TRX_OFF the PLL needs time to activate. */
@@ -648,13 +648,14 @@ uint8_t txTrama(uint8_t *data)
 	}
 	DISABLE_TRX_IRQ();
 	// TODO: check why we need to transition to the off state before we go to tx_aret_on
-	pal_trx_reg_write(RG_TRX_STATE,CMD_TRX_OFF); // off o force off -forzar al AT86RF212 a estar en estado de off para configurar
-	DELAY_US(RST_PULSE_WIDTH_NS); //tTR10
-	while ((pal_trx_reg_read(RG_TRX_STATUS)&0x1F)!= CMD_TRX_OFF)// espero al estado de off
-	{
-		DELAY_US(300);
-		pal_trx_reg_write(RG_TRX_STATE,CMD_FORCE_TRX_OFF);
-	}
+// 	pal_trx_reg_write(RG_TRX_STATE,CMD_TRX_OFF); // off o force off -forzar al AT86RF212 a estar en estado de off para configurar
+// 	DELAY_US(RST_PULSE_WIDTH_NS); //tTR10
+// 	while ((pal_trx_reg_read(RG_TRX_STATUS)&0x1F)!= CMD_TRX_OFF)// espero al estado de off
+// 	{
+// 		DELAY_US(300);
+// 		pal_trx_reg_write(RG_TRX_STATE,CMD_FORCE_TRX_OFF);
+// 	}
+	setState(CMD_TRX_OFF);
 	/////////
 	pal_trx_reg_write(RG_TRX_STATE,CMD_TX_ARET_ON); // off o force off -forzar al AT86RF212 a estar en estado de off para configurar
 	DELAY_US(TRX_OFF_TO_PLL_ON_TIME_US);
@@ -714,13 +715,14 @@ void iniciarAT86RF212(void)
 	
 	pal_trx_reg_write(RG_IRQ_MASK, CMD_NOP); // deshabilitar interrupciones del AT86RF212 mientras lo configuro
 	while ((pal_trx_reg_read(RG_IRQ_STATUS))!= CMD_NOP);// espero al estado de off
-	pal_trx_reg_write(RG_TRX_STATE,CMD_TRX_OFF); // off o force off -forzar al AT86RF212 a estar en estado de off para configurar
-	DELAY_US(RST_PULSE_WIDTH_NS); //tTR10
-	while ((pal_trx_reg_read(RG_TRX_STATUS)&0x1F)!= CMD_TRX_OFF)// espero al estado de off
-		{
-			DELAY_US(300);
-			pal_trx_reg_write(RG_TRX_STATE,CMD_FORCE_TRX_OFF);
-		}
+	while (setState(CMD_TRX_OFF)!=RADIO_SUCCESS);
+// 	pal_trx_reg_write(RG_TRX_STATE,CMD_TRX_OFF); // off o force off -forzar al AT86RF212 a estar en estado de off para configurar
+// 	DELAY_US(RST_PULSE_WIDTH_NS); //tTR10
+// 	while ((pal_trx_reg_read(RG_TRX_STATUS)&0x1F)!= CMD_TRX_OFF)// espero al estado de off
+// 		{
+// 			DELAY_US(300);
+// 			pal_trx_reg_write(RG_TRX_STATE,CMD_FORCE_TRX_OFF);
+// 		}
 	
 	
 	pal_trx_reg_write(RG_TRX_CTRL_0, CMD_NOP); 
