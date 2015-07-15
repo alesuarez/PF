@@ -47,6 +47,9 @@ uint8_t algo2=0;
 uint8_t TRX_CTRL_2=0;
 uint8_t aux2=0;
 uint8_t tx_end=0;
+uint8_t variable1;
+uint8_t variable2;
+uint8_t variable3;
 usart_options_t usart_opt = {
 	//! Baudrate is set in the conf_example_usart.h file.
 	.baudrate    = 9600,
@@ -563,7 +566,7 @@ void iniciarAT86(void)
 }
 uint8_t getStateAT86RF212(void)
 {
-	return pal_trx_reg_read(TRX_STATUS) & 0x1F;
+	return pal_trx_reg_read(RG_TRX_STATUS) & 0x1F;
 }
 void reg_read_mod_write(U8 addr, U8 val, U8 mask)
 {
@@ -587,6 +590,7 @@ uint8_t setState(uint8_t state)
 
 	// if we're in a transition state, wait for the state to become stable
 	curr_state = getStateAT86RF212();
+	variable2=curr_state;
 	if ((curr_state == BUSY_TX_ARET) || (curr_state == BUSY_RX_AACK) || (curr_state == BUSY_RX) || (curr_state == BUSY_TX))
 	{
 		while (getStateAT86RF212() == curr_state);
@@ -624,14 +628,14 @@ uint8_t setState(uint8_t state)
 	}
 
 	/* Now we're okay to transition to any new state. */
-	pal_trx_reg_write(RG_TRX_STATE, state);
+	//pal_trx_reg_write(RG_TRX_STATE, state);
 
 	/* When the PLL is active most states can be reached in 1us. However, from */
 	/* TRX_OFF the PLL needs time to activate. */
 	delay = (curr_state == TRX_OFF) ? TIME_TRX_OFF_PLL_ON : TIME_RX_ON_PLL_ON; 
 	DELAY_US(delay);
-
-	if (getStateAT86RF212() == state)
+	variable3=getStateAT86RF212();
+	if ( variable3== state)
 	{
 		return RADIO_SUCCESS;
 	}
@@ -655,7 +659,7 @@ uint8_t txTrama(uint8_t *data)
 // 		DELAY_US(300);
 // 		pal_trx_reg_write(RG_TRX_STATE,CMD_FORCE_TRX_OFF);
 // 	}
-	setState(CMD_TRX_OFF);
+	while (setState(CMD_TRX_OFF)!=RADIO_SUCCESS);
 	/////////
 	pal_trx_reg_write(RG_TRX_STATE,CMD_TX_ARET_ON); // off o force off -forzar al AT86RF212 a estar en estado de off para configurar
 	DELAY_US(TRX_OFF_TO_PLL_ON_TIME_US);
@@ -688,7 +692,9 @@ uint8_t txTrama(uint8_t *data)
 	
 	ENABLE_TRX_IRQ();
 	while (tx_end!=0);
-	return getStateAT86RF212();
+	DELAY_US(400);
+	variable1=getStateAT86RF212();
+	return variable1;
 }
 void pal_trx_reg_write_addr(uint8_t addr,uint8_t mask)
 {
@@ -789,7 +795,7 @@ int main (void)
 //  		escribir_linea_pc("Modulo RF:\tPASS\r\n");
  
 	iniciarAT86RF212();
-	iniciarAT86();
+	/*iniciarAT86();*/
 	register_value = pal_trx_reg_read(RG_PART_NUM);//pedido de identificacion del modulo. Debe devolver 0x07
 
 	if (register_value == PART_NUM_AT86RF212) 
