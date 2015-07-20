@@ -2,7 +2,7 @@
 
 //AT86RF212B
 //**************************************************
-// Register 0x03 (TRX_CTRL_0) -> 0x01 [PAD_IO=2mA,PAD_IO_CLKM=2mA,CLKM_SHA_SEL=0,CLKM_CTRL=(1)1Mhz]
+// Register 0x03 (TRX_CTRL_0) -> 0x00 [PAD_IO=2mA,PAD_IO_CLKM=2mA,CLKM_SHA_SEL=0,CLKM_CTRL=(0)]
 //**************************************************
 // BIT7:6 - PAD_IO 
 //These register bits set the output driver current of digital output pads, except CLKM
