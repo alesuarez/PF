@@ -50,6 +50,7 @@ uint8_t tx_end=0;
 uint8_t variable1;
 uint8_t variable2;
 uint8_t variable3;
+uint8_t TX_;
 usart_options_t usart_opt = {
 	//! Baudrate is set in the conf_example_usart.h file.
 	.baudrate    = 9600,
@@ -133,6 +134,7 @@ static void eic_int_handler2(void)
 		eic_clear_interrupt_line(&AVR32_EIC, AVR32_EIC_INT2);
 		//IRQ2 Pin 26 MCU --> Pin 24 T
 		algo2=pal_trx_reg_read(RG_IRQ_STATUS);
+		
 		tx_end=1;
 		
 		
@@ -755,6 +757,38 @@ void iniciarAT86RF212(void)
 }
 
 
+void TXAT86RF212(void)
+{
+	SLP_TR_HIGH();
+	DELAY_US(RST_PULSE_WIDTH_NS);
+	SLP_TR_LOW();
+	variable3=getStateAT86RF212();
+	
+}
+
+void resetAT86RF212()
+{
+		RST_LOW();
+	SLP_TR_LOW();
+
+	/* Wait typical time. */
+	DELAY_US(P_ON_TO_CLKM_AVAILABLE_TYP_US);
+
+	/* Apply reset pulse */
+	RST_HIGH();
+	DELAY_US(RST_PULSE_WIDTH_US);
+	pal_trx_reg_write(RG_TRX_STATE, CMD_TRX_OFF);
+	pal_trx_reg_write(RG_IRQ_MASK,CMD_NOP); // TRX_IRQ_AWAKE_END multifuncional IRQ
+	
+	//DELAY_US(100);
+	//algo=pal_trx_reg_read(RG_IRQ_MASK);
+	
+	while (algo2!=0x08){
+		algo2=getStateAT86RF212();
+	}
+	algo2=getStateAT86RF212();
+	
+}
 int main (void)
 {
 	char temps[10] = "\0";
@@ -794,8 +828,9 @@ int main (void)
 //  	 	}
 //  		escribir_linea_pc("Modulo RF:\tPASS\r\n");
  
-	iniciarAT86RF212();
-	/*iniciarAT86();*/
+	//iniciarAT86RF212();
+//	iniciarAT86();
+    resetAT86RF212();
 	register_value = pal_trx_reg_read(RG_PART_NUM);//pedido de identificacion del modulo. Debe devolver 0x07
 
 	if (register_value == PART_NUM_AT86RF212) 
@@ -820,12 +855,16 @@ int main (void)
 	
 	while(true)
 	{
+		TXAT86RF212();
 	//irq_status=pal_trx_reg_read(RG_IRQ_STATUS);
 	//txTrama(0xff,tx_buffer,8);
 // 	if (getStateAT86RF212()==CMD_PLL_ON)
 // 	{
-	txTrama(tx_buffer);
-		
+// 	gpio_clr_gpio_pin(LED_1);
+// 	txTrama(tx_buffer);
+// 	while(getStateAT86RF212()!=BUSY_TX_ARET);
+// 	gpio_set_gpio_pin(LED_1);
+// 	delay_ms(4000);	
 // 		at86rfx_tx_frame(tx_buffer);
 // 		pal_trx_reg_write(RG_TRX_STATE,CMD_TX_START);
 // 		while(getStateAT86RF212()!=CMD_TX_START);
@@ -853,9 +892,8 @@ int main (void)
 // 				cola_PC_nr = 0;
 // 		}
 // 		
-		gpio_set_gpio_pin(LED_1);
- 		delay_ms(4000);
-		gpio_clr_gpio_pin(LED_1);
+		
+		
  	}
 
 }
