@@ -759,10 +759,10 @@ void iniciarAT86RF212(void)
 
 void TXAT86RF212(void)
 {
-	SLP_TR_HIGH();
-	DELAY_US(RST_PULSE_WIDTH_NS);
-	SLP_TR_LOW();
+	RESET();
+	pal_trx_reg_write(RG_TRX_STATE, CMD_FORCE_TRX_OFF); // Forzar el estado off
 	variable3=getStateAT86RF212();
+	while(pal_trx_reg_read(RG_TRX_STATUS)&0x1F)!=CMD_TRX_OFF); // espero el estado off
 	
 }
 
@@ -787,6 +787,14 @@ void resetAT86RF212()
 		algo2=getStateAT86RF212();
 	}
 	algo2=getStateAT86RF212();
+	
+}
+void RESET()
+{
+// especificaciones segun LwMesh
+	RST_LOW();
+	DELAY_US(P_ON_TO_CLKM_AVAILABLE_TYP_US);
+	RST_HIGH();
 	
 }
 int main (void)
