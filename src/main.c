@@ -498,151 +498,11 @@ void leer_temp(char* temps)
 	else
 		sprintf(temps,"%s","X");
 }
-void iniciarAT86(void)
-{
-	//
-// TRX_CTRL_0  PAG 120
-// Bit 7:6 -R/W– PAD_IO -> These register bits set the output driver current of digital output pads, except CLKM 
-//			00= 2mA (minima corriente)
-// Bit 5:4 –R/W- PAD_IO_CLKM -> These register bits set the output driver strength of pin CLKM
-//			01=4mA (minima corriente) <~~~~~~~~~~~ CAMBIAR ~~~~~~~~~~~
-// Bit 3   –R/W- CLKM_SHA_SEL -> The register bit CLKM_SHA_SEL defines whether a new clock rate
-//			1-> CLKM clock rate change appears after SLEEP cycle
-// Bit 2:0 –R/W CLKM_CTRL -> These register bits set the clock rate of pin 17 (CLKM)
-//			1 -> 1 MHz <~~~~~~~~~~~ CAMBIAR ~~~~~~~~~~~ pag 121 tabla 7-30 poner a cero
-	TRX_CTRL_0 = pal_trx_reg_read(RG_TRX_CTRL_0);// 25  0001 1001
-	//pal_trx_reg_write(TRX_CTRL_0, 8); // 0000 1000
-//
-// PHY_TX_PWR (R/W) PAG 106
-// Bit 7 – PA_BOOST -> This bit enables the PA boost mode where the TX output power is increased by approximately 5 dB
-//			0 -> the PA linearity is decreased compared to the normal mode
-// Bit 6:5 – GC_PA  -> These register bits control the gain of the PA by changing its bias current.
-//			11(3) -> 0dB
-// Bit 4:0 – TX_PWR -> These register bits control the transmitter output power
-//			0000 -> ~~~~~~~~~~~~~~~~~VER~~~~~~~~~~~~~~~~~~~
-	PHY_TX_PWR =pal_trx_reg_read(RG_PHY_TX_PWR);// 96 0110 0000
-//
-// PHY_CC_CCA PAG 125 -> contains register bits to set the channel center frequency according to channel page 0 of IEEE 802.15.4-2003/2006
-// Bit 7  -W-  CCA_REQUEST  A manual CCA measurement is initiated by setting CCA_REQUEST = 1. The register bit is automatically 
-//							cleared after requesting a CCA measurement with CCA_REQUEST = 1 
-//				0->
-// Bit 6:5 -R/W- CCA_MODE The CCA mode can be selected using register bits CCA_MODE.
-//				01(1) -> “Energy above threshold”
-// Bit 4:0 -R/W- CHANNEL -> Channel Assignment according to IEEE 802.15.4-2003/2006 
-//				101(5) -> 914 Mhz
-	PHY_CC_CCA = pal_trx_reg_read(RG_PHY_CC_CCA);//37  0010 0101
-// 
-// TRX_CTRL_2  R/W
-// Bit 7 – RX_SAFE_MODE -> If this bit is set, Dynamic Frame Buffer Protection is enabled.
-//			0-> buffer protection disable
-// Bit 6 – TRX_OFF_AVDD_EN -> If this register bit is set, the analog voltage regulator is turned on (kept on) during
-//                            TRX_OFF, enabling faster RX/TX turn on time. T
-//          0-> disble
-// Bit 5 – OQPSK_SCRAM_EN -> If set to 1 (reset value), the scrambler is enabled for OQPSK_DATA_RATE = 2 and
-//                          BPSK_OQPSK = 1 (O-QPSK is active). Otherwise, the scrambler is disabled.
-//          1-> reset value
-// Bit 4 The bit is relevant for SUB_MODE = 1 and BPSK_OQPSK = 1
-//          0-> If set to 0 (reset value), pulse shaping is half-sine filtering for O-QPSK transmission with 1000 kchip/s
-// Bit 3 – BPSK_OQPSK
-//			0-> If set to 0 (reset value), BPSK transmission and reception is applied
-// Bit 2 – SUB_MODE
-//			1-> If set to 1 (reset value), the chip rate is 1000 kchip/s for BPSK_OQPSK = 1 and 600 kchip/s for BPSK_OQPSK = 0.
-// Bit 1:0 – OQPSK_DATA_RATE
-//			00-> 250 O-QPSK Data Rate [kbit/s] && SUB_MODE ==1
-	TRX_CTRL_2= pal_trx_reg_read(RG_TRX_CTRL_2);// 36 0010 0100
-//
-// IRQ_MASK PAG 26 ->The IRQ_MASK register is used to enable or disable individual interrupts
-// Bit 3 - MASK_TRX_END -
-//         0-> disable ~~~~~~~~~~~~~~CAMBIAR a 1 ~~~~~~~~~~~~ 
-	IRQ_MASK=pal_trx_reg_read(RG_IRQ_MASK);// 0000 0000
-//*******************************************************************************************************
-// funcion para escribir un registro en el AT86
-//
-	//pal_trx_reg_write(IRQ_MASK, 255); // 1 en el bit 3
-//
-	
-//
-//*******************************************************************************************************
-	
-	TRX_STATUS=pal_trx_reg_read(RG_TRX_STATUS);
-}
 uint8_t getStateAT86RF212(void)
 {
 	return pal_trx_reg_read(RG_TRX_STATUS) & 0x1F;
 }
-void reg_read_mod_write(U8 addr, U8 val, U8 mask)
-{
-	uint8_t tmp;
 
-	tmp = pal_trx_reg_read(addr);
-	val &= mask;                // mask off stray bits from val
-	tmp &= ~mask;               // mask off bits in reg val
-	tmp |= val;                 // copy val into reg val
-	pal_trx_reg_write(addr, tmp);   // write back to reg
-}
-uint8_t setState(uint8_t state)
-{
-	uint8_t curr_state, delay;
-
-	// if we're sleeping then don't allow transition
-// 	if (CHB_SLPTR_PORT & _BV(CHB_SLPTR_PIN))
-// 	{
-// 		return RADIO_WRONG_STATE;
-// 	}
-
-	// if we're in a transition state, wait for the state to become stable
-	curr_state = getStateAT86RF212();
-	variable2=curr_state;
-	if ((curr_state == BUSY_TX_ARET) || (curr_state == BUSY_RX_AACK) || (curr_state == BUSY_RX) || (curr_state == BUSY_TX))
-	{
-		while (getStateAT86RF212() == curr_state);
-	}
-
-	// At this point it is clear that the requested new_state is:
-	// TRX_OFF, RX_ON, PLL_ON, RX_AACK_ON or TX_ARET_ON.
-	// we need to handle some special cases before we transition to the new state
-	switch (state)
-	{
-		case CMD_TRX_OFF:
-			/* Go to TRX_OFF from any state. */
-			SLP_TR_LOW();		
-			pal_trx_reg_write(RG_TRX_STATE, CMD_FORCE_TRX_OFF);
-			DELAY_US(TIME_ALL_STATES_TRX_OFF); // 
-		break;
-
-		case CMD_TX_ARET_ON:
-		if (curr_state == RX_AACK_ON)
-		{
-			/* First do intermediate state transition to PLL_ON, then to TX_ARET_ON. */
-			pal_trx_reg_write(RG_TRX_STATE, CMD_PLL_ON);
-			DELAY_US(TIME_ALL_STATES_TRX_OFF); // 
-		}
-		break;
-
-		case CMD_RX_AACK_ON:
-		if (curr_state == TX_ARET_ON)
-		{
-			/* First do intermediate state transition to RX_ON, then to RX_AACK_ON. */
-			pal_trx_reg_write(RG_TRX_STATE, CMD_PLL_ON);
-			DELAY_US(TIME_ALL_STATES_TRX_OFF); // 
-		}
-		break;
-	}
-
-	/* Now we're okay to transition to any new state. */
-	//pal_trx_reg_write(RG_TRX_STATE, state);
-
-	/* When the PLL is active most states can be reached in 1us. However, from */
-	/* TRX_OFF the PLL needs time to activate. */
-	delay = (curr_state == TRX_OFF) ? TIME_TRX_OFF_PLL_ON : TIME_RX_ON_PLL_ON; 
-	DELAY_US(delay);
-	variable3=getStateAT86RF212();
-	if ( variable3== state)
-	{
-		return RADIO_SUCCESS;
-	}
-	return RADIO_TIMED_OUT;
-}
 uint8_t txTrama(uint8_t *data)
 {
 	uint8_t state = getStateAT86RF212();
@@ -653,16 +513,9 @@ uint8_t txTrama(uint8_t *data)
 		return RADIO_WRONG_STATE;
 	}
 	DISABLE_TRX_IRQ();
-	// TODO: check why we need to transition to the off state before we go to tx_aret_on
-// 	pal_trx_reg_write(RG_TRX_STATE,CMD_TRX_OFF); // off o force off -forzar al AT86RF212 a estar en estado de off para configurar
-// 	DELAY_US(RST_PULSE_WIDTH_NS); //tTR10
-// 	while ((pal_trx_reg_read(RG_TRX_STATUS)&0x1F)!= CMD_TRX_OFF)// espero al estado de off
-// 	{
-// 		DELAY_US(300);
-// 		pal_trx_reg_write(RG_TRX_STATE,CMD_FORCE_TRX_OFF);
-// 	}
+
 	while (setState(CMD_TRX_OFF)!=RADIO_SUCCESS);
-	/////////
+
 	pal_trx_reg_write(RG_TRX_STATE,CMD_TX_ARET_ON); // off o force off -forzar al AT86RF212 a estar en estado de off para configurar
 	DELAY_US(TRX_OFF_TO_PLL_ON_TIME_US);
 	while ((pal_trx_reg_read(RG_TRX_STATUS)&0x1F)!=CMD_TX_ARET_ON)// espero al estado de off
@@ -671,131 +524,38 @@ uint8_t txTrama(uint8_t *data)
 		pal_trx_reg_write(RG_TRX_STATE,CMD_TX_ARET_ON);
 	}
 	
-	/*chb_set_state(CHB_TX_ARET_ON);*/
-	/////////////////////////////////////
-	
-	// TODO: try and start the frame transmission by writing TX_START command instead of toggling
-	// sleep pin...i just feel like it's kind of weird...
-
 	// write frame to buffer. first write header into buffer (add 1 for len byte), then data.
 	pal_trx_frame_write(data,data[0] - LENGTH_FIELD_LEN);
 	
-// 	chb_frame_write(hdr, CHB_HDR_SZ + 1, data, len); // -------------------------
-// 
-// 	//Do frame transmission.
 	pal_trx_reg_write(RG_TRX_STATE,CMD_TX_START);
-// 	
-// 	// wait for the transmission to end, signalled by the TRX END flag
-// 	while (!pcb->tx_end);
-// 	pcb->tx_end = false;
-// 
-// 	// check the status of the transmission
-	//while (); ciclo para esperar la interrupcion e podria actualizar el estado
-	
+
 	ENABLE_TRX_IRQ();
-	while (tx_end!=0);
+	while (tx_end!=0); // la variable se setea en la interrupcion
 	DELAY_US(400);
 	variable1=getStateAT86RF212();
 	return variable1;
 }
-void pal_trx_reg_write_addr(uint8_t addr,uint8_t mask)
-{
-	uint8_t aux;
-	aux=pal_trx_reg_read(addr);
-	aux|=mask;
-	pal_trx_reg_write(addr, aux);
-	aux=pal_trx_reg_read(addr);
-}
 
-void iniciarAT86RF212(void)
-{
-	
-	RST_HIGH();
-	SLP_TR_LOW();
-
-	/* Wait typical time. */
-	DELAY_US(P_ON_TO_CLKM_AVAILABLE_TYP_US);
-
-	/* Apply reset pulse */
-	RST_LOW();
-	DELAY_US(RST_PULSE_WIDTH_US);
-	RST_HIGH();
-	
-	pal_trx_reg_write(RG_IRQ_MASK, CMD_NOP); // deshabilitar interrupciones del AT86RF212 mientras lo configuro
-	while ((pal_trx_reg_read(RG_IRQ_STATUS))!= CMD_NOP);// espero al estado de off
-	while (setState(CMD_TRX_OFF)!=RADIO_SUCCESS);
-// 	pal_trx_reg_write(RG_TRX_STATE,CMD_TRX_OFF); // off o force off -forzar al AT86RF212 a estar en estado de off para configurar
-// 	DELAY_US(RST_PULSE_WIDTH_NS); //tTR10
-// 	while ((pal_trx_reg_read(RG_TRX_STATUS)&0x1F)!= CMD_TRX_OFF)// espero al estado de off
-// 		{
-// 			DELAY_US(300);
-// 			pal_trx_reg_write(RG_TRX_STATE,CMD_FORCE_TRX_OFF);
-// 		}
-	
-	
-	pal_trx_reg_write(RG_TRX_CTRL_0, CMD_NOP); 
-	
-	// set channel ->
-//	pal_trx_reg_write(RG_PHY_CC_CCA,||SR_SUB_MODE); // 914Mhz
-	pal_trx_reg_write(RG_IRQ_MASK,0x0C);  // IRQ_RX_START && IRQ_TRX_END
-	PAL_WAIT_1_US();
-	pal_trx_reg_write(RG_TRX_STATE,CMD_RX_ON);// seteo el tran en RX
-	//interrupcions micro
-   /* CFG_CHB_INTP_RISE_EDGE();
-
-    if (chb_get_state() != RX_STATE)
-    {
-    	// ERROR occurred initializing the radio. Print out error message.
-        char buf[50];
-
-        // grab the error message from flash & print it out
-        strcpy_P(buf, chb_err_init);
-       	escribir_linea_pc("ERROR Modulo RF %c \n",buf);
-    }*/
-   while ((pal_trx_reg_read(RG_TRX_STATUS)&0x1F)!=CMD_RX_ON);
-  cpu_irq_enable();
-}
-
-
-void TXAT86RF212(void)
+uint8_t init_AT86RF212(void)
 {
 	RESET();
 	pal_trx_reg_write(RG_TRX_STATE, CMD_FORCE_TRX_OFF); // Forzar el estado off
-	variable3=getStateAT86RF212();
-	while(pal_trx_reg_read(RG_TRX_STATUS)&0x1F)!=CMD_TRX_OFF); // espero el estado off
-	
+	while(pal_trx_reg_read(RG_TRX_STATUS) & 0x1F) != CMD_TRX_OFF); // espero el estado off
+	pal_trx_reg_write(RG_TRX_CTRL_0, CMD_NOP); 
+//	pal_trx_reg_write(RG_PHY_CC_CCA,||SR_SUB_MODE); // 914Mhz set channel ->
+	pal_trx_reg_write(RG_IRQ_MASK, 0x0C);  // IRQ_RX_START && IRQ_TRX_END
+	pal_trx_reg_write(RG_TRX_CTRL_1, 0x02) // AACK_PROM_MODE Promiscuous mode is enabled 
+	PAL_WAIT_1_US();
+	pal_trx_reg_write(RG_TRX_STATE, CMD_RX_ON);// seteo el tran en RX
+	while ((pal_trx_reg_read(RG_TRX_STATUS)&0x1F)!=CMD_RX_ON);
 }
 
-void resetAT86RF212()
-{
-		RST_LOW();
-	SLP_TR_LOW();
-
-	/* Wait typical time. */
-	DELAY_US(P_ON_TO_CLKM_AVAILABLE_TYP_US);
-
-	/* Apply reset pulse */
-	RST_HIGH();
-	DELAY_US(RST_PULSE_WIDTH_US);
-	pal_trx_reg_write(RG_TRX_STATE, CMD_TRX_OFF);
-	pal_trx_reg_write(RG_IRQ_MASK,CMD_NOP); // TRX_IRQ_AWAKE_END multifuncional IRQ
-	
-	//DELAY_US(100);
-	//algo=pal_trx_reg_read(RG_IRQ_MASK);
-	
-	while (algo2!=0x08){
-		algo2=getStateAT86RF212();
-	}
-	algo2=getStateAT86RF212();
-	
-}
 void RESET()
 {
-// especificaciones segun LwMesh
 	RST_LOW();
 	DELAY_US(P_ON_TO_CLKM_AVAILABLE_TYP_US);
 	RST_HIGH();
-	
+	delay_ms(1);
 }
 int main (void)
 {
@@ -836,10 +596,7 @@ int main (void)
 //  	 	}
 //  		escribir_linea_pc("Modulo RF:\tPASS\r\n");
  
-	//iniciarAT86RF212();
-//	iniciarAT86();
-    resetAT86RF212();
-	register_value = pal_trx_reg_read(RG_PART_NUM);//pedido de identificacion del modulo. Debe devolver 0x07
+   	register_value = pal_trx_reg_read(RG_PART_NUM);//pedido de identificacion del modulo. Debe devolver 0x07
 
 	if (register_value == PART_NUM_AT86RF212) 
  		escribir_linea_pc("Modulo RF:\tPASS\r\n");
@@ -851,7 +608,8 @@ int main (void)
 	
 	init_i2c_pins();
 	init_i2c_module();
-	//iniciarAT86();
+	// inicializacion del tran
+	init_AT86RF212();
 	//------------------Fin de conguracion
 	
 	escribir_linea_pc("TESIS TUCUMAN 2015\n\r");
@@ -863,46 +621,19 @@ int main (void)
 	
 	while(true)
 	{
-		TXAT86RF212();
-	//irq_status=pal_trx_reg_read(RG_IRQ_STATUS);
-	//txTrama(0xff,tx_buffer,8);
-// 	if (getStateAT86RF212()==CMD_PLL_ON)
-// 	{
-// 	gpio_clr_gpio_pin(LED_1);
-// 	txTrama(tx_buffer);
-// 	while(getStateAT86RF212()!=BUSY_TX_ARET);
-// 	gpio_set_gpio_pin(LED_1);
-// 	delay_ms(4000);	
-// 		at86rfx_tx_frame(tx_buffer);
-// 		pal_trx_reg_write(RG_TRX_STATE,CMD_TX_START);
-// 		while(getStateAT86RF212()!=CMD_TX_START);
-// 		pal_trx_reg_write(RG_TRX_STATE,CMD_RX_ON);
-	/*}*/
-// 	else
-// 	{
-		
-		//iniciarAT86();
-/*	}*/
-	//irq_status=pal_trx_reg_read(RG_IRQ_STATUS);
-//	irq_status=pal_trx_reg_read(IRQ_STATUS);
-//		iniciarAT86();
-// 		if (cola_PC_nr != cola_PC_nw )
-// 		{
-// 			if (cola_PC[cola_PC_nr] == 't')
-// 			{
-// 				leer_temp(temps);
-// 				escribir_linea_pc("Temp: ");
-// 				escribir_linea_pc(temps);
-// 				escribir_linea_pc("*C\r\n");
-// 			}
-// 			cola_PC_nr++;
-// 			if (cola_PC_nr >= tamano_cola)
-// 				cola_PC_nr = 0;
-// 		}
-// 		
-		
-		
+		if (cola_PC_nr != cola_PC_nw )
+		{
+			if (cola_PC[cola_PC_nr] == 't')
+			{
+				leer_temp(temps);
+				escribir_linea_pc("Temp: ");
+				escribir_linea_pc(temps);
+				escribir_linea_pc("*C\r\n");
+			}
+			cola_PC_nr++;
+			if (cola_PC_nr >= tamano_cola)
+				cola_PC_nr = 0;
+		}
  	}
-
 }
 
