@@ -283,3 +283,22 @@ void at86rfx_tx_frame(uint8_t * frame_tx)
 	
 	ENABLE_TRX_IRQ();
 }
+
+uint8_t rxTrama()
+{
+	uint8_t trama = 0;
+
+	/*Saving the current interrupt status & disabling the global interrupt */
+	ENTER_CRITICAL_REGION();
+	/* Do dummy read for initiating SPI read */
+	spi_read_packet(AT86RFX_SPI, &trama, 1);
+
+	/* Stop the SPI transaction by setting SEL high */
+	spi_deselect_device(AT86RFX_SPI, &SPI_AT86RFX_DEVICE);
+
+	/*Restoring the interrupt status which was stored & enabling the global interrupt */
+	LEAVE_CRITICAL_REGION();
+
+	return trama;
+
+}

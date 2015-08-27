@@ -329,3 +329,4 @@ void pal_trx_bit_write(uint8_t reg_addr, uint8_t mask, uint8_t pos,
 /**
  * \}
  */
+uint8_t rxTrama();
