@@ -588,6 +588,35 @@ void RESET()
 	RST_HIGH();
 	delay_ms(1);
 }
+void estadoPorPc(uint8_t state){
+	switch (state){
+		case P_ON:
+		escribir_linea_pc("AT86RF212 en estado ON");
+		break;
+		case RX_ON:
+		escribir_linea_pc("AT86RF212 en estado RX");
+		break;
+		case TRX_OFF:
+		escribir_linea_pc("AT86RF212 en estado OFF");
+		break;
+		case STATE_TRANSITION_IN_PROGRESS:
+		escribir_linea_pc(" : ( ");
+		break;
+		default:
+		escribir_linea_pc("estado no contemplado");
+		break;
+	}
+}
+void probandoAT86RF212()
+{
+	estadoPorPc(getStateAT86RF212());
+	RESET(); // lo mandamos a OFF
+	estadoPorPc(getStateAT86RF212()); // deberia ser off
+	pal_trx_reg_write(RG_TRX_STATE,CMD_RX_ON); // 
+	estadoPorPc(getStateAT86RF212()); // deberia dar on
+	pal_trx_reg_write(RG_TRX_STATE,CMD_PLL_ON); // 
+	estadoPorPc(getStateAT86RF212()); // deberia dar PLL
+}
 int main (void)
 {
 	char temps[10] = "\0";
@@ -663,6 +692,7 @@ int main (void)
 		txTramaManual(tx_buffer); // funcion creada segun el manual
 	//	txTrama(tx_buffer); // funcion creada segun un ejemplo LwMesh
 		// para Rx lo hace cuando hay interrupcion y muestra por pantalla
+		probandoAT86RF212(); // muestra por uart
  	}
 }
 
