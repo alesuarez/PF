@@ -141,7 +141,7 @@ static void eic_int_handler2(void)
 				escribir_linea_pc("Trama enviada\r\n");
 			break;
 			case TRX_IRQ_RX_START:
-				rxTrama();
+				escribir_linea_pc(rxTrama()); // creo q se tendria que leer la interrupcion de la SPI
 			break;
 		}
 }
@@ -660,6 +660,9 @@ int main (void)
 			if (cola_PC_nr >= tamano_cola)
 				cola_PC_nr = 0;
 		}
+		txTramaManual(tx_buffer); // funcion creada segun el manual
+	//	txTrama(tx_buffer); // funcion creada segun un ejemplo LwMesh
+		// para Rx lo hace cuando hay interrupcion y muestra por pantalla
  	}
 }
 
