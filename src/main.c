@@ -569,8 +569,11 @@ uint8_t txTramaManual(uint8_t *data)
 
 uint8_t init_AT86RF212(void)
 {
+	variable1=getStateAT86RF212();
 	RESET();
+	variable1=getStateAT86RF212();
 	pal_trx_reg_write(RG_TRX_STATE, CMD_FORCE_TRX_OFF); // Forzar el estado off
+	variable1=getStateAT86RF212();
 	while(getStateAT86RF212()!= CMD_TRX_OFF); // espero el estado off
 	pal_trx_reg_write(RG_TRX_CTRL_0, CMD_NOP); 
 //	pal_trx_reg_write(RG_PHY_CC_CCA,||SR_SUB_MODE); // 914Mhz set channel ->
@@ -584,9 +587,9 @@ uint8_t init_AT86RF212(void)
 void RESET()
 {
 	RST_LOW();
-	DELAY_US(P_ON_TO_CLKM_AVAILABLE_TYP_US);
+	DELAY_US(RST_PULSE_WIDTH_NS);
 	RST_HIGH();
-	delay_ms(1);
+	//delay_ms(1);
 }
 void estadoPorPc(uint8_t state){
 	switch (state){
