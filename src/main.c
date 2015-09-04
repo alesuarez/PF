@@ -391,19 +391,16 @@ void init_i2c_module(void)
 
 void init_rf_pins(void)
 {
-	//Configuracion de los pines para SPI
+//Configuracion de los pines para SPI
 	spi_init_pins();
 
-	//PIN para interrupcion externa RF PA13-> IRQ2
-	gpio_configure_pin (AVR32_PIN_PA13, (GPIO_DIR_INPUT | GPIO_PULL_UP)); // PA13 IRQ2
-	gpio_enable_module_pin(AVR32_EIC_EXTINT_2_0_PIN, AVR32_EIC_EXTINT_2_0_FUNCTION); // Habilito interrupcion externa con este pin
-//	gpio_enable_pin_interrupt(AT86RFX_IRQ_PIN, GPIO_RISING_EDGE);
+	//PIN para interrupcion externa RF
+	
+	gpio_enable_pin_interrupt(AT86RFX_IRQ_PIN, GPIO_RISING_EDGE);
 	gpio_clear_pin_interrupt_flag(AT86RFX_IRQ_PIN);
 
-// 	gpio_configure_pin(AT86RFX_RST_PIN, GPIO_DIR_OUTPUT | GPIO_INIT_HIGH);
-// 	gpio_configure_pin(AT86RFX_SLP_PIN, GPIO_DIR_OUTPUT | GPIO_INIT_HIGH);	
-// 	
-
+	gpio_configure_pin(AT86RFX_RST_PIN, GPIO_DIR_OUTPUT | GPIO_INIT_HIGH);
+	gpio_configure_pin(AT86RFX_SLP_PIN, GPIO_DIR_OUTPUT | GPIO_INIT_HIGH);
 }
 
 void rs_232_init_pins(void)
@@ -570,6 +567,8 @@ uint8_t txTramaManual(uint8_t *data)
 uint8_t init_AT86RF212(void)
 {
 	variable1=getStateAT86RF212();
+	SLP_TR_LOW();
+	variable1=getStateAT86RF212();
 	RESET();
 	variable1=getStateAT86RF212();
 	pal_trx_reg_write(RG_TRX_STATE, CMD_FORCE_TRX_OFF); // Forzar el estado off
@@ -578,17 +577,21 @@ uint8_t init_AT86RF212(void)
 	pal_trx_reg_write(RG_TRX_CTRL_0, CMD_NOP); 
 //	pal_trx_reg_write(RG_PHY_CC_CCA,||SR_SUB_MODE); // 914Mhz set channel ->
 	pal_trx_reg_write(RG_IRQ_MASK, 0x0C);  // IRQ_RX_START && IRQ_TRX_END
-	pal_trx_reg_write(RG_TRX_CTRL_1, 0x02); // AACK_PROM_MODE Promiscuous mode is enabled 
+	pal_trx_reg_write(RG_XAH_CTRL_1, 0x02); // AACK_PROM_MODE Promiscuous mode is enabled 
+	variable2=pal_trx_reg_read(RG_XAH_CTRL_1);
 	PAL_WAIT_1_US();
 	pal_trx_reg_write(RG_TRX_STATE, CMD_RX_ON);// seteo el tran en RX
-	while ((pal_trx_reg_read(RG_TRX_STATUS)&0x1F)!=CMD_RX_ON);
+	variable1=getStateAT86RF212();
+//	while (getStateAT86RF212()!=CMD_RX_ON);
 }
 
 void RESET()
 {
 	RST_LOW();
+	
 	DELAY_US(RST_PULSE_WIDTH_NS);
 	RST_HIGH();
+	
 	//delay_ms(1);
 }
 void estadoPorPc(uint8_t state){
