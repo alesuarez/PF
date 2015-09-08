@@ -549,16 +549,15 @@ uint8_t txTramaManual(uint8_t *data)
 	if (state==CMD_RX_ON) {
 		DISABLE_TRX_IRQ();
 		
-		SLP_TR_LOW();
-		pal_trx_reg_write(RG_TRX_STATE,CMD_FORCE_TRX_OFF); //
-		
-		while (getStateAT86RF212()!=CMD_TRX_OFF);
-		
+		variable1=getStateAT86RF212();
+		escribir_linea_pc("AT86RF por transmitir...");	
 		pal_trx_reg_write(RG_TRX_STATE,CMD_TX_START); //
-		
+		estadoPorPc(getStateAT86RF212());
+		DELAY_US(1000/3); // hacia el estado busy_tx
 		pal_trx_frame_write(data,data[0] - LENGTH_FIELD_LEN);
-		
-		pal_trx_reg_write(RG_TRX_STATE,CMD_TX_START);
+		ENABLE_TRX_IRQ();
+	} else {
+		escribir_linea_pc(" no se puede enviar la trama \n");
 	}
 }
 
@@ -566,6 +565,7 @@ uint8_t txTramaManual(uint8_t *data)
 
 uint8_t init_AT86RF212(void)
 {
+	
 	variable1=getStateAT86RF212();
 	SLP_TR_LOW();
 	variable1=getStateAT86RF212();
@@ -576,10 +576,11 @@ uint8_t init_AT86RF212(void)
 	while(getStateAT86RF212()!= CMD_TRX_OFF); // espero el estado off
 	pal_trx_reg_write(RG_TRX_CTRL_0, CMD_NOP); 
 //	pal_trx_reg_write(RG_PHY_CC_CCA,||SR_SUB_MODE); // 914Mhz set channel ->
+// BPSK-40 (por defecto)
 	pal_trx_reg_write(RG_IRQ_MASK, 0x0C);  // IRQ_RX_START && IRQ_TRX_END
 	pal_trx_reg_write(RG_XAH_CTRL_1, 0x02); // AACK_PROM_MODE Promiscuous mode is enabled 
 	variable2=pal_trx_reg_read(RG_XAH_CTRL_1);
-	PAL_WAIT_1_US();
+	DELAY_US(1);
 	pal_trx_reg_write(RG_TRX_STATE, CMD_RX_ON);// seteo el tran en RX
 	variable1=getStateAT86RF212();
 //	while (getStateAT86RF212()!=CMD_RX_ON);
@@ -606,7 +607,7 @@ void estadoPorPc(uint8_t state){
 		escribir_linea_pc("AT86RF212 en estado OFF");
 		break;
 		case STATE_TRANSITION_IN_PROGRESS:
-		escribir_linea_pc(" : ( ");
+		escribir_linea_pc(" :'( ");
 		break;
 		default:
 		escribir_linea_pc("estado no contemplado");

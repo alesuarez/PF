@@ -157,4 +157,5 @@ enum{
 void escribir_linea_pc (char*);
 static void inicializar_interrupciones();
 void spi_init_pins(void);
+void estadoPorPc(uint8_t);
 #endif /* DEFINICIONES_H_ */
