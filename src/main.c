@@ -549,20 +549,28 @@ uint8_t txTrama(uint8_t *data)
 uint8_t txTramaManual(uint8_t *data)
 {
 	uint8_t state = getStateAT86RF212();
+	//Set register bit TX_AUTO_CRC_ON = 1 register 0x04, TRX_CTRL_1
+	//Set MAX_FRAME_RETRIES register 0x2C, XAH_CTRL_0
+	//Set MAX_CSMA_RETRIES register 0x2C, XAH_CTRL_0
+	//Set CSMA_SEED registers 0x2D, 0x2E
+	//Set MAX_BE, MIN_BE register 0x2F, CSMA_BE
+	//Configure CCA see Section 8.6
+	
 	if (state==CMD_RX_ON) {
 		DISABLE_TRX_IRQ();
 		
 		variable1=getStateAT86RF212();
 		escribir_linea_pc("AT86RF por transmitir...\r\n");	
 		estadoPorPc();
-		pal_trx_reg_write(RG_TRX_STATE,CMD_FORCE_PLL_ON);
-		while(getStateAT86RF212()!=CMD_PLL_ON);
-		pal_trx_reg_write(RG_TRX_STATE,CMD_TX_START); //
-		
+		pal_trx_reg_write(RG_TRX_STATE,CMD_FORCE_PLL_ON); //pongo en PLL ON
+		while(getStateAT86RF212()!=CMD_PLL_ON);  //espero q se ponga en PLL ON
+		//escribo la trama de datos en el buffer - segun pag 158
+		pal_trx_reg_write(RG_TRX_STATE,CMD_TX_START); // inicio tx - segun manual: Write TRX_CMD = TX_START, or assert pin 11 (SLP_TR)
 		DELAY_US(RST_PULSE_WIDTH_NS); // hacia el estado busy_tx
-		pal_trx_frame_write(data,5);
-		
-		ENABLE_TRX_IRQ();
+		pal_trx_frame_write(data,5);  //esto para mi hay q ponerlo arriba donde dije escribir trama
+		// espero IRQ_3 (TRX_END) issued
+		// Read IRQ_STATUS register, pin 24 (IRQ) deasserted
+		ENABLE_TRX_IRQ(); 
 		estadoPorPc();
 		variable1=getStateAT86RF212();
 		
@@ -570,7 +578,7 @@ uint8_t txTramaManual(uint8_t *data)
 	} else {
 		escribir_linea_pc(" no se puede enviar la trama \n");
 	}
-	pal_trx_reg_write(RG_TRX_STATE,CMD_RX_ON);
+	pal_trx_reg_write(RG_TRX_STATE,CMD_RX_ON); //vuelvo a estador RX ON
 	estadoPorPc();
 }
 uint8_t txTramachibi(uint8_t *data)
