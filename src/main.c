@@ -601,10 +601,10 @@ uint8_t txTramachibi(uint8_t *data)
 
 void promiscuous_mode()
 {
-	uint8_t address;
-	for (address=0x20; address<0x2C; address++)
+	for (uint8_t address=0x20; address<0x2C; address++)
 	{
 		pal_trx_reg_write(address, 0x00);
+		delay_ms(1);
 	}
 	pal_trx_reg_write(RG_XAH_CTRL_1, 0x02);	// AACK_PROM_MODE Promiscuous mode is enabled
 	PAL_WAIT_1_US();
@@ -615,7 +615,6 @@ void promiscuous_mode()
 void RESET()
 {
 	RST_LOW();
-	
 	DELAY_US(RST_PULSE_WIDTH_NS);
 	RST_HIGH();
 	
@@ -658,7 +657,7 @@ void estadoPorPc(){
 		case RX_AACK_ON_NOCLK:
 		escribir_linea_pc("\r\n AT86RF212 en estado RX_AACK_ON_NOCLK \n");
 		case STATE_TRANSITION_IN_PROGRESS:
-		escribir_linea_pc("\r\n :'( ");
+		escribir_linea_pc("\r\n :'(  STATE_TRANSITION_IN_PROGRESS ");
 		break;
 		
 		default:
@@ -687,7 +686,7 @@ uint8_t init_AT86RF212(void)
 	pal_trx_reg_write(RG_TRX_CTRL_0, 0x00);
 	//pal_trx_reg_write(RG_PHY_CC_CCA,||SR_SUB_MODE); // 914Mhz set channel ->
 
-	pal_trx_reg_write(RG_TRX_CTRL_1, 0x12); // 1 -> TX AUTO_CRC && 1-> IRQ_MASK_MODE
+	pal_trx_reg_write(RG_TRX_CTRL_1, 0x2E); // 1 -> TX AUTO_CRC && SPI_CMD_MODE -> 3 && 1-> IRQ_MASK_MODE 
 	PAL_WAIT_1_US();
 	pal_trx_reg_write(RG_TRX_CTRL_2, 0x00);
 	PAL_WAIT_1_US();
