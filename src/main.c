@@ -546,11 +546,11 @@ uint8_t txTrama(uint8_t *data)
 	return variable1;
 }
 
-uint8_t txTramaManual(uint8_t *data)  //pag 158 de 212 manual trans
+uint8_t txTramaManual(uint8_t *data)
 {
 	uint8_t state = getStateAT86RF212();
 	if (state==CMD_RX_ON) {
-		DISABLE_TRX_IRQ(); //aca deshabilitas las int de TX, porque? esto no deshabilita tmb el TX END?
+		DISABLE_TRX_IRQ();
 		
 		variable1=getStateAT86RF212();
 		escribir_linea_pc("AT86RF por transmitir...\r\n");	
@@ -559,12 +559,8 @@ uint8_t txTramaManual(uint8_t *data)  //pag 158 de 212 manual trans
 		while(getStateAT86RF212()!=CMD_PLL_ON);
 		pal_trx_reg_write(RG_TRX_STATE,CMD_TX_START); //
 		
-<<<<<<< HEAD
 		DELAY_US(RST_PULSE_WIDTH_NS); // hacia el estado busy_tx
 		pal_trx_frame_write(data,5);
-=======
-		while (getStateAT86RF212()!=CMD_TRX_OFF);  //en el manual no dice nada de mandar a off, quiza no es necesario, vos fijate.
->>>>>>> da5ce6aec68c4cf13f32f006c4463a53abd4d8ae
 		
 		ENABLE_TRX_IRQ();
 		estadoPorPc();
@@ -591,7 +587,6 @@ uint8_t txTramachibi(uint8_t *data)
 		pal_trx_frame_write(RG_TRX_STATE,CMD_TX_START);
 		DELAY_US(RST_PULSE_WIDTH_NS);
 		
-<<<<<<< HEAD
 		pal_trx_frame_write(data,data[0] - LENGTH_FIELD_LEN);
 		escribir_linea_pc("\n\n\n FINNNNNN \n\n\n\n");
 	}
@@ -600,11 +595,6 @@ uint8_t txTramachibi(uint8_t *data)
 		
 		escribir_linea_pc("\nno se puede tx\r\n");
 		pal_trx_frame_write(RG_TRX_STATE,CMD_RX_ON);
-=======
-		pal_trx_frame_write(data,data[0] - LENGTH_FIELD_LEN); // Segun leo, esto seria la manera de transmitir "optimizando tiempo" para sistemas de respuesta critica, la manera basica seria: primero se pone el dato y despues se lo pone en TX START, osea q esto iria antes q la linea de codigo anterior...podrias probar primero lo basico y dsp optimizar DIGO! Ademas el manual recomienda el modo "no critico"
-		
-		pal_trx_reg_write(RG_TRX_STATE,CMD_TX_START); //Aca pones Start de nuevo, no entiendo porque, aca el micro deberia esperar un TX END y dsp una interrupcion en el pin 24 del IRQ y salir.
->>>>>>> da5ce6aec68c4cf13f32f006c4463a53abd4d8ae
 	}
 	
 }
