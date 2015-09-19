@@ -130,11 +130,16 @@ __interrupt
 // PA13/GPIO 13/GLOC-OUT[0]/GLOC-IN[7]/TC0-A0/SCIF-GCLK[2]/PWMA-PWMA[13]/CAT-SMP/EIC-EXTINT[2]/CAT-CSA[0]/XIN32_2
 static void eic_int_handler2(void)
 {
-		uint8_t IRQ_STATUS;
+	uint8_t IRQ_STATUS = pal_trx_reg_read(RG_IRQ_STATUS) & 0x0C;
+	variable1=pal_trx_reg_read(RG_IRQ_STATUS);
+	variable2=pal_trx_reg_read(RG_IRQ_MASK);
+		
 		// Interrupt Line must be cleared to enable
 		eic_clear_interrupt_line(&AVR32_EIC, AVR32_EIC_INT2);
 		//IRQ2 Pin 26 MCU --> Pin 24 T
-		IRQ_STATUS = pal_trx_reg_read(RG_IRQ_STATUS);
+		//IRQ_STATUS = pal_trx_reg_read(RG_IRQ_STATUS);
+		variable1=pal_trx_reg_read(RG_IRQ_STATUS);
+		variable2=pal_trx_reg_read(RG_IRQ_MASK);
 		switch (IRQ_STATUS)
 		{
 			case TRX_IRQ_TRX_END:
@@ -521,7 +526,7 @@ uint8_t txTrama(uint8_t *data)
 	}
 	DISABLE_TRX_IRQ();
 	
-	SLP_TR_LOW();
+	//SLP_TR_LOW();
 	pal_trx_reg_write(RG_TRX_STATE,CMD_FORCE_TRX_OFF); // 
 	
 	while (getStateAT86RF212()!= CMD_TRX_OFF);
@@ -557,20 +562,24 @@ uint8_t txTramaManual(uint8_t *data)
 	//Configure CCA see Section 8.6
 	
 	if (state==CMD_RX_ON) {
-		DISABLE_TRX_IRQ();
+		//DISABLE_TRX_IRQ();
 		
 		variable1=getStateAT86RF212();
 		escribir_linea_pc("AT86RF por transmitir...\r\n");	
 		estadoPorPc();
 		pal_trx_reg_write(RG_TRX_STATE,CMD_FORCE_PLL_ON); //pongo en PLL ON
 		while(getStateAT86RF212()!=CMD_PLL_ON);  //espero q se ponga en PLL ON
+		estadoPorPc();
+		pal_trx_reg_write(RG_IRQ_MASK,0x0C);
+		variable1=pal_trx_reg_read(RG_IRQ_MASK);
+		
 		//escribo la trama de datos en el buffer - segun pag 158
 		pal_trx_reg_write(RG_TRX_STATE,CMD_TX_START); // inicio tx - segun manual: Write TRX_CMD = TX_START, or assert pin 11 (SLP_TR)
 		DELAY_US(RST_PULSE_WIDTH_NS); // hacia el estado busy_tx
-		pal_trx_frame_write(data,5);  //esto para mi hay q ponerlo arriba donde dije escribir trama
+		pal_trx_frame_write(data,4);  //esto para mi hay q ponerlo arriba donde dije escribir trama
 		// espero IRQ_3 (TRX_END) issued
 		// Read IRQ_STATUS register, pin 24 (IRQ) deasserted
-		ENABLE_TRX_IRQ(); 
+		//ENABLE_TRX_IRQ(); 
 		estadoPorPc();
 		variable1=getStateAT86RF212();
 		
@@ -682,7 +691,10 @@ uint8_t init_AT86RF212(void)
 	estadoPorPc();
 	
 	variable1=getStateAT86RF212();
-	SLP_TR_LOW();
+	
+	//SLP_TR_LOW();
+	
+	
 	estadoPorPc();
 	RESET();
 	PAL_WAIT_1_US();
@@ -691,20 +703,21 @@ uint8_t init_AT86RF212(void)
 	
 	variable1=getStateAT86RF212();
 	while(getStateAT86RF212()!= CMD_TRX_OFF); // espero el estado off
-	pal_trx_reg_write(RG_TRX_CTRL_0, 0x00);
+	//pal_trx_reg_write(RG_TRX_CTRL_0, 0x00);
 	//pal_trx_reg_write(RG_PHY_CC_CCA,||SR_SUB_MODE); // 914Mhz set channel ->
 
 	pal_trx_reg_write(RG_TRX_CTRL_1, 0x2E); // 1 -> TX AUTO_CRC && SPI_CMD_MODE -> 3 && 1-> IRQ_MASK_MODE 
-	PAL_WAIT_1_US();
-	pal_trx_reg_write(RG_TRX_CTRL_2, 0x00);
-	PAL_WAIT_1_US();
+	//PAL_WAIT_1_US();
+	pal_trx_reg_write(RG_IRQ_MASK, 0x0C);
+	//pal_trx_reg_write(RG_TRX_CTRL_2, 0x00);
+	//PAL_WAIT_1_US();
 	//pal_trx_reg_write(RG_XOSC_CTRL, 0x40); // manejo del cristal externo y capacitores
 	//PAL_WAIT_1_US();
 	promiscuous_mode();
 	pal_trx_reg_write(RG_TRX_STATE, CMD_RX_ON);// seteo el tran en RX
 	variable1=getStateAT86RF212();
 	while (getStateAT86RF212()!=CMD_RX_ON);
-	cpu_irq_enable();
+	//cpu_irq_enable();
 	estadoPorPc();
 	escribir_linea_pc("\n Terminando configuracion AT86RF212 \n\n");
 }
@@ -712,6 +725,7 @@ uint8_t init_AT86RF212(void)
 
 
 int main (void)
+
 {
 	char temps[10] = "\0";
 	int i=0;
@@ -763,11 +777,12 @@ int main (void)
 	init_i2c_pins();
 	init_i2c_module();
 	// inicializacion del tran
+	pal_trx_reg_write(RG_TRX_STATE,CMD_FORCE_PLL_ON);
 	init_AT86RF212();
 	//------------------Fin de conguracion
 	
 	escribir_linea_pc("TESIS TUCUMAN 2015\n\r\n");
-	//pal_trx_reg_write(RG_TRX_STATE,CMD_RX_AACK_ON);
+	
 	while(true)
 	{
 		if (cola_PC_nr != cola_PC_nw )
@@ -783,10 +798,11 @@ int main (void)
 			if (cola_PC_nr >= tamano_cola)
 				cola_PC_nr = 0;
 		}
-		txTramaManual(tx_buffer);
+		//at86rfx_tx_frame(tx_buffer);
+		//txTramaManual(tx_buffer);
 		//txTramachibi(tx_buffer);
 		//txTramachibi(tx_buffer);
-		estadoPorPc();
+		//estadoPorPc();
 		delay_ms(500);
 		//txTramachibi(tx_buffer); // funcion creada segun el manual
 	//	txTrama(tx_buffer); // funcion creada segun un ejemplo LwMesh
