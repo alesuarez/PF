@@ -51,6 +51,7 @@ uint8_t variable1;
 uint8_t variable2;
 uint8_t variable3;
 uint8_t TX_;
+uint8_t address;
 usart_options_t usart_opt = {
 	//! Baudrate is set in the conf_example_usart.h file.
 	.baudrate    = 9600,
@@ -615,18 +616,18 @@ uint8_t txTramachibi(uint8_t *data)
 	}
 	
 }
-
 void promiscuous_mode()
 {
-	for (uint8_t address=0x20; address<0x2C; address++)
+	for (address=0x20; address<0x2C; address++)
 	{
 		pal_trx_reg_write(address, 0x00);
-		delay_ms(1);
+		delay_ms(5);
 	}
 	pal_trx_reg_write(RG_XAH_CTRL_1, 0x02);	// AACK_PROM_MODE Promiscuous mode is enabled
 	PAL_WAIT_1_US();
 	pal_trx_reg_write(RG_CSMA_SEED_1, 0xD2); // AACK_DIS_ACK = 1 && AACK_FVN_MODE = 3
 	PAL_WAIT_1_US();
+	
 }
 
 void RESET()
@@ -636,6 +637,18 @@ void RESET()
 	RST_HIGH();
 	
 	delay_ms(1);
+}
+void reset()
+{
+	SLP_TR_LOW();
+	RST_HIGH();
+	DELAY_US(400);
+	RST_LOW();
+	DELAY_US(63);
+	RST_LOW();
+	pal_trx_reg_write(RG_TRX_CTRL_0,0x08);
+	//pal_trx_reg_write(RG_TRX_STATE,CMD_FORCE_TRX_OFF);
+	
 }
 void estadoPorPc(){
 	delay_ms(1);
@@ -706,7 +719,7 @@ uint8_t init_AT86RF212(void)
 	//pal_trx_reg_write(RG_TRX_CTRL_0, 0x00);
 	//pal_trx_reg_write(RG_PHY_CC_CCA,||SR_SUB_MODE); // 914Mhz set channel ->
 
-	pal_trx_reg_write(RG_TRX_CTRL_1, 0x2E); // 1 -> TX AUTO_CRC && SPI_CMD_MODE -> 3 && 1-> IRQ_MASK_MODE 
+	pal_trx_reg_write(RG_TRX_CTRL_1, 0x2E); // 1 -> TX AUTO_CRC && SPI_CMD_MODE -> 3 && 1-> IRQ_MASK_MODE
 	//PAL_WAIT_1_US();
 	pal_trx_reg_write(RG_IRQ_MASK, 0x0C);
 	//pal_trx_reg_write(RG_TRX_CTRL_2, 0x00);
@@ -777,7 +790,10 @@ int main (void)
 	init_i2c_pins();
 	init_i2c_module();
 	// inicializacion del tran
-	pal_trx_reg_write(RG_TRX_STATE,CMD_FORCE_PLL_ON);
+	//pal_trx_reg_write(RG_TRX_STATE,CMD_FORCE_PLL_ON);
+
+	
+
 	init_AT86RF212();
 	//------------------Fin de conguracion
 	
@@ -802,7 +818,7 @@ int main (void)
 		//txTramaManual(tx_buffer);
 		//txTramachibi(tx_buffer);
 		//txTramachibi(tx_buffer);
-		//estadoPorPc();
+		estadoPorPc();
 		delay_ms(500);
 		//txTramachibi(tx_buffer); // funcion creada segun el manual
 	//	txTrama(tx_buffer); // funcion creada segun un ejemplo LwMesh
