@@ -154,6 +154,19 @@ enum{
 	TIME_TRX_OFF_PLL_ON         = 110,
 	TIME_IRQ_PROCESSING_DLY     = 32
 };
+enum{
+	BAUDRATE    = 1,
+	TEMPERATURA = 2
+};
+
+typedef struct
+{
+	uint8_t addr;
+	uint8_t cmd;	
+	uint8_t payload[2];	
+	uint8_t crc;	
+}config_package;
+
 void escribir_linea_pc (char*);
 static void inicializar_interrupciones();
 void spi_init_pins(void);

@@ -21,6 +21,7 @@
 #include "ASF/common/components/at86rf212.h"
 
 #define BUFFER_SIZE       (15)
+#define ADDRESS 0x01
 
 char cola_PC[tamano_cola];
 int cola_PC_nw = 0;
@@ -52,6 +53,9 @@ uint8_t variable2;
 uint8_t variable3;
 uint8_t TX_;
 uint8_t address;
+bool configuracion = false;
+uint8_t pConfiguracion=0;
+config_package tramaConfiguracion;
 usart_options_t usart_opt = {
 	//! Baudrate is set in the conf_example_usart.h file.
 	.baudrate    = 9600,
@@ -180,13 +184,18 @@ static void usart_int_handler_RS232(void)
 		
 	if (usart_read_char(&AVR32_USART2, &c) != USART_SUCCESS) //aqui lee el caracter por el puerto uart2
 		return;
-
 	
-		cola_PC[cola_PC_nw] = (char) c;
-		cola_PC_nw++;	
+	cola_PC[cola_PC_nw] = (char) c;
 	
-		if (cola_PC_nw >= tamano_cola)
-			cola_PC_nw = 0;
+	if (cola_PC[cola_PC_nw] == 0x01)
+	{
+		configuracion = true;
+		pConfiguracion = cola_PC_nw;
+	}
+	cola_PC_nw++;
+	
+	if (cola_PC_nw >= tamano_cola)
+	cola_PC_nw = 0;
 	
 	tc_start(tc,EXAMPLE_TC_CHANNEL);
 	return;
@@ -734,8 +743,36 @@ uint8_t init_AT86RF212(void)
 	estadoPorPc();
 	escribir_linea_pc("\n Terminando configuracion AT86RF212 \n\n");
 }
+void modeConfig()
+{
+// cuando esta en modo de configuracion no hace nada, solo espera que le lleguen los datos
 
+	while(cola_PC_nr != pConfiguracion + 9);
+	// comprobar CRC
+	// solo si pasa el crc sigo la configuracion
+	tramaConfiguracion->crc = cola_PC[pConfiguracion+8];
 
+	// fin comprobacion
+	
+	tramaConfiguracion->cmd = cola_PC[pConfiguracion+3];
+
+	tramaConfiguracion->payload[0] = cola_PC[pConfiguracion+5];	
+	tramaConfiguracion->payload[1] = cola_PC[pConfiguracion+6];
+	tramaConfiguracion->payload[2] = cola_PC[pConfiguracion+7];
+
+	switch (tramaConfiguracion->cmd){
+		case BAUDRATE:
+			escribir_linea_pc("\r\nConfiguracion del baud rate\n");
+		break;
+		case TEMPERATURA:
+			escribir_linea_pc("\r\nVeo la temperatura\n");
+		break;
+		case default:
+			escribir_linea_pc("\r\nComando no valido\n");
+		break;
+	}
+	return;
+}
 
 int main (void)
 
@@ -811,8 +848,22 @@ int main (void)
 				escribir_linea_pc("*C\r\n");
 			}
 			cola_PC_nr++;
+			
 			if (cola_PC_nr >= tamano_cola)
 				cola_PC_nr = 0;
+				
+			if (configuracion && (cola_PC_nr == pConfiguracion + 3))
+			{
+				if ((cola_PC[pConfiguracion] & cola_PC[pConfiguracion+1] & cola_PC[pConfiguracion+2]) == 0x01)
+				{
+					if (cola_PC[pConfiguracion+3] == ADDRESS)
+					{
+						modeConfig();
+					}
+					
+				}
+				configuracion = false;
+			}
 		}
 		//at86rfx_tx_frame(tx_buffer);
 		//txTramaManual(tx_buffer);
