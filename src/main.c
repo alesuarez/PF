@@ -21,11 +21,11 @@
 #include "ASF/common/components/at86rf212.h"
 
 #define BUFFER_SIZE       (15)
-#define ADDRESS 0x01
+#define ADDRESS 0x31
 
-char cola_PC[tamano_cola];
-int cola_PC_nw = 0;
-int cola_PC_nr = 0;
+uint8_t cola_PC[tamano_cola];
+uint8_t cola_PC_nw = 0;
+uint8_t cola_PC_nr = 0;
 
 volatile static uint32_t tc_tick = 1;
 
@@ -169,7 +169,7 @@ static void usart_int_handler_RS232(void)
 	// TDW sensor de temperatura -> RX UART2 Pin 24 MCU
 	tc_stop(tc,EXAMPLE_TC_CHANNEL);
 	
-	int c=0;
+	uint8_t c=0;
 	/*
 	 * In the code line below, the interrupt priority level does not need to
 	 * be explicitly masked as it is already because we are within the
@@ -185,12 +185,15 @@ static void usart_int_handler_RS232(void)
 	if (usart_read_char(&AVR32_USART2, &c) != USART_SUCCESS) //aqui lee el caracter por el puerto uart2
 		return;
 	
-	cola_PC[cola_PC_nw] = (char) c;
+	cola_PC[cola_PC_nw] = c;
 	
 	if (cola_PC[cola_PC_nw] == 0x01)
-	{
+	{	
+		if (!configuracion){
+			pConfiguracion = cola_PC_nw;
+		}
 		configuracion = true;
-		pConfiguracion = cola_PC_nw;
+		
 	}
 	cola_PC_nw++;
 	
@@ -747,29 +750,27 @@ void modeConfig()
 {
 // cuando esta en modo de configuracion no hace nada, solo espera que le lleguen los datos
 
-	while(cola_PC_nr != pConfiguracion + 9);
+	while(cola_PC_nw < (pConfiguracion + 0x09));
 	// comprobar CRC
 	// solo si pasa el crc sigo la configuracion
-	tramaConfiguracion->crc = cola_PC[pConfiguracion+8];
+	tramaConfiguracion.crc = cola_PC[pConfiguracion+8];
 
 	// fin comprobacion
 	
-	tramaConfiguracion->cmd = cola_PC[pConfiguracion+3];
+	tramaConfiguracion.cmd = cola_PC[pConfiguracion+3];
 
-	tramaConfiguracion->payload[0] = cola_PC[pConfiguracion+5];	
-	tramaConfiguracion->payload[1] = cola_PC[pConfiguracion+6];
-	tramaConfiguracion->payload[2] = cola_PC[pConfiguracion+7];
+	tramaConfiguracion.payload[0] = cola_PC[pConfiguracion+5];	
+	tramaConfiguracion.payload[1] = cola_PC[pConfiguracion+6];
+	tramaConfiguracion.payload[2] = cola_PC[pConfiguracion+7];
 
-	switch (tramaConfiguracion->cmd){
+	switch (tramaConfiguracion.cmd){
 		case BAUDRATE:
 			escribir_linea_pc("\r\nConfiguracion del baud rate\n");
 		break;
 		case TEMPERATURA:
 			escribir_linea_pc("\r\nVeo la temperatura\n");
 		break;
-		case default:
-			escribir_linea_pc("\r\nComando no valido\n");
-		break;
+		
 	}
 	return;
 }
@@ -831,7 +832,7 @@ int main (void)
 
 	
 
-	init_AT86RF212();
+	//init_AT86RF212();
 	//------------------Fin de conguracion
 	
 	escribir_linea_pc("TESIS TUCUMAN 2015\n\r\n");
@@ -852,7 +853,7 @@ int main (void)
 			if (cola_PC_nr >= tamano_cola)
 				cola_PC_nr = 0;
 				
-			if (configuracion && (cola_PC_nr == pConfiguracion + 3))
+			if (configuracion && (cola_PC_nr >= pConfiguracion + 4))
 			{
 				if ((cola_PC[pConfiguracion] & cola_PC[pConfiguracion+1] & cola_PC[pConfiguracion+2]) == 0x01)
 				{

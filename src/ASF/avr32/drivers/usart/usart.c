@@ -828,7 +828,7 @@ int usart_putchar(volatile avr32_usart_t *usart, int c)
 }
 
 
-int usart_read_char(volatile avr32_usart_t *usart, int *c)
+int usart_read_char(volatile avr32_usart_t *usart, uint8_t *c)
 {
   // Check for errors: frame, parity and overrun. In RS485 mode, a parity error
   // would mean that an address char has been received.

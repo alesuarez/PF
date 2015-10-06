@@ -155,8 +155,8 @@ enum{
 	TIME_IRQ_PROCESSING_DLY     = 32
 };
 enum{
-	BAUDRATE    = 1,
-	TEMPERATURA = 2
+	BAUDRATE    = 0x31,
+	TEMPERATURA = 0x32
 };
 
 typedef struct

@@ -770,7 +770,7 @@ __always_inline static int usart_test_hit(volatile avr32_usart_t *usart)
  * \retval USART_RX_EMPTY The RX buffer was empty.
  * \retval USART_RX_ERROR An error was detected.
  */
-extern int usart_read_char(volatile avr32_usart_t *usart, int *c);
+extern int usart_read_char(volatile avr32_usart_t *usart, uint8_t *c);
 
 /*! \brief Waits until a character is received, and returns it.
  *
