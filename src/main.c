@@ -206,7 +206,22 @@ static void usart_int_handler_RS232(void)
 	
 }
 
-
+bool check_pack(uint8_t tampack) //tampack es la cantidad de bytes del paquete hasta antes de EOT, para cdo lo hagamos variable
+{
+	uint8_t i=3; //cosa que no tome los SOH
+	char lrc= cola_PC[i];
+	
+	while(i<tampack){
+	i=i+1;
+	lrc=lrc ^ cola_Pc[i]; //este es el XOR
+	}
+	if (lrc=cola_Pc[i]){
+		return true; //el LRC del paquete y el calculado son iguales
+	}else 
+	{
+		return false; //el LRC del paquete y el calculado no coinciden
+	}
+}
 
 void escribir_linea_pc (char *str)
 {
