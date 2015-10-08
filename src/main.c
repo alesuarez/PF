@@ -215,7 +215,7 @@ bool check_pack(uint8_t tampack) //tampack es la cantidad de bytes del paquete h
 	i=i+1;
 	lrc=lrc ^ cola_Pc[i]; //este es el XOR
 	}
-	if (lrc=cola_Pc[i]){
+	if (lrc==cola_Pc[i]){
 		return true; //el LRC del paquete y el calculado son iguales
 	}else 
 	{
@@ -764,29 +764,31 @@ uint8_t init_AT86RF212(void)
 void modeConfig()
 {
 // cuando esta en modo de configuracion no hace nada, solo espera que le lleguen los datos
-
+	uint8_t tam=8;
 	while(cola_PC_nw < (pConfiguracion + 0x09));
 	// comprobar CRC
+	if (check_pack(tam)){
 	// solo si pasa el crc sigo la configuracion
-	tramaConfiguracion.crc = cola_PC[pConfiguracion+8];
-
-	// fin comprobacion
+		tramaConfiguracion.crc = cola_PC[pConfiguracion+8];
 	
-	tramaConfiguracion.cmd = cola_PC[pConfiguracion+3];
-
-	tramaConfiguracion.payload[0] = cola_PC[pConfiguracion+5];	
-	tramaConfiguracion.payload[1] = cola_PC[pConfiguracion+6];
-	tramaConfiguracion.payload[2] = cola_PC[pConfiguracion+7];
-
-	switch (tramaConfiguracion.cmd){
-		case BAUDRATE:
-			escribir_linea_pc("\r\nConfiguracion del baud rate\n");
-		break;
-		case TEMPERATURA:
-			escribir_linea_pc("\r\nVeo la temperatura\n");
-		break;
+		// fin comprobacion
 		
-	}
+		tramaConfiguracion.cmd = cola_PC[pConfiguracion+3];
+	
+		tramaConfiguracion.payload[0] = cola_PC[pConfiguracion+5];	
+		tramaConfiguracion.payload[1] = cola_PC[pConfiguracion+6];
+		tramaConfiguracion.payload[2] = cola_PC[pConfiguracion+7];
+	
+		switch (tramaConfiguracion.cmd){
+			case BAUDRATE:
+				escribir_linea_pc("\r\nConfiguracion del baud rate\n");
+			break;
+			case TEMPERATURA:
+				escribir_linea_pc("\r\nVeo la temperatura\n");
+			break;
+			
+		}
+	} //ver que onda cuando sale de aca, si falla el LRC no hace nada, quiza deberia hacer algo?
 	return;
 }
 
