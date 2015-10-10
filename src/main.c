@@ -42,6 +42,7 @@ uint8_t PHY_TX_PWR = 0;
 uint8_t PHY_CC_CCA = 0;
 
 uint8_t IRQ_MASK= 0;
+uint8_t IRQ_STATUS;
 uint8_t irq_status= 0;
 uint8_t algo=0;
 uint8_t algo2=0;
@@ -56,6 +57,8 @@ uint8_t address;
 bool configuracion = false;
 uint8_t pConfiguracion=0;
 config_package tramaConfiguracion;
+uint8_t spi;
+
 usart_options_t usart_opt = {
 	//! Baudrate is set in the conf_example_usart.h file.
 	.baudrate    = 9600,
@@ -116,12 +119,6 @@ static void tc_irq(void)
 		gpio_toggle_pin(AVR32_PIN_PA11);	
 		tc_tick = 1;
 	}
-	
-		
-
-	
-	
-	
 }
 
 #if __GNUC__
@@ -135,23 +132,28 @@ __interrupt
 // PA13/GPIO 13/GLOC-OUT[0]/GLOC-IN[7]/TC0-A0/SCIF-GCLK[2]/PWMA-PWMA[13]/CAT-SMP/EIC-EXTINT[2]/CAT-CSA[0]/XIN32_2
 static void eic_int_handler2(void)
 {
-	uint8_t IRQ_STATUS = pal_trx_reg_read(RG_IRQ_STATUS) & 0x0C;
-	variable1=pal_trx_reg_read(RG_IRQ_STATUS);
-	variable2=pal_trx_reg_read(RG_IRQ_MASK);
+	IRQ_STATUS = pal_trx_reg_read(RG_IRQ_STATUS);
+	IRQ_STATUS &= 0x0C;
+	//variable1=pal_trx_reg_read(RG_IRQ_STATUS);
+	//variable2=pal_trx_reg_read(RG_IRQ_MASK);
 		
 		// Interrupt Line must be cleared to enable
 		eic_clear_interrupt_line(&AVR32_EIC, AVR32_EIC_INT2);
 		//IRQ2 Pin 26 MCU --> Pin 24 T
 		//IRQ_STATUS = pal_trx_reg_read(RG_IRQ_STATUS);
-		variable1=pal_trx_reg_read(RG_IRQ_STATUS);
-		variable2=pal_trx_reg_read(RG_IRQ_MASK);
+		//variable1=pal_trx_reg_read(RG_IRQ_STATUS);
+		//variable2=pal_trx_reg_read(RG_IRQ_MASK);
 		switch (IRQ_STATUS)
 		{
 			case TRX_IRQ_TRX_END:
 				escribir_linea_pc("\n\n --> Trama enviada :) :) \r\n");
+				spi = (uint8_t) spi_get(AT86RFX_SPI);
+				escribir_linea_pc(spi);
+				
 			break;
 			case TRX_IRQ_RX_START:
-				escribir_linea_pc(rxTrama()); // creo q se tendria que leer la interrupcion de la SPI
+				spi = spi_get(AT86RFX_SPI);
+				//escribir_linea_pc(rxTrama()); // creo q se tendria que leer la interrupcion de la SPI
 			break;
 		}
 }
@@ -712,23 +714,24 @@ void estadoPorPc(){
 uint8_t init_AT86RF212(void)
 {
 	escribir_linea_pc("\n Inicializando AT86RF212 \n\n");
+	Disable_global_interrupt();
+	//estadoPorPc();
 	
-	estadoPorPc();
-	
-	variable1=getStateAT86RF212();
+	//variable1=getStateAT86RF212();
 	
 	//SLP_TR_LOW();
 	
 	
-	estadoPorPc();
-	RESET();
-	PAL_WAIT_1_US();
+	//estadoPorPc();
+	reset();
+	//PAL_WAIT_1_US();
+	pal_trx_reg_write(RG_IRQ_MASK, 0x00);
 	pal_trx_reg_write(RG_TRX_STATE, CMD_FORCE_TRX_OFF); // Forzar el estado off
-	DELAY_US(RST_PULSE_WIDTH_NS); //tTR10
+	DELAY_US(RST_PULSE_WIDTH_US); //tTR10
 	
-	variable1=getStateAT86RF212();
+	//variable1=getStateAT86RF212();
 	while(getStateAT86RF212()!= CMD_TRX_OFF); // espero el estado off
-	//pal_trx_reg_write(RG_TRX_CTRL_0, 0x00);
+	pal_trx_reg_write(RG_TRX_CTRL_0, 0x08);
 	//pal_trx_reg_write(RG_PHY_CC_CCA,||SR_SUB_MODE); // 914Mhz set channel ->
 
 	pal_trx_reg_write(RG_TRX_CTRL_1, 0x2E); // 1 -> TX AUTO_CRC && SPI_CMD_MODE -> 3 && 1-> IRQ_MASK_MODE
@@ -739,11 +742,12 @@ uint8_t init_AT86RF212(void)
 	//pal_trx_reg_write(RG_XOSC_CTRL, 0x40); // manejo del cristal externo y capacitores
 	//PAL_WAIT_1_US();
 	promiscuous_mode();
-	pal_trx_reg_write(RG_TRX_STATE, CMD_RX_ON);// seteo el tran en RX
-	variable1=getStateAT86RF212();
-	while (getStateAT86RF212()!=CMD_RX_ON);
+	pal_trx_reg_write(RG_TRX_STATE, CMD_FORCE_PLL_ON);// seteo el tran en 
+// 	variable1=getStateAT86RF212();
+	DELAY_US(TIME_TRX_OFF_PLL_ON );
+ 	while (getStateAT86RF212()!=CMD_PLL_ON);
 	//cpu_irq_enable();
-	estadoPorPc();
+	Enable_global_interrupt();
 	escribir_linea_pc("\n Terminando configuracion AT86RF212 \n\n");
 }
 void modeConfig()
@@ -776,7 +780,6 @@ void modeConfig()
 }
 
 int main (void)
-
 {
 	char temps[10] = "\0";
 	int i=0;
@@ -815,8 +818,8 @@ int main (void)
 //  	 	}
 //  		escribir_linea_pc("Modulo RF:\tPASS\r\n");
  
-   	register_value = pal_trx_reg_read(RG_PART_NUM);//pedido de identificacion del modulo. Debe devolver 0x07
-
+	register_value = pal_trx_reg_read(RG_PART_NUM);//pedido de identificacion del modulo. Debe devolver 0x07
+	
 	if (register_value == PART_NUM_AT86RF212) 
  		escribir_linea_pc("Modulo RF:\tPASS\r\n");
 	else
@@ -832,11 +835,12 @@ int main (void)
 
 	
 
-	//init_AT86RF212();
+	init_AT86RF212();
 	//------------------Fin de conguracion
 	
 	escribir_linea_pc("TESIS TUCUMAN 2015\n\r\n");
 	
+	pal_trx_reg_write(RG_TRX_STATE, CMD_RX_ON);// seteo el tran en RX
 	while(true)
 	{
 		if (cola_PC_nr != cola_PC_nw )
