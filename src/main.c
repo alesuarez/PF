@@ -752,7 +752,7 @@ uint8_t init_AT86RF212(void)
 	
 	
 	//estadoPorPc();
-	reset();
+	RESET();
 	//PAL_WAIT_1_US();
 	pal_trx_reg_write(RG_IRQ_MASK, 0x00);
 	PAL_WAIT_1_US();
@@ -775,17 +775,15 @@ uint8_t init_AT86RF212(void)
 	PAL_WAIT_1_US();
 	promiscuous_mode();
 	PAL_WAIT_1_US();
-	pal_trx_reg_write(RG_TRX_STATE, CMD_FORCE_PLL_ON);// seteo el tran en 
-// 	variable1=getStateAT86RF212();
-	DELAY_US(TIME_TRX_OFF_PLL_ON );
- 	while (getStateAT86RF212()!=CMD_PLL_ON);
-// 	PAL_WAIT_1_US();
-// 	pal_trx_reg_write(RG_TRX_STATE, CMD_RX_ON);// seteo el tran en
-// 	DELAY_US(TIME_PLL_ON_RX_ON);
-// 
-// 	while (getStateAT86RF212()!=CMD_RX_ON);
-// 	
-	//cpu_irq_enable();
+	pal_trx_reg_write(RG_TRX_STATE, CMD_FORCE_PLL_ON);// seteo el tran en
+	DELAY_US(TIME_PLL_ON_RX_ON);
+
+	while (getStateAT86RF212()!=CMD_PLL_ON);
+	PAL_WAIT_1_US();
+	pal_trx_reg_write(RG_TRX_STATE, CMD_RX_ON);
+	PAL_WAIT_1_US();
+ 	
+	cpu_irq_enable();
 	Enable_global_interrupt();
 	
 	escribir_linea_pc("\n Terminando configuracion AT86RF212 \n\n");
@@ -852,15 +850,7 @@ int main (void)
 	
 	// Inicializacion del timer
 	tc_init(tc);
-	// inicializacion de AT86RF212
-	//while (trx_init()!=TRX_SUCCESS);
-	//at86rfx_init();
-	//Inicializacion Modulo RF (Depurar!)
-// 	while (at86rfx_init() != AT86RFX_SUCCESS) {
-//  	 		escribir_linea_pc("Modulo RF:\tFAILED\r\n");
-//  	 	}
-//  		escribir_linea_pc("Modulo RF:\tPASS\r\n");
- 
+	
 	register_value = pal_trx_reg_read(RG_PART_NUM);//pedido de identificacion del modulo. Debe devolver 0x07
 	
 	if (register_value == PART_NUM_AT86RF212) 
@@ -883,7 +873,7 @@ int main (void)
 	
 	escribir_linea_pc("TESIS TUCUMAN 2015\n\r\n");
 	
-	setStateAT86RF212(CMD_RX_ON, TIME_PLL_ON_RX_ON);// seteo el tran en RX
+	//setStateAT86RF212(CMD_RX_ON, TIME_PLL_ON_RX_ON);// seteo el tran en RX
 	//pal_trx_reg_write(RG_IRQ_MASK, 0x0C);
 	while(true)
 	{
