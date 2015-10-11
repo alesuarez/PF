@@ -33,7 +33,7 @@ volatile avr32_tc_t *tc = EXAMPLE_TC;
 
 volatile uint8_t resolution = AT30TSE_CONFIG_RES_12_bit;
 
-uint8_t tx_buffer[5]="aleja";
+uint8_t tx_buffer[5]="hola";
 
 uint8_t TRX_STATUS = 0;
 uint8_t register_value = 0;
@@ -57,10 +57,7 @@ uint8_t address;
 bool configuracion = false;
 uint8_t pConfiguracion=0;
 config_package tramaConfiguracion;
-uint8_t spi = 0;
-uint8_t colaRX[tamano_cola];
-uint8_t contadorRX = 0;
-uint8_t dato;
+uint8_t spi;
 
 usart_options_t usart_opt = {
 	//! Baudrate is set in the conf_example_usart.h file.
@@ -135,11 +132,10 @@ __interrupt
 // PA13/GPIO 13/GLOC-OUT[0]/GLOC-IN[7]/TC0-A0/SCIF-GCLK[2]/PWMA-PWMA[13]/CAT-SMP/EIC-EXTINT[2]/CAT-CSA[0]/XIN32_2
 static void eic_int_handler2(void)
 {
-	
-	IRQ_STATUS = pal_trx_reg_read(RG_IRQ_STATUS) & 0x0C;
-	
-	variable1=pal_trx_reg_read(RG_IRQ_STATUS);
-	variable2=pal_trx_reg_read(RG_IRQ_MASK);
+	IRQ_STATUS = pal_trx_reg_read(RG_IRQ_STATUS);
+	IRQ_STATUS &= 0x0C;
+	//variable1=pal_trx_reg_read(RG_IRQ_STATUS);
+	//variable2=pal_trx_reg_read(RG_IRQ_MASK);
 		
 		// Interrupt Line must be cleared to enable
 		eic_clear_interrupt_line(&AVR32_EIC, AVR32_EIC_INT2);
@@ -147,21 +143,17 @@ static void eic_int_handler2(void)
 		//IRQ_STATUS = pal_trx_reg_read(RG_IRQ_STATUS);
 		//variable1=pal_trx_reg_read(RG_IRQ_STATUS);
 		//variable2=pal_trx_reg_read(RG_IRQ_MASK);
-		if (contadorRX>25){
-			escribir_linea_pc("\n\n a \n\n");
-			escribir_linea_pc(colaRX);
-			escribir_linea_pc("\n\n a \n\n");
- 			 contadorRX=0;
-		}
-		switch (IRQ_STATUS){
+		switch (IRQ_STATUS)
+		{
 			case TRX_IRQ_TRX_END:
 				escribir_linea_pc("\n\n --> Trama enviada :) :) \r\n");
-				spi_read_single(&AVR32_SPI,&colaRX[contadorRX++]);
-						
+				spi = (uint8_t) spi_get(AT86RFX_SPI);
+				escribir_linea_pc(spi);
+				
 			break;
 			case TRX_IRQ_RX_START:
-			escribir_linea_pc("\n\n --> Trama recibida :) :) \r\n");
-				spi_read_single(&AVR32_SPI,&colaRX[contadorRX++]);
+				spi = spi_get(AT86RFX_SPI);
+				//escribir_linea_pc(rxTrama()); // creo q se tendria que leer la interrupcion de la SPI
 			break;
 		}
 }
@@ -216,22 +208,7 @@ static void usart_int_handler_RS232(void)
 	
 }
 
-// bool check_pack(uint8_t tampack) //tampack es la cantidad de bytes del paquete hasta antes de EOT, para cdo lo hagamos variable
-// {
-// 	uint8_t i=3; //cosa que no tome los SOH
-// 	char lrc= cola_PC[i];
-// 	
-// 	while(i<tampack){
-// 	i=i+1;
-// 	lrc=lrc ^ cola_Pc[i]; //este es el XOR
-// 	}
-// 	if (lrc==cola_Pc[i]){
-// 		return true; //el LRC del paquete y el calculado son iguales
-// 	}else 
-// 	{
-// 		return false; //el LRC del paquete y el calculado no coinciden
-// 	}
-// }
+
 
 void escribir_linea_pc (char *str)
 {
@@ -547,11 +524,6 @@ void leer_temp(char* temps)
 	else
 		sprintf(temps,"%s","X");
 }
-void setStateAT86RF212(uint8_t state, uint8_t time)
-{
-	pal_trx_reg_write(RG_TRX_STATE, state);
-	DELAY_US(time);
-}
 uint8_t getStateAT86RF212(void)
 {
 	return pal_trx_reg_read(RG_TRX_STATUS) & 0x1F;
@@ -605,35 +577,33 @@ uint8_t txTramaManual(uint8_t *data)
 	//Configure CCA see Section 8.6
 	
 	if (state==CMD_RX_ON) {
-		DISABLE_TRX_IRQ();
+		//DISABLE_TRX_IRQ();
 		
 		//variable1=getStateAT86RF212();
 		escribir_linea_pc("AT86RF por transmitir...\r\n");	
 		//estadoPorPc();
 		pal_trx_reg_write(RG_TRX_STATE,CMD_FORCE_PLL_ON); //pongo en PLL ON
 		while(getStateAT86RF212()!=CMD_PLL_ON);  //espero q se ponga en PLL ON
-		//estadoPorPc();
-		//pal_trx_reg_write(RG_IRQ_MASK,0x0C);
-		//variable1=pal_trx_reg_read(RG_IRQ_MASK);
-		pal_trx_reg_write(RG_TRX_STATE,CMD_TX_START); // inicio tx - segun manual: Write TRX_CMD = TX_START, or assert pin 11 (SLP_TR)
+	//	estadoPorPc();
+		pal_trx_reg_write(RG_IRQ_MASK,0x0C);
+		variable1=pal_trx_reg_read(RG_IRQ_MASK);
 		pal_trx_frame_write(data,4);  //esto para mi hay q ponerlo arriba donde dije escribir trama
-		// spi_write_packet(&AVR32_SPI,data,4);
 		//escribo la trama de datos en el buffer - segun pag 158
-		
-		//DELAY_US(RST_PULSE_WIDTH_US); // hacia el estado busy_tx
+		pal_trx_reg_write(RG_TRX_STATE,CMD_TX_START); // inicio tx - segun manual: Write TRX_CMD = TX_START, or assert pin 11 (SLP_TR)
+		DELAY_US(RST_PULSE_WIDTH_NS); // hacia el estado busy_tx
 		
 		// espero IRQ_3 (TRX_END) issued
 		// Read IRQ_STATUS register, pin 24 (IRQ) deasserted
-		ENABLE_TRX_IRQ(); 
-		//estadoPorPc();
-		//variable1=getStateAT86RF212();
+		//ENABLE_TRX_IRQ(); 
+	//	estadoPorPc();
+		variable1=getStateAT86RF212();
 		
 		
 	} else {
 		escribir_linea_pc(" no se puede enviar la trama \n");
 	}
 	pal_trx_reg_write(RG_TRX_STATE,CMD_RX_ON); //vuelvo a estador RX ON
-	//estadoPorPc();
+	estadoPorPc();
 }
 uint8_t txTramachibi(uint8_t *data)
 {
@@ -662,15 +632,15 @@ uint8_t txTramachibi(uint8_t *data)
 }
 void promiscuous_mode()
 {
-	
 	for (address=0x20; address<0x2C; address++)
 	{
 		pal_trx_reg_write(address, 0x00);
+		delay_ms(5);
 	}
 	pal_trx_reg_write(RG_XAH_CTRL_1, 0x02);	// AACK_PROM_MODE Promiscuous mode is enabled
-//	PAL_WAIT_1_US();
+	PAL_WAIT_1_US();
 	pal_trx_reg_write(RG_CSMA_SEED_1, 0xD2); // AACK_DIS_ACK = 1 && AACK_FVN_MODE = 3
-//	PAL_WAIT_1_US();
+	PAL_WAIT_1_US();
 	
 }
 
@@ -679,6 +649,7 @@ void RESET()
 	RST_LOW();
 	DELAY_US(RST_PULSE_WIDTH_NS);
 	RST_HIGH();
+	
 	delay_ms(1);
 }
 void reset()
@@ -755,76 +726,61 @@ uint8_t init_AT86RF212(void)
 	reset();
 	//PAL_WAIT_1_US();
 	pal_trx_reg_write(RG_IRQ_MASK, 0x00);
-	PAL_WAIT_1_US();
 	pal_trx_reg_write(RG_TRX_STATE, CMD_FORCE_TRX_OFF); // Forzar el estado off
 	DELAY_US(RST_PULSE_WIDTH_US); //tTR10
 	
 	//variable1=getStateAT86RF212();
 	while(getStateAT86RF212()!= CMD_TRX_OFF); // espero el estado off
-	PAL_WAIT_1_US();
 	pal_trx_reg_write(RG_TRX_CTRL_0, 0x08);
 	//pal_trx_reg_write(RG_PHY_CC_CCA,||SR_SUB_MODE); // 914Mhz set channel ->
-	PAL_WAIT_1_US();
-	pal_trx_reg_write(RG_TRX_CTRL_1, 0x22); // 1 -> TX AUTO_CRC && 1-> IRQ_MASK_MODE
-	PAL_WAIT_1_US();
-	//pal_trx_reg_write(RG_RX_CTRL, 0x20);
+
+	pal_trx_reg_write(RG_TRX_CTRL_1, 0x2E); // 1 -> TX AUTO_CRC && SPI_CMD_MODE -> 3 && 1-> IRQ_MASK_MODE
+	//PAL_WAIT_1_US();
 	pal_trx_reg_write(RG_IRQ_MASK, 0x0C);
-//	pal_trx_reg_write(RG_TRX_CTRL_2, 0x00); // configuracion de velocidad y frec
-	PAL_WAIT_1_US();
-	//pal_trx_reg_write(RG_XOSC_CTRL, 0x40); // manejo del cristal externo y capacitores se muere cuando se activa
-	PAL_WAIT_1_US();
+	//pal_trx_reg_write(RG_TRX_CTRL_2, 0x00);
+	//PAL_WAIT_1_US();
+	//pal_trx_reg_write(RG_XOSC_CTRL, 0x40); // manejo del cristal externo y capacitores
+	//PAL_WAIT_1_US();
 	promiscuous_mode();
-	PAL_WAIT_1_US();
 	pal_trx_reg_write(RG_TRX_STATE, CMD_FORCE_PLL_ON);// seteo el tran en 
 // 	variable1=getStateAT86RF212();
 	DELAY_US(TIME_TRX_OFF_PLL_ON );
  	while (getStateAT86RF212()!=CMD_PLL_ON);
-// 	PAL_WAIT_1_US();
-// 	pal_trx_reg_write(RG_TRX_STATE, CMD_RX_ON);// seteo el tran en
-// 	DELAY_US(TIME_PLL_ON_RX_ON);
-// 
-// 	while (getStateAT86RF212()!=CMD_RX_ON);
-// 	
 	//cpu_irq_enable();
 	Enable_global_interrupt();
-	
 	escribir_linea_pc("\n Terminando configuracion AT86RF212 \n\n");
 }
 void modeConfig()
 {
 // cuando esta en modo de configuracion no hace nada, solo espera que le lleguen los datos
-	uint8_t tam=8;
+
 	while(cola_PC_nw < (pConfiguracion + 0x09));
 	// comprobar CRC
-//	if (check_pack(tam)){
 	// solo si pasa el crc sigo la configuracion
-		tramaConfiguracion.crc = cola_PC[pConfiguracion+8];
+	tramaConfiguracion.crc = cola_PC[pConfiguracion+8];
+
+	// fin comprobacion
 	
-		// fin comprobacion
+	tramaConfiguracion.cmd = cola_PC[pConfiguracion+3];
+
+	tramaConfiguracion.payload[0] = cola_PC[pConfiguracion+5];	
+	tramaConfiguracion.payload[1] = cola_PC[pConfiguracion+6];
+	tramaConfiguracion.payload[2] = cola_PC[pConfiguracion+7];
+
+	switch (tramaConfiguracion.cmd){
+		case BAUDRATE:
+			escribir_linea_pc("\r\nConfiguracion del baud rate\n");
+		break;
+		case TEMPERATURA:
+			escribir_linea_pc("\r\nVeo la temperatura\n");
+		break;
 		
-		tramaConfiguracion.cmd = cola_PC[pConfiguracion+3];
-	
-		tramaConfiguracion.payload[0] = cola_PC[pConfiguracion+5];	
-		tramaConfiguracion.payload[1] = cola_PC[pConfiguracion+6];
-		tramaConfiguracion.payload[2] = cola_PC[pConfiguracion+7];
-	
-		switch (tramaConfiguracion.cmd){
-			case BAUDRATE:
-				escribir_linea_pc("\r\nConfiguracion del baud rate\n");
-			break;
-			case TEMPERATURA:
-				escribir_linea_pc("\r\nVeo la temperatura\n");
-			break;
-			
-		}
-//	} //ver que onda cuando sale de aca, si falla el LRC no hace nada, quiza deberia hacer algo?
+	}
 	return;
 }
 
 int main (void)
 {
-// nodo I
-
 	char temps[10] = "\0";
 	int i=0;
 	
@@ -884,8 +840,7 @@ int main (void)
 	
 	escribir_linea_pc("TESIS TUCUMAN 2015\n\r\n");
 	
-	setStateAT86RF212(CMD_RX_ON, TIME_PLL_ON_RX_ON);// seteo el tran en RX
-	//pal_trx_reg_write(RG_IRQ_MASK, 0x0C);
+	pal_trx_reg_write(RG_TRX_STATE, CMD_RX_ON);// seteo el tran en RX
 	while(true)
 	{
 		if (cola_PC_nr != cola_PC_nw )
@@ -916,11 +871,11 @@ int main (void)
 			}
 		}
 		//at86rfx_tx_frame(tx_buffer);
-		//txTramaManual(tx_buffer);
+		txTramaManual(tx_buffer);
 		//txTramachibi(tx_buffer);
 		//txTramachibi(tx_buffer);
-		estadoPorPc();
- 		delay_ms(500);
+		//estadoPorPc();
+		delay_ms(500);
 		//txTramachibi(tx_buffer); // funcion creada segun el manual
 	//	txTrama(tx_buffer); // funcion creada segun un ejemplo LwMesh
 		// para Rx lo hace cuando hay interrupcion y muestra por pantalla
