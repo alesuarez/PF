@@ -159,12 +159,16 @@ enum{
 	TEMPERATURA = 0x32
 };
 
+// 
+#define MAX_PAYLOAD 0x07
+//
 typedef struct
 {
 	uint8_t addr;
-	uint8_t cmd;	
-	uint8_t payload[2];	
-	uint8_t crc;	
+	uint8_t cmd;
+	uint8_t payload[MAX_PAYLOAD];	
+	uint8_t tamPayload;
+	uint8_t lrc;	
 }config_package;
 
 void escribir_linea_pc (char*);

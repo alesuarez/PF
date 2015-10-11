@@ -55,12 +55,18 @@ uint8_t variable3;
 uint8_t TX_;
 uint8_t address;
 bool configuracion = false;
-uint8_t pConfiguracion=0;
-config_package tramaConfiguracion;
+uint8_t pSOH = 0;
+uint8_t pEOT = 0;
+/////////
+uint8_t p;
+uint8_t i = 0;
+///////
+static config_package tConfiguracion;
 uint8_t spi = 0;
 uint8_t colaRX[tamano_cola];
 uint8_t contadorRX = 0;
 uint8_t dato;
+
 
 usart_options_t usart_opt = {
 	//! Baudrate is set in the conf_example_usart.h file.
@@ -197,14 +203,19 @@ static void usart_int_handler_RS232(void)
 	
 	cola_PC[cola_PC_nw] = c;
 	
-	if (cola_PC[cola_PC_nw] == 0x01)
-	{	
-		if (!configuracion){
-			pConfiguracion = cola_PC_nw;
-		}
-		configuracion = true;
-		
+	if (c == 0x01){		
+		++pSOH;
 	}
+	
+	if(pSOH == 0x03) {
+			pSOH = cola_PC_nw;
+	}
+	
+	if (c == 0x04) {
+		pEOT = cola_PC_nw;
+		configuracion = true;
+	}
+	
 	cola_PC_nw++;
 	
 	if (cola_PC_nw >= tamano_cola)
@@ -215,23 +226,6 @@ static void usart_int_handler_RS232(void)
 
 	
 }
-
-// bool check_pack(uint8_t tampack) //tampack es la cantidad de bytes del paquete hasta antes de EOT, para cdo lo hagamos variable
-// {
-// 	uint8_t i=3; //cosa que no tome los SOH
-// 	char lrc= cola_PC[i];
-// 	
-// 	while(i<tampack){
-// 	i=i+1;
-// 	lrc=lrc ^ cola_Pc[i]; //este es el XOR
-// 	}
-// 	if (lrc==cola_Pc[i]){
-// 		return true; //el LRC del paquete y el calculado son iguales
-// 	}else 
-// 	{
-// 		return false; //el LRC del paquete y el calculado no coinciden
-// 	}
-// }
 
 void escribir_linea_pc (char *str)
 {
@@ -790,31 +784,51 @@ uint8_t init_AT86RF212(void)
 	
 	escribir_linea_pc("\n Terminando configuracion AT86RF212 \n\n");
 }
+
+uint8_t checkPack(config_package packet) //tampack es la cantidad de bytes del paquete hasta antes de EOT, para cdo lo hagamos variable
+{
+	uint8_t i = 0; //cosa que no tome los SOH
+	uint8_t lrc = 0;
+
+	while(i < packet.tamPayload) {
+		lrc = lrc ^ packet.payload[i]; //este es el XOR
+		i++;
+	}
+	
+	if (lrc == packet.lrc){
+		return 1; //el LRC del paquete y el calculado son iguales
+	}
+	
+	return 0; //el LRC del paquete y el calculado no coinciden
+}
+
+void unpack()
+{
+	//// faltan variables locales
+	
+	p = ++pSOH;	
+	tConfiguracion.addr = cola_PC[pSOH];
+	tConfiguracion.cmd = cola_PC[++pSOH];
+	tConfiguracion.lrc = cola_PC[--pEOT];
+			
+	while(p < pEOT) {
+		tConfiguracion.payload[i++] = cola_PC[p++];
+	}
+	tConfiguracion.tamPayload = i;
+}
 void modeConfig()
 {
-// cuando esta en modo de configuracion no hace nada, solo espera que le lleguen los datos
-	uint8_t tam=8;
-	while(cola_PC_nw < (pConfiguracion + 0x09));
-	// comprobar CRC
-//	if (check_pack(tam)){
-	// solo si pasa el crc sigo la configuracion
-		tramaConfiguracion.crc = cola_PC[pConfiguracion+8];
+	if (!checkPack(tConfiguracion))
+		return;
+	configuracion = false;
 	
-		// fin comprobacion
-		
-		tramaConfiguracion.cmd = cola_PC[pConfiguracion+3];
-	
-		tramaConfiguracion.payload[0] = cola_PC[pConfiguracion+5];	
-		tramaConfiguracion.payload[1] = cola_PC[pConfiguracion+6];
-		tramaConfiguracion.payload[2] = cola_PC[pConfiguracion+7];
-	
-		switch (tramaConfiguracion.cmd){
-			case BAUDRATE:
-				escribir_linea_pc("\r\nConfiguracion del baud rate\n");
-			break;
-			case TEMPERATURA:
-				escribir_linea_pc("\r\nVeo la temperatura\n");
-			break;
+	switch (tConfiguracion.cmd){
+		case BAUDRATE:
+			escribir_linea_pc("\r\nConfiguracion del baud rate\n");
+		break;
+		case TEMPERATURA:
+			escribir_linea_pc("\r\nVeo la temperatura\n");
+		break;
 			
 		}
 //	} //ver que onda cuando sale de aca, si falla el LRC no hace nada, quiza deberia hacer algo?
@@ -877,12 +891,12 @@ int main (void)
 
 	
 
-	init_AT86RF212();
+	//init_AT86RF212();
 	//------------------Fin de conguracion
 	
 	escribir_linea_pc("TESIS TUCUMAN 2015\n\r\n");
 	
-	setStateAT86RF212(CMD_RX_ON, TIME_PLL_ON_RX_ON);// seteo el tran en RX
+	//setStateAT86RF212(CMD_RX_ON, TIME_PLL_ON_RX_ON);// seteo el tran en RX
 	//pal_trx_reg_write(RG_IRQ_MASK, 0x0C);
 	while(true)
 	{
@@ -900,17 +914,17 @@ int main (void)
 			if (cola_PC_nr >= tamano_cola)
 				cola_PC_nr = 0;
 				
-			if (configuracion && (cola_PC_nr >= pConfiguracion + 4))
+			if (configuracion)
 			{
-				if ((cola_PC[pConfiguracion] & cola_PC[pConfiguracion+1] & cola_PC[pConfiguracion+2]) == 0x01)
-				{
-					if (cola_PC[pConfiguracion+3] == ADDRESS)
-					{
-						modeConfig();
-					}
-					
+				Disable_global_interrupt();
+				
+				unpack();
+				if (tConfiguracion.addr == ADDRESS) {
+					modeConfig();
 				}
+				
 				configuracion = false;
+				Enable_global_interrupt();
 			}
 		}
 		//at86rfx_tx_frame(tx_buffer);
