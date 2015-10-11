@@ -823,6 +823,7 @@ void modeConfig()
 
 int main (void)
 {
+// nodo II
 	char temps[10] = "\0";
 	int i=0;
 	
