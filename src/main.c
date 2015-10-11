@@ -138,8 +138,8 @@ static void eic_int_handler2(void)
 	
 	IRQ_STATUS = pal_trx_reg_read(RG_IRQ_STATUS) & 0x0C;
 	
-	variable1=pal_trx_reg_read(RG_IRQ_STATUS);
-	variable2=pal_trx_reg_read(RG_IRQ_MASK);
+	//variable1=pal_trx_reg_read(RG_IRQ_STATUS);
+	//variable2=pal_trx_reg_read(RG_IRQ_MASK);
 		
 		// Interrupt Line must be cleared to enable
 		eic_clear_interrupt_line(&AVR32_EIC, AVR32_EIC_INT2);
@@ -156,12 +156,13 @@ static void eic_int_handler2(void)
 		switch (IRQ_STATUS){
 			case TRX_IRQ_TRX_END:
 				escribir_linea_pc("\n\n --> Trama enviada :) :) \r\n");
-				spi_read_single(&AVR32_SPI,&colaRX[contadorRX++]);
+				pal_trx_frame_read(&colaRX[contadorRX++],1);
+			
 						
 			break;
 			case TRX_IRQ_RX_START:
 			escribir_linea_pc("\n\n --> Trama recibida :) :) \r\n");
-				spi_read_single(&AVR32_SPI,&colaRX[contadorRX++]);
+				pal_trx_frame_read(&colaRX[contadorRX++],1);
 			break;
 		}
 }
