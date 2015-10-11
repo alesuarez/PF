@@ -36,9 +36,7 @@ uint8_t configuracion = 0;
 uint8_t pSOH = 0;
 uint8_t pEOT = 0;
 static config_package tConfiguracion;
-
-uint8_t colaRX[tamano_cola];
-uint8_t contadorRX = 0;
+int aux = 0;
 usart_options_t usart1200 = {
 	.baudrate    = 1200,
 	.channelmode = USART_NORMAL_CHMODE, //ECHO UART
@@ -47,14 +45,32 @@ usart_options_t usart1200 = {
 	.stopbits    = USART_1_STOPBIT,
 };
 
-usart_options_t usart_opt = {
-	//! Baudrate is set in the conf_example_usart.h file.
+usart_options_t usart9600 = {
 	.baudrate    = 9600,
 	.channelmode = USART_NORMAL_CHMODE, //ECHO UART
 	.charlength  = 8,
 	.paritytype  = USART_NO_PARITY,
 	.stopbits    = USART_1_STOPBIT,
 };
+
+usart_options_t usart14400= {
+	.baudrate    = 14400,
+	.channelmode = USART_NORMAL_CHMODE, //ECHO UART
+	.charlength  = 8,
+	.paritytype  = USART_NO_PARITY,
+	.stopbits    = USART_1_STOPBIT,
+};
+
+usart_options_t usart19200 = {
+	.baudrate    = 19200,
+	.channelmode = USART_NORMAL_CHMODE, //ECHO UART
+	.charlength  = 8,
+	.paritytype  = USART_NO_PARITY,
+	.stopbits    = USART_1_STOPBIT,
+};
+uint8_t colaRX[tamano_cola];
+uint8_t contadorRX = 0;
+
 //eic = External Interrupt Controller
 eic_options_t eic_options2 = {    
 	// Enable level-triggered interrupt.
@@ -396,7 +412,7 @@ void rs_232_init_pins(void)
 int rs_232_init_usart()
 {
 	sysclk_enable_peripheral_clock(&AVR32_USART2);	
-	int estado_usart2 = usart_init_rs232(&AVR32_USART2, &usart_opt, sysclk_get_peripheral_bus_hz(&AVR32_USART2));	
+	int estado_usart2 = usart_init_rs232(&AVR32_USART2, &usart9600, sysclk_get_peripheral_bus_hz(&AVR32_USART2));	
 	return estado_usart2;
 }
 
@@ -639,13 +655,35 @@ void getTemperature()
 
 void setUART()
 {
+	int i=2;
+	int mult = 1;
+	unsigned long baudRate = 0;
 	Disable_global_interrupt();
-	sysclk_disable_peripheral_clock(&AVR32_USART2);
-	usart_reset(&AVR32_USART2);
-	//rs_232_init_pins();
-	sysclk_enable_peripheral_clock(&AVR32_USART2);	
-	usart_init_rs232(&AVR32_USART2, &usart1200, sysclk_get_peripheral_bus_hz(&AVR32_USART2));
+	tc_stop(tc,EXAMPLE_TC_CHANNEL);
+	
+	while(i<tConfiguracion.tamPayload)
+	{
+		tConfiguracion.payload[i++]-=0x30;
+	}
+	for(int i=2; i < tConfiguracion.tamPayload; i++)
+	{
+		baudRate = baudRate * mult + tConfiguracion.payload[i];
+		mult = mult*10;
+	}	
+	switch (baudRate){
+		case 1200:
+			usart_init_rs232(&AVR32_USART2, &usart1200, sysclk_get_peripheral_bus_hz(&AVR32_USART2));
+		break;
+		case 9600:
+			usart_init_rs232(&AVR32_USART2, &usart9600, sysclk_get_peripheral_bus_hz(&AVR32_USART2));
+		break;	
+		case 14400:
+			usart_init_rs232(&AVR32_USART2, &usart14400, sysclk_get_peripheral_bus_hz(&AVR32_USART2));
+		break;
+	}
+	(&AVR32_USART2)->ier = AVR32_USART_IER_RXRDY_MASK;
 	Enable_global_interrupt();
+	tc_start(tc,EXAMPLE_TC_CHANNEL);
 }
 
 uint8_t checkPack(config_package packet) //tampack es la cantidad de bytes del paquete hasta antes de EOT, para cdo lo hagamos variable
@@ -758,7 +796,7 @@ int main (void)
 				pEOT = 0;
 			}
 		}
-		
+		estadoPorPc();
 		delay_ms(500);
 	}
 }

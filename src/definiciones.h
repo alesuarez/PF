@@ -59,15 +59,10 @@
 
 //----------------------------------------------------------
 
-
-
+//
 
 
 //Probando definciones sens temp
-
-
-
-
 
 #define AT30TSE_TEMPERATURE_REG         0x00
 #define AT30TSE_TEMPERATURE_REG_SIZE    2
