@@ -57,10 +57,6 @@ uint8_t address;
 bool configuracion = false;
 uint8_t pSOH = 0;
 uint8_t pEOT = 0;
-/////////
-uint8_t p;
-uint8_t i = 0;
-///////
 static config_package tConfiguracion;
 uint8_t spi = 0;
 uint8_t colaRX[tamano_cola];
@@ -784,7 +780,15 @@ uint8_t init_AT86RF212(void)
 	
 	escribir_linea_pc("\n Terminando configuracion AT86RF212 \n\n");
 }
-
+void getTemperature()
+{
+	char temps[10] = "\0";
+	leer_temp(temps);
+	escribir_linea_pc("Temp: ");
+	escribir_linea_pc(temps);
+	escribir_linea_pc("*C\r\n");
+	return;
+}
 uint8_t checkPack(config_package packet) //tampack es la cantidad de bytes del paquete hasta antes de EOT, para cdo lo hagamos variable
 {
 	uint8_t i = 0; //cosa que no tome los SOH
@@ -804,7 +808,8 @@ uint8_t checkPack(config_package packet) //tampack es la cantidad de bytes del p
 
 void unpack()
 {
-	//// faltan variables locales
+	uint8_t p = 0;
+	uint8_t i = 0;
 	
 	p = ++pSOH;	
 	tConfiguracion.addr = cola_PC[pSOH];
@@ -818,16 +823,15 @@ void unpack()
 }
 void modeConfig()
 {
+	
 	if (!checkPack(tConfiguracion))
 		return;
-	configuracion = false;
-	
 	switch (tConfiguracion.cmd){
 		case BAUDRATE:
 			escribir_linea_pc("\r\nConfiguracion del baud rate\n");
 		break;
 		case TEMPERATURA:
-			escribir_linea_pc("\r\nVeo la temperatura\n");
+			getTemperature();
 		break;
 			
 		}
@@ -837,7 +841,7 @@ void modeConfig()
 
 int main (void)
 {
-	char temps[10] = "\0";
+	
 	int i=0;
 	
 	//board_init();
@@ -896,18 +900,13 @@ int main (void)
 	
 	escribir_linea_pc("TESIS TUCUMAN 2015\n\r\n");
 	
-	//setStateAT86RF212(CMD_RX_ON, TIME_PLL_ON_RX_ON);// seteo el tran en RX
-	//pal_trx_reg_write(RG_IRQ_MASK, 0x0C);
 	while(true)
 	{
 		if (cola_PC_nr != cola_PC_nw )
 		{
 			if (cola_PC[cola_PC_nr] == 't')
 			{
-				leer_temp(temps);
-				escribir_linea_pc("Temp: ");
-				escribir_linea_pc(temps);
-				escribir_linea_pc("*C\r\n");
+				
 			}
 			cola_PC_nr++;
 			
@@ -916,22 +915,20 @@ int main (void)
 				
 			if (configuracion)
 			{
-				Disable_global_interrupt();
-				
 				unpack();
 				if (tConfiguracion.addr == ADDRESS) {
 					modeConfig();
 				}
-				
 				configuracion = false;
-				Enable_global_interrupt();
+				pSOH = 0;
+				pEOT = 0;
 			}
 		}
 		//at86rfx_tx_frame(tx_buffer);
 		//txTramaManual(tx_buffer);
 		//txTramachibi(tx_buffer);
 		//txTramachibi(tx_buffer);
-		estadoPorPc();
+		//estadoPorPc();
  		delay_ms(500);
 		//txTramachibi(tx_buffer); // funcion creada segun el manual
 	//	txTrama(tx_buffer); // funcion creada segun un ejemplo LwMesh
