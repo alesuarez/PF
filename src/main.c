@@ -39,8 +39,13 @@ static config_package tConfiguracion;
 
 uint8_t colaRX[tamano_cola];
 uint8_t contadorRX = 0;
-
-
+usart_options_t usart1200 = {
+	.baudrate    = 1200,
+	.channelmode = USART_NORMAL_CHMODE, //ECHO UART
+	.charlength  = 8,
+	.paritytype  = USART_NO_PARITY,
+	.stopbits    = USART_1_STOPBIT,
+};
 
 usart_options_t usart_opt = {
 	//! Baudrate is set in the conf_example_usart.h file.
@@ -356,17 +361,7 @@ void init_i2c_module(void)
 	};
 	
 	// Initialize as master.
-	int status = twim_master_init (&AVR32_TWIM0, &TWIM_OPTIONS);
-	
-	// Check whether TARGET device is connected
-	
-	if (status == STATUS_OK) {
-		// display test result to user
-		escribir_linea_pc("Sensor Temp:\tPASS\r\n");
-	} else {
-		// display test result to user
-		escribir_linea_pc("Sensor Temp:\tFAILED\r\n");
-	}
+	twim_master_init (&AVR32_TWIM0, &TWIM_OPTIONS);
 } 
 
 void init_rf_pins(void)
@@ -499,16 +494,16 @@ void txTramaManual(uint8_t *data)
 	if (getStateAT86RF212() == CMD_RX_ON) {
 		DISABLE_TRX_IRQ();
 	
-		pal_trx_reg_write(RG_TRX_STATE,CMD_FORCE_PLL_ON); //pongo en PLL ON
+		pal_trx_reg_write(RG_TRX_STATE, CMD_FORCE_PLL_ON); //pongo en PLL ON
 		while(getStateAT86RF212()!=CMD_PLL_ON);  //espero q se ponga en PLL ON
 		
-		pal_trx_reg_write(RG_TRX_STATE,CMD_TX_START); // inicio tx - segun manual: Write TRX_CMD = TX_START, or assert pin 11 (SLP_TR)
-		pal_trx_frame_write(data, data-LENGTH_FIELD_LEN);  //esto para mi hay q ponerlo arriba donde dije escribir trama
+		pal_trx_frame_write(data, data - LENGTH_FIELD_LEN);
+		pal_trx_reg_write(RG_TRX_STATE, CMD_TX_START); // inicio tx - segun manual: Write TRX_CMD = TX_START, or assert pin 11 (SLP_TR)
 		
 		ENABLE_TRX_IRQ(); 
 	} 
 
-	pal_trx_reg_write(RG_TRX_STATE,CMD_RX_ON); //vuelvo a estador RX ON
+	pal_trx_reg_write(RG_TRX_STATE, CMD_RX_ON); //vuelvo a estador RX ON
 	return;
 }
 
@@ -638,15 +633,24 @@ void getTemperature()
 {
 	char temps[10] = "\0";
 	leer_temp(temps);
-	escribir_linea_pc("Temp: ");
 	escribir_linea_pc(temps);
-	escribir_linea_pc("*C\r\n");
 	return;
+}
+
+void setUART()
+{
+	Disable_global_interrupt();
+	sysclk_disable_peripheral_clock(&AVR32_USART2);
+	usart_reset(&AVR32_USART2);
+	//rs_232_init_pins();
+	sysclk_enable_peripheral_clock(&AVR32_USART2);	
+	usart_init_rs232(&AVR32_USART2, &usart1200, sysclk_get_peripheral_bus_hz(&AVR32_USART2));
+	Enable_global_interrupt();
 }
 
 uint8_t checkPack(config_package packet) //tampack es la cantidad de bytes del paquete hasta antes de EOT, para cdo lo hagamos variable
 {
-	uint8_t i = 0; //cosa que no tome los SOH
+	uint8_t i = 0; 
 	uint8_t lrc = 0;
 
 	while(i < packet.tamPayload) {
@@ -683,10 +687,11 @@ void modeConfig()
 		return;
 		
 	switch (tConfiguracion.cmd){
-		case BAUDRATE:
-			escribir_linea_pc("\r\nConfiguracion del baud rate\n");
+		case CONFIG_BAUDRATE:
+			setUART();
 		break;
-		case TEMPERATURA:
+		
+		case CONFIG_TEMPERATURA:
 			getTemperature();
 		break;
 	}
@@ -740,8 +745,7 @@ int main (void)
 		{
 			cola_PC_nr++;
 			
-			if (cola_PC_nr >= tamano_cola)
-				cola_PC_nr = 0;
+			if (cola_PC_nr >= tamano_cola) cola_PC_nr = 0;
 				
 			if (configuracion)
 			{
@@ -756,7 +760,6 @@ int main (void)
 		}
 		
 		delay_ms(500);
-		
-		}
+	}
 }
 
