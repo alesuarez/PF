@@ -163,8 +163,8 @@ static void eic_int_handler2(void)
 // 			break;
 			case TRX_IRQ_RX_START:
 			
-				pal_trx_frame_read(&colaRX[contadorRX],5);
-				contadorRX=contadorRX+5;
+				pal_trx_frame_read(&colaRX[contadorRX],9);
+				contadorRX=contadorRX+9;
 			break;
 		}
 }

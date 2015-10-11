@@ -4214,16 +4214,16 @@ static void eic_int_handler2(void)
 // 			break;
 			case TRX_IRQ_RX_START:
 			
-				pal_trx_frame_read(&colaRX[contadorRX],5);
+				pal_trx_frame_read(&colaRX[contadorRX],9);
 8000342c:	48 a7       	lddpc	r7,80003454 <eic_int_handler2+0x78>
 8000342e:	0f 88       	ld.ub	r8,r7[0x0]
-80003430:	30 5b       	mov	r11,5
+80003430:	30 9b       	mov	r11,9
 80003432:	48 cc       	lddpc	r12,80003460 <eic_int_handler2+0x84>
 80003434:	10 0c       	add	r12,r8
 80003436:	f0 1f 00 0c 	mcall	80003464 <eic_int_handler2+0x88>
-				contadorRX=contadorRX+5;
+				contadorRX=contadorRX+9;
 8000343a:	0f 88       	ld.ub	r8,r7[0x0]
-8000343c:	2f b8       	sub	r8,-5
+8000343c:	2f 78       	sub	r8,-9
 8000343e:	ae 88       	st.b	r7[0x0],r8
 			break;
 		}
