@@ -154,15 +154,17 @@ static void eic_int_handler2(void)
  			 contadorRX=0;
 		}
 		switch (IRQ_STATUS){
-			case TRX_IRQ_TRX_END:
-				escribir_linea_pc("\n\n --> Trama enviada :) :) \r\n");
-				pal_trx_frame_read(&colaRX[contadorRX++],1);
-			
-						
-			break;
+// 			case TRX_IRQ_TRX_END:
+// 				escribir_linea_pc("\n\n --> Trama enviada :) :) \r\n");
+// 				pal_trx_frame_read(&colaRX[contadorRX],6);
+// 				contadorRX=contadorRX+6;
+// 			
+// 						
+// 			break;
 			case TRX_IRQ_RX_START:
-			escribir_linea_pc("\n\n --> Trama recibida :) :) \r\n");
-				pal_trx_frame_read(&colaRX[contadorRX++],1);
+			
+				pal_trx_frame_read(&colaRX[contadorRX],5);
+				contadorRX=contadorRX+5;
 			break;
 		}
 }
@@ -909,7 +911,7 @@ int main (void)
 		//txTramaManual(tx_buffer);
 		//txTramachibi(tx_buffer);
 		//txTramachibi(tx_buffer);
-		estadoPorPc();
+		//estadoPorPc();
  		delay_ms(500);
 		//txTramachibi(tx_buffer); // funcion creada segun el manual
 	//	txTrama(tx_buffer); // funcion creada segun un ejemplo LwMesh
