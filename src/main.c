@@ -33,7 +33,7 @@ volatile avr32_tc_t *tc = EXAMPLE_TC;
 
 volatile uint8_t resolution = AT30TSE_CONFIG_RES_12_bit;
 
-uint8_t tx_buffer[5]="hola";
+uint8_t tx_buffer[5]="alejandro";
 
 uint8_t TRX_STATUS = 0;
 uint8_t register_value = 0;
@@ -871,7 +871,10 @@ int main (void)
 			}
 		}
 		//at86rfx_tx_frame(tx_buffer);
-		txTramaManual(tx_buffer);
+		for(i=0;i<3;i++){
+			txTramaManual(tx_buffer);
+		}
+		
 		//txTramachibi(tx_buffer);
 		//txTramachibi(tx_buffer);
 		//estadoPorPc();
