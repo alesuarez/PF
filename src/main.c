@@ -147,7 +147,7 @@ static void eic_int_handler2(void)
 		//IRQ_STATUS = pal_trx_reg_read(RG_IRQ_STATUS);
 		//variable1=pal_trx_reg_read(RG_IRQ_STATUS);
 		//variable2=pal_trx_reg_read(RG_IRQ_MASK);
-		if (contadorRX>25){
+		if (contadorRX>120){
 			escribir_linea_pc("\n\n a \n\n");
 			escribir_linea_pc(colaRX);
 			escribir_linea_pc("\n\n a \n\n");
@@ -163,8 +163,8 @@ static void eic_int_handler2(void)
 // 			break;
 			case TRX_IRQ_RX_START:
 			
-				pal_trx_frame_read(&colaRX[contadorRX],9);
-				contadorRX=contadorRX+9;
+				pal_trx_frame_read(&colaRX[contadorRX],120);
+				contadorRX=contadorRX+120;
 			break;
 		}
 }

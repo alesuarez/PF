@@ -4182,10 +4182,10 @@ static void eic_int_handler2(void)
 		//IRQ_STATUS = pal_trx_reg_read(RG_IRQ_STATUS);
 		//variable1=pal_trx_reg_read(RG_IRQ_STATUS);
 		//variable2=pal_trx_reg_read(RG_IRQ_MASK);
-		if (contadorRX>25){
+		if (contadorRX>120){
 800033f8:	49 78       	lddpc	r8,80003454 <eic_int_handler2+0x78>
 800033fa:	11 89       	ld.ub	r9,r8[0x0]
-800033fc:	31 98       	mov	r8,25
+800033fc:	37 88       	mov	r8,120
 800033fe:	f0 09 18 00 	cp.b	r9,r8
 80003402:	e0 88 00 0f 	brls	80003420 <eic_int_handler2+0x44>
 			escribir_linea_pc("\n\n a \n\n");
@@ -4214,16 +4214,16 @@ static void eic_int_handler2(void)
 // 			break;
 			case TRX_IRQ_RX_START:
 			
-				pal_trx_frame_read(&colaRX[contadorRX],9);
+				pal_trx_frame_read(&colaRX[contadorRX],120);
 8000342c:	48 a7       	lddpc	r7,80003454 <eic_int_handler2+0x78>
 8000342e:	0f 88       	ld.ub	r8,r7[0x0]
-80003430:	30 9b       	mov	r11,9
+80003430:	37 8b       	mov	r11,120
 80003432:	48 cc       	lddpc	r12,80003460 <eic_int_handler2+0x84>
 80003434:	10 0c       	add	r12,r8
 80003436:	f0 1f 00 0c 	mcall	80003464 <eic_int_handler2+0x88>
-				contadorRX=contadorRX+9;
+				contadorRX=contadorRX+120;
 8000343a:	0f 88       	ld.ub	r8,r7[0x0]
-8000343c:	2f 78       	sub	r8,-9
+8000343c:	28 88       	sub	r8,-120
 8000343e:	ae 88       	st.b	r7[0x0],r8
 			break;
 		}
