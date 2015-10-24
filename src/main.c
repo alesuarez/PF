@@ -33,7 +33,7 @@ volatile avr32_tc_t *tc = EXAMPLE_TC;
 
 volatile uint8_t resolution = AT30TSE_CONFIG_RES_12_bit;
 
-uint8_t tx_buffer[9]="alejandro";
+uint8_t tx_buffer[200]="Esto es un mensaje de 120 bytes que se envia de un punto A hacia un punto B con el fin de hacer distintas mediciones :)";
 
 uint8_t TRX_STATUS = 0;
 uint8_t register_value = 0;
@@ -587,7 +587,7 @@ uint8_t txTramaManual(uint8_t *data)
 	//	estadoPorPc();
 		pal_trx_reg_write(RG_IRQ_MASK,0x0C);
 		variable1=pal_trx_reg_read(RG_IRQ_MASK);
-		pal_trx_frame_write(data,data[0] - LENGTH_FIELD_LEN);  //esto para mi hay q ponerlo arriba donde dije escribir trama
+		pal_trx_frame_write(data,200);  //esto para mi hay q ponerlo arriba donde dije escribir trama
 		//escribo la trama de datos en el buffer - segun pag 158
 		pal_trx_reg_write(RG_TRX_STATE,CMD_TX_START); // inicio tx - segun manual: Write TRX_CMD = TX_START, or assert pin 11 (SLP_TR)
 		DELAY_US(RST_PULSE_WIDTH_NS); // hacia el estado busy_tx
@@ -871,9 +871,9 @@ int main (void)
 			}
 		}
 		//at86rfx_tx_frame(tx_buffer);
-		for(i=0;i<3;i++){
+		
 			txTramaManual(tx_buffer);
-		}
+		
 		
 		//txTramachibi(tx_buffer);
 		//txTramachibi(tx_buffer);
