@@ -4190,11 +4190,11 @@ static void eic_int_handler2(void)
 800033fa:	30 48       	mov	r8,4
 800033fc:	f0 09 18 00 	cp.b	r9,r8
 80003400:	c1 11       	brne	80003422 <eic_int_handler2+0x46>
+// 				contadorRX=contadorRX+6;
 // 			
 // 						
 // 			break;
 			case TRX_IRQ_RX_START:
-			
 				pal_trx_frame_read(&colaRX[contadorRX],120); // para 200kbps
 80003402:	48 d7       	lddpc	r7,80003434 <eic_int_handler2+0x58>
 80003404:	0f 8c       	ld.ub	r12,r7[0x0]

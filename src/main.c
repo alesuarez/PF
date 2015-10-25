@@ -157,7 +157,6 @@ static void eic_int_handler2(void)
 // 						
 // 			break;
 			case TRX_IRQ_RX_START:
-			
 				pal_trx_frame_read(&colaRX[contadorRX],120); // para 200kbps
 				escribir_linea_pc("\n\n - = T r a m a   r e c i b i d a  = -\n\n");
 				escribir_linea_pc(colaRX);
