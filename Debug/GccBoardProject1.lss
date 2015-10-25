@@ -11,41 +11,43 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
   3 .exception    00000200  80009600  80009600  00009a00  2**9
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
-  4 .rodata       00000aa0  80009800  80009800  00009c00  2**2
+  4 .rodata       00000ac4  80009800  80009800  00009c00  2**2
                   CONTENTS, ALLOC, LOAD, READONLY, DATA
-  5 .dalign       00000004  00000004  00000004  00000000  2**0
+  5 .lalign       00000004  8000a2c4  8000a2c4  0000a6c4  2**0
                   ALLOC
-  6 .data         00000524  00000008  8000a2a0  0000a808  2**2
+  6 .dalign       00000004  00000004  00000004  00000000  2**0
+                  ALLOC
+  7 .data         00000524  00000008  8000a2c8  0000a808  2**2
                   CONTENTS, ALLOC, LOAD, DATA
-  7 .balign       00000004  0000052c  8000a7c4  0000ad2c  2**0
+  8 .balign       00000004  0000052c  8000a7ec  0000ad2c  2**0
                   ALLOC
-  8 .bss          000002f0  00000530  00000530  00000000  2**2
+  9 .bss          000002f0  00000530  00000530  00000000  2**2
                   ALLOC
-  9 .heap         000027e0  00000820  00000820  00000000  2**0
+ 10 .heap         000027e0  00000820  00000820  00000000  2**0
                   ALLOC
- 10 .comment      00000030  00000000  00000000  0000ad2c  2**0
+ 11 .comment      00000030  00000000  00000000  0000ad2c  2**0
                   CONTENTS, READONLY
- 11 .debug_aranges 00000d98  00000000  00000000  0000ad60  2**3
+ 12 .debug_aranges 00000d98  00000000  00000000  0000ad60  2**3
                   CONTENTS, READONLY, DEBUGGING
- 12 .debug_pubnames 00001adc  00000000  00000000  0000baf8  2**0
+ 13 .debug_pubnames 00001adc  00000000  00000000  0000baf8  2**0
                   CONTENTS, READONLY, DEBUGGING
- 13 .debug_info   00028624  00000000  00000000  0000d5d4  2**0
+ 14 .debug_info   00028624  00000000  00000000  0000d5d4  2**0
                   CONTENTS, READONLY, DEBUGGING
- 14 .debug_abbrev 0000582c  00000000  00000000  00035bf8  2**0
+ 15 .debug_abbrev 0000582c  00000000  00000000  00035bf8  2**0
                   CONTENTS, READONLY, DEBUGGING
- 15 .debug_line   0000ec75  00000000  00000000  0003b424  2**0
+ 16 .debug_line   0000ec7f  00000000  00000000  0003b424  2**0
                   CONTENTS, READONLY, DEBUGGING
- 16 .debug_frame  00002058  00000000  00000000  0004a09c  2**2
+ 17 .debug_frame  00002058  00000000  00000000  0004a0a4  2**2
                   CONTENTS, READONLY, DEBUGGING
- 17 .debug_str    0000558d  00000000  00000000  0004c0f4  2**0
+ 18 .debug_str    0000558d  00000000  00000000  0004c0fc  2**0
                   CONTENTS, READONLY, DEBUGGING
- 18 .debug_loc    0000a721  00000000  00000000  00051681  2**0
+ 19 .debug_loc    0000a721  00000000  00000000  00051689  2**0
                   CONTENTS, READONLY, DEBUGGING
- 19 .debug_macinfo 00797142  00000000  00000000  0005bda2  2**0
+ 20 .debug_macinfo 00797142  00000000  00000000  0005bdaa  2**0
                   CONTENTS, READONLY, DEBUGGING
- 20 .stack        00001000  00003000  00003000  00000000  2**0
+ 21 .stack        00001000  00003000  00003000  00000000  2**0
                   ALLOC
- 21 .debug_ranges 00001038  00000000  00000000  007f2ee4  2**0
+ 22 .debug_ranges 00001038  00000000  00000000  007f2eec  2**0
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .reset:
@@ -2777,7 +2779,7 @@ idata_load_loop:
   st.d    r0++, r4
 80002d66:	c0 72       	brcc	80002d74 <idata_load_loop_end>
   cp      r0, r1
-80002d68:	fe c2 8a c8 	sub	r2,pc,-30008
+80002d68:	fe c2 8a a0 	sub	r2,pc,-30048
 
 80002d6c <idata_load_loop>:
   brlo    idata_load_loop
@@ -3980,7 +3982,7 @@ void rs_232_init_pins(void)
 80003300:	d8 02       	popm	pc
 80003302:	00 00       	add	r0,r0
 80003304:	80 00       	ld.sh	r0,r0[0x0]
-80003306:	9d 00       	st.w	lr[0x0],r0
+80003306:	9d 24       	st.w	lr[0x8],r4
 80003308:	80 00       	ld.sh	r0,r0[0x0]
 8000330a:	25 8c       	sub	r12,88
 
@@ -4018,7 +4020,7 @@ void init_i2c_pins(void)
 8000332c:	d8 02       	popm	pc
 8000332e:	00 00       	add	r0,r0
 80003330:	80 00       	ld.sh	r0,r0[0x0]
-80003332:	9c f0       	ld.uh	r0,lr[0xe]
+80003332:	9d 14       	st.w	lr[0x4],r4
 80003334:	80 00       	ld.sh	r0,r0[0x0]
 80003336:	25 8c       	sub	r12,88
 
@@ -4165,9 +4167,9 @@ static void eic_int_handler2(void)
 	
 	IRQ_STATUS = pal_trx_reg_read(RG_IRQ_STATUS) & 0x0C;
 800033e0:	30 fc       	mov	r12,15
-800033e2:	f0 1f 00 1a 	mcall	80003448 <eic_int_handler2+0x6c>
+800033e2:	f0 1f 00 18 	mcall	80003440 <eic_int_handler2+0x64>
 800033e6:	e2 1c 00 0c 	andl	r12,0xc,COH
-800033ea:	49 98       	lddpc	r8,8000344c <eic_int_handler2+0x70>
+800033ea:	49 78       	lddpc	r8,80003444 <eic_int_handler2+0x68>
 800033ec:	b0 8c       	st.b	r8[0x0],r12
 	
 	//variable1=pal_trx_reg_read(RG_IRQ_STATUS);
@@ -4177,732 +4179,732 @@ static void eic_int_handler2(void)
 		eic_clear_interrupt_line(&AVR32_EIC, AVR32_EIC_INT2);
 800033ee:	30 2b       	mov	r11,2
 800033f0:	fe 7c 24 00 	mov	r12,-56320
-800033f4:	f0 1f 00 17 	mcall	80003450 <eic_int_handler2+0x74>
+800033f4:	f0 1f 00 15 	mcall	80003448 <eic_int_handler2+0x6c>
 		//IRQ2 Pin 26 MCU --> Pin 24 T
 		//IRQ_STATUS = pal_trx_reg_read(RG_IRQ_STATUS);
 		//variable1=pal_trx_reg_read(RG_IRQ_STATUS);
 		//variable2=pal_trx_reg_read(RG_IRQ_MASK);
-		if (contadorRX>120){
-800033f8:	49 78       	lddpc	r8,80003454 <eic_int_handler2+0x78>
+		if (contadorRX>90){
+800033f8:	49 58       	lddpc	r8,8000344c <eic_int_handler2+0x70>
 800033fa:	11 89       	ld.ub	r9,r8[0x0]
-800033fc:	37 88       	mov	r8,120
+800033fc:	35 a8       	mov	r8,90
 800033fe:	f0 09 18 00 	cp.b	r9,r8
-80003402:	e0 88 00 0f 	brls	80003420 <eic_int_handler2+0x44>
-			escribir_linea_pc("\n\n a \n\n");
-80003406:	49 57       	lddpc	r7,80003458 <eic_int_handler2+0x7c>
-80003408:	0e 9c       	mov	r12,r7
-8000340a:	f0 1f 00 15 	mcall	8000345c <eic_int_handler2+0x80>
+80003402:	e0 88 00 0b 	brls	80003418 <eic_int_handler2+0x3c>
+			escribir_linea_pc("\n\n - = T r a m a   r e c i b i d a  = -\n\n");
+80003406:	49 3c       	lddpc	r12,80003450 <eic_int_handler2+0x74>
+80003408:	f0 1f 00 13 	mcall	80003454 <eic_int_handler2+0x78>
 			escribir_linea_pc(colaRX);
-8000340e:	49 5c       	lddpc	r12,80003460 <eic_int_handler2+0x84>
-80003410:	f0 1f 00 13 	mcall	8000345c <eic_int_handler2+0x80>
-			escribir_linea_pc("\n\n a \n\n");
-80003414:	0e 9c       	mov	r12,r7
-80003416:	f0 1f 00 12 	mcall	8000345c <eic_int_handler2+0x80>
+8000340c:	49 3c       	lddpc	r12,80003458 <eic_int_handler2+0x7c>
+8000340e:	f0 1f 00 12 	mcall	80003454 <eic_int_handler2+0x78>
  			 contadorRX=0;
-8000341a:	30 09       	mov	r9,0
-8000341c:	48 e8       	lddpc	r8,80003454 <eic_int_handler2+0x78>
-8000341e:	b0 89       	st.b	r8[0x0],r9
+80003412:	30 09       	mov	r9,0
+80003414:	48 e8       	lddpc	r8,8000344c <eic_int_handler2+0x70>
+80003416:	b0 89       	st.b	r8[0x0],r9
 		}
 		switch (IRQ_STATUS){
-80003420:	48 b8       	lddpc	r8,8000344c <eic_int_handler2+0x70>
-80003422:	11 89       	ld.ub	r9,r8[0x0]
-80003424:	30 48       	mov	r8,4
-80003426:	f0 09 18 00 	cp.b	r9,r8
-8000342a:	c0 b1       	brne	80003440 <eic_int_handler2+0x64>
+80003418:	48 b8       	lddpc	r8,80003444 <eic_int_handler2+0x68>
+8000341a:	11 89       	ld.ub	r9,r8[0x0]
+8000341c:	30 48       	mov	r8,4
+8000341e:	f0 09 18 00 	cp.b	r9,r8
+80003422:	c0 b1       	brne	80003438 <eic_int_handler2+0x5c>
 // 			
 // 						
 // 			break;
 			case TRX_IRQ_RX_START:
 			
-				pal_trx_frame_read(&colaRX[contadorRX],120);
-8000342c:	48 a7       	lddpc	r7,80003454 <eic_int_handler2+0x78>
-8000342e:	0f 88       	ld.ub	r8,r7[0x0]
-80003430:	37 8b       	mov	r11,120
-80003432:	48 cc       	lddpc	r12,80003460 <eic_int_handler2+0x84>
-80003434:	10 0c       	add	r12,r8
-80003436:	f0 1f 00 0c 	mcall	80003464 <eic_int_handler2+0x88>
-				contadorRX=contadorRX+120;
-8000343a:	0f 88       	ld.ub	r8,r7[0x0]
-8000343c:	28 88       	sub	r8,-120
-8000343e:	ae 88       	st.b	r7[0x0],r8
+				pal_trx_frame_read(&colaRX[contadorRX],90); // para 200kbps
+80003424:	48 a7       	lddpc	r7,8000344c <eic_int_handler2+0x70>
+80003426:	0f 88       	ld.ub	r8,r7[0x0]
+80003428:	35 ab       	mov	r11,90
+8000342a:	48 cc       	lddpc	r12,80003458 <eic_int_handler2+0x7c>
+8000342c:	10 0c       	add	r12,r8
+8000342e:	f0 1f 00 0c 	mcall	8000345c <eic_int_handler2+0x80>
+				contadorRX=contadorRX+90;
+80003432:	0f 88       	ld.ub	r8,r7[0x0]
+80003434:	2a 68       	sub	r8,-90
+80003436:	ae 88       	st.b	r7[0x0],r8
 			break;
 		}
 }
-80003440:	e3 cd 40 80 	ldm	sp++,r7,lr
-80003444:	d6 03       	rete
-80003446:	00 00       	add	r0,r0
+80003438:	e3 cd 40 80 	ldm	sp++,r7,lr
+8000343c:	d6 03       	rete
+8000343e:	00 00       	add	r0,r0
+80003440:	80 00       	ld.sh	r0,r0[0x0]
+80003442:	2e 64       	sub	r4,-26
+80003444:	00 00       	add	r0,r0
+80003446:	08 15       	sub	r5,r4
 80003448:	80 00       	ld.sh	r0,r0[0x0]
-8000344a:	2e 64       	sub	r4,-26
+8000344a:	24 dc       	sub	r12,77
 8000344c:	00 00       	add	r0,r0
-8000344e:	08 15       	sub	r5,r4
+8000344e:	06 39       	cp.w	r9,r3
 80003450:	80 00       	ld.sh	r0,r0[0x0]
-80003452:	24 dc       	sub	r12,77
-80003454:	00 00       	add	r0,r0
-80003456:	06 39       	cp.w	r9,r3
-80003458:	80 00       	ld.sh	r0,r0[0x0]
-8000345a:	99 58       	st.w	r12[0x14],r8
+80003452:	99 58       	st.w	r12[0x14],r8
+80003454:	80 00       	ld.sh	r0,r0[0x0]
+80003456:	33 c8       	mov	r8,60
+80003458:	00 00       	add	r0,r0
+8000345a:	06 78       	tst	r8,r3
 8000345c:	80 00       	ld.sh	r0,r0[0x0]
-8000345e:	33 c8       	mov	r8,60
-80003460:	00 00       	add	r0,r0
-80003462:	06 78       	tst	r8,r3
-80003464:	80 00       	ld.sh	r0,r0[0x0]
-80003466:	2d 90       	sub	r0,-39
+8000345e:	2d 90       	sub	r0,-39
 
-80003468 <modeConfig>:
+80003460 <modeConfig>:
 	Enable_global_interrupt();
 	
 	escribir_linea_pc("\n Terminando configuracion AT86RF212 \n\n");
 }
 void modeConfig()
 {
-80003468:	d4 01       	pushm	lr
+80003460:	d4 01       	pushm	lr
 // cuando esta en modo de configuracion no hace nada, solo espera que le lleguen los datos
 	uint8_t tam=8;
 	while(cola_PC_nw < (pConfiguracion + 0x09));
-8000346a:	49 48       	lddpc	r8,800034b8 <modeConfig+0x50>
-8000346c:	11 89       	ld.ub	r9,r8[0x0]
-8000346e:	49 48       	lddpc	r8,800034bc <modeConfig+0x54>
-80003470:	11 8a       	ld.ub	r10,r8[0x0]
-80003472:	f2 c8 ff f7 	sub	r8,r9,-9
-80003476:	10 3a       	cp.w	r10,r8
-80003478:	c1 e5       	brlt	800034b4 <modeConfig+0x4c>
+80003462:	49 48       	lddpc	r8,800034b0 <modeConfig+0x50>
+80003464:	11 89       	ld.ub	r9,r8[0x0]
+80003466:	49 48       	lddpc	r8,800034b4 <modeConfig+0x54>
+80003468:	11 8a       	ld.ub	r10,r8[0x0]
+8000346a:	f2 c8 ff f7 	sub	r8,r9,-9
+8000346e:	10 3a       	cp.w	r10,r8
+80003470:	c1 e5       	brlt	800034ac <modeConfig+0x4c>
 	// comprobar CRC
 //	if (check_pack(tam)){
 	// solo si pasa el crc sigo la configuracion
 		tramaConfiguracion.crc = cola_PC[pConfiguracion+8];
-8000347a:	49 28       	lddpc	r8,800034c0 <modeConfig+0x58>
-8000347c:	49 2a       	lddpc	r10,800034c4 <modeConfig+0x5c>
-8000347e:	f4 09 00 09 	add	r9,r10,r9
+80003472:	49 28       	lddpc	r8,800034b8 <modeConfig+0x58>
+80003474:	49 2a       	lddpc	r10,800034bc <modeConfig+0x5c>
+80003476:	f4 09 00 09 	add	r9,r10,r9
 	
 		// fin comprobacion
 		
 		tramaConfiguracion.cmd = cola_PC[pConfiguracion+3];
-80003482:	13 ba       	ld.ub	r10,r9[0x3]
-80003484:	b0 9a       	st.b	r8[0x1],r10
+8000347a:	13 ba       	ld.ub	r10,r9[0x3]
+8000347c:	b0 9a       	st.b	r8[0x1],r10
 	
 		tramaConfiguracion.payload[0] = cola_PC[pConfiguracion+5];	
-80003486:	13 db       	ld.ub	r11,r9[0x5]
-80003488:	b0 ab       	st.b	r8[0x2],r11
+8000347e:	13 db       	ld.ub	r11,r9[0x5]
+80003480:	b0 ab       	st.b	r8[0x2],r11
 		tramaConfiguracion.payload[1] = cola_PC[pConfiguracion+6];
-8000348a:	13 eb       	ld.ub	r11,r9[0x6]
-8000348c:	b0 bb       	st.b	r8[0x3],r11
+80003482:	13 eb       	ld.ub	r11,r9[0x6]
+80003484:	b0 bb       	st.b	r8[0x3],r11
 		tramaConfiguracion.payload[2] = cola_PC[pConfiguracion+7];
-8000348e:	13 f9       	ld.ub	r9,r9[0x7]
-80003490:	b0 c9       	st.b	r8[0x4],r9
+80003486:	13 f9       	ld.ub	r9,r9[0x7]
+80003488:	b0 c9       	st.b	r8[0x4],r9
 	
 		switch (tramaConfiguracion.cmd){
-80003492:	33 18       	mov	r8,49
+8000348a:	33 18       	mov	r8,49
+8000348c:	f0 0a 18 00 	cp.b	r10,r8
+80003490:	c0 60       	breq	8000349c <modeConfig+0x3c>
+80003492:	33 28       	mov	r8,50
 80003494:	f0 0a 18 00 	cp.b	r10,r8
-80003498:	c0 60       	breq	800034a4 <modeConfig+0x3c>
-8000349a:	33 28       	mov	r8,50
-8000349c:	f0 0a 18 00 	cp.b	r10,r8
-800034a0:	c0 b1       	brne	800034b6 <modeConfig+0x4e>
-800034a2:	c0 58       	rjmp	800034ac <modeConfig+0x44>
+80003498:	c0 b1       	brne	800034ae <modeConfig+0x4e>
+8000349a:	c0 58       	rjmp	800034a4 <modeConfig+0x44>
 			case BAUDRATE:
 				escribir_linea_pc("\r\nConfiguracion del baud rate\n");
-800034a4:	48 9c       	lddpc	r12,800034c8 <modeConfig+0x60>
-800034a6:	f0 1f 00 0a 	mcall	800034cc <modeConfig+0x64>
+8000349c:	48 9c       	lddpc	r12,800034c0 <modeConfig+0x60>
+8000349e:	f0 1f 00 0a 	mcall	800034c4 <modeConfig+0x64>
 			break;
-800034aa:	d8 02       	popm	pc
+800034a2:	d8 02       	popm	pc
 			case TEMPERATURA:
 				escribir_linea_pc("\r\nVeo la temperatura\n");
-800034ac:	48 9c       	lddpc	r12,800034d0 <modeConfig+0x68>
-800034ae:	f0 1f 00 08 	mcall	800034cc <modeConfig+0x64>
-800034b2:	d8 02       	popm	pc
-800034b4:	c0 08       	rjmp	800034b4 <modeConfig+0x4c>
-800034b6:	d8 02       	popm	pc
+800034a4:	48 9c       	lddpc	r12,800034c8 <modeConfig+0x68>
+800034a6:	f0 1f 00 08 	mcall	800034c4 <modeConfig+0x64>
+800034aa:	d8 02       	popm	pc
+800034ac:	c0 08       	rjmp	800034ac <modeConfig+0x4c>
+800034ae:	d8 02       	popm	pc
+800034b0:	00 00       	add	r0,r0
+800034b2:	06 38       	cp.w	r8,r3
+800034b4:	00 00       	add	r0,r0
+800034b6:	06 37       	cp.w	r7,r3
 800034b8:	00 00       	add	r0,r0
-800034ba:	06 38       	cp.w	r8,r3
+800034ba:	07 43       	ld.w	r3,--r3
 800034bc:	00 00       	add	r0,r0
-800034be:	06 37       	cp.w	r7,r3
-800034c0:	00 00       	add	r0,r0
-800034c2:	07 43       	ld.w	r3,--r3
-800034c4:	00 00       	add	r0,r0
-800034c6:	07 4c       	ld.w	r12,--r3
+800034be:	07 4c       	ld.w	r12,--r3
+800034c0:	80 00       	ld.sh	r0,r0[0x0]
+800034c2:	99 84       	st.w	r12[0x20],r4
+800034c4:	80 00       	ld.sh	r0,r0[0x0]
+800034c6:	33 c8       	mov	r8,60
 800034c8:	80 00       	ld.sh	r0,r0[0x0]
-800034ca:	99 60       	st.w	r12[0x18],r0
-800034cc:	80 00       	ld.sh	r0,r0[0x0]
-800034ce:	33 c8       	mov	r8,60
-800034d0:	80 00       	ld.sh	r0,r0[0x0]
-800034d2:	99 80       	st.w	r12[0x20],r0
+800034ca:	99 a4       	st.w	r12[0x28],r4
 
-800034d4 <init_AT86RF212>:
+800034cc <init_AT86RF212>:
 	}
 	delay_ms(1);
 }
 
 uint8_t init_AT86RF212(void)
 {
-800034d4:	eb cd 40 80 	pushm	r7,lr
+800034cc:	eb cd 40 80 	pushm	r7,lr
 	escribir_linea_pc("\n Inicializando AT86RF212 \n\n");
-800034d8:	fe fc 02 60 	ld.w	r12,pc[608]
-800034dc:	f0 1f 00 98 	mcall	8000373c <init_AT86RF212+0x268>
+800034d0:	fe fc 02 68 	ld.w	r12,pc[616]
+800034d4:	f0 1f 00 9a 	mcall	8000373c <init_AT86RF212+0x270>
 	Disable_global_interrupt();
-800034e0:	d3 03       	ssrf	0x10
+800034d8:	d3 03       	ssrf	0x10
 	
 	//SLP_TR_LOW();
 	
 	
 	//estadoPorPc();
 	RESET();
-800034e2:	f0 1f 00 98 	mcall	80003740 <init_AT86RF212+0x26c>
+800034da:	f0 1f 00 9a 	mcall	80003740 <init_AT86RF212+0x274>
 	//PAL_WAIT_1_US();
 	pal_trx_reg_write(RG_IRQ_MASK, 0x00);
-800034e6:	30 0b       	mov	r11,0
-800034e8:	30 ec       	mov	r12,14
-800034ea:	f0 1f 00 97 	mcall	80003744 <init_AT86RF212+0x270>
+800034de:	30 0b       	mov	r11,0
+800034e0:	30 ec       	mov	r12,14
+800034e2:	f0 1f 00 99 	mcall	80003744 <init_AT86RF212+0x278>
  * \param  delay:   (input) delay in CPU cycles before timeout.
  * \param  cpu_time: (output) internal information used by the timer API.
  */
 __always_inline static void cpu_set_timeout(unsigned long delay, t_cpu_time *cpu_time)
 {
   cpu_time->delay_start_cycle = Get_system_register(AVR32_COUNT);
-800034ee:	e1 b8 00 42 	mfsr	r8,0x108
+800034e6:	e1 b8 00 42 	mfsr	r8,0x108
   cpu_time->delay_end_cycle   = cpu_time->delay_start_cycle + delay;
-800034f2:	f0 ca ff ff 	sub	r10,r8,-1
+800034ea:	f0 ca ff ff 	sub	r10,r8,-1
  *
  * \return true if timeout occurred, otherwise false.
  */
 __always_inline static unsigned long cpu_is_timeout(t_cpu_time *cpu_time)
 {
   unsigned long current_cycle_count = Get_system_register(AVR32_COUNT);
-800034f6:	e1 b9 00 42 	mfsr	r9,0x108
+800034ee:	e1 b9 00 42 	mfsr	r9,0x108
   // Test if the timeout as already occurred.
   else if (cpu_time->timer_state == CPU_TIMER_STATE_REACHED)
     return true;
 
   // If the ending cycle count of this timeout is wrapped, ...
   else if (cpu_time->delay_start_cycle > cpu_time->delay_end_cycle)
-800034fa:	14 38       	cp.w	r8,r10
-800034fc:	e0 88 00 09 	brls	8000350e <init_AT86RF212+0x3a>
+800034f2:	14 38       	cp.w	r8,r10
+800034f4:	e0 88 00 09 	brls	80003506 <init_AT86RF212+0x3a>
   {
     if (current_cycle_count < cpu_time->delay_start_cycle && current_cycle_count > cpu_time->delay_end_cycle)
-80003500:	12 38       	cp.w	r8,r9
-80003502:	fe 98 ff fa 	brls	800034f6 <init_AT86RF212+0x22>
-80003506:	12 3a       	cp.w	r10,r9
-80003508:	e0 83 00 ce 	brlo	800036a4 <init_AT86RF212+0x1d0>
-8000350c:	cf 5b       	rjmp	800034f6 <init_AT86RF212+0x22>
+800034f8:	12 38       	cp.w	r8,r9
+800034fa:	fe 98 ff fa 	brls	800034ee <init_AT86RF212+0x22>
+800034fe:	12 3a       	cp.w	r10,r9
+80003500:	e0 83 00 cf 	brlo	8000369e <init_AT86RF212+0x1d2>
+80003504:	cf 5b       	rjmp	800034ee <init_AT86RF212+0x22>
     }
     return false;
   }
   else
   {
     if (current_cycle_count < cpu_time->delay_start_cycle || current_cycle_count > cpu_time->delay_end_cycle)
-8000350e:	12 38       	cp.w	r8,r9
-80003510:	e0 8b 00 ca 	brhi	800036a4 <init_AT86RF212+0x1d0>
-80003514:	12 3a       	cp.w	r10,r9
-80003516:	e0 83 00 c7 	brlo	800036a4 <init_AT86RF212+0x1d0>
-8000351a:	ce eb       	rjmp	800034f6 <init_AT86RF212+0x22>
+80003506:	12 38       	cp.w	r8,r9
+80003508:	e0 8b 00 cb 	brhi	8000369e <init_AT86RF212+0x1d2>
+8000350c:	12 3a       	cp.w	r10,r9
+8000350e:	e0 83 00 c8 	brlo	8000369e <init_AT86RF212+0x1d2>
+80003512:	ce eb       	rjmp	800034ee <init_AT86RF212+0x22>
  *
  * \return true if timeout occurred, otherwise false.
  */
 __always_inline static unsigned long cpu_is_timeout(t_cpu_time *cpu_time)
 {
   unsigned long current_cycle_count = Get_system_register(AVR32_COUNT);
-8000351c:	e1 b9 00 42 	mfsr	r9,0x108
+80003514:	e1 b9 00 42 	mfsr	r9,0x108
   // Test if the timeout as already occurred.
   else if (cpu_time->timer_state == CPU_TIMER_STATE_REACHED)
     return true;
 
   // If the ending cycle count of this timeout is wrapped, ...
   else if (cpu_time->delay_start_cycle > cpu_time->delay_end_cycle)
-80003520:	14 38       	cp.w	r8,r10
-80003522:	e0 88 00 08 	brls	80003532 <init_AT86RF212+0x5e>
+80003518:	14 38       	cp.w	r8,r10
+8000351a:	e0 88 00 08 	brls	8000352a <init_AT86RF212+0x5e>
   {
     if (current_cycle_count < cpu_time->delay_start_cycle && current_cycle_count > cpu_time->delay_end_cycle)
-80003526:	12 38       	cp.w	r8,r9
-80003528:	fe 98 ff fa 	brls	8000351c <init_AT86RF212+0x48>
-8000352c:	12 3a       	cp.w	r10,r9
-8000352e:	c0 73       	brcs	8000353c <init_AT86RF212+0x68>
-80003530:	cf 6b       	rjmp	8000351c <init_AT86RF212+0x48>
+8000351e:	12 38       	cp.w	r8,r9
+80003520:	fe 98 ff fa 	brls	80003514 <init_AT86RF212+0x48>
+80003524:	12 3a       	cp.w	r10,r9
+80003526:	c0 73       	brcs	80003534 <init_AT86RF212+0x68>
+80003528:	cf 6b       	rjmp	80003514 <init_AT86RF212+0x48>
     }
     return false;
   }
   else
   {
     if (current_cycle_count < cpu_time->delay_start_cycle || current_cycle_count > cpu_time->delay_end_cycle)
-80003532:	12 38       	cp.w	r8,r9
-80003534:	e0 8b 00 04 	brhi	8000353c <init_AT86RF212+0x68>
-80003538:	12 3a       	cp.w	r10,r9
-8000353a:	cf 12       	brcc	8000351c <init_AT86RF212+0x48>
+8000352a:	12 38       	cp.w	r8,r9
+8000352c:	e0 8b 00 04 	brhi	80003534 <init_AT86RF212+0x68>
+80003530:	12 3a       	cp.w	r10,r9
+80003532:	cf 12       	brcc	80003514 <init_AT86RF212+0x48>
 	PAL_WAIT_1_US();
 	pal_trx_reg_write(RG_TRX_STATE, CMD_FORCE_TRX_OFF); // Forzar el estado off
 	DELAY_US(RST_PULSE_WIDTH_US); //tTR10
 	
 	//variable1=getStateAT86RF212();
 	while(getStateAT86RF212()!= CMD_TRX_OFF); // espero el estado off
-8000353c:	30 87       	mov	r7,8
-8000353e:	f0 1f 00 83 	mcall	80003748 <init_AT86RF212+0x274>
-80003542:	ee 0c 18 00 	cp.b	r12,r7
-80003546:	cf c1       	brne	8000353e <init_AT86RF212+0x6a>
+80003534:	30 87       	mov	r7,8
+80003536:	f0 1f 00 85 	mcall	80003748 <init_AT86RF212+0x27c>
+8000353a:	ee 0c 18 00 	cp.b	r12,r7
+8000353e:	cf c1       	brne	80003536 <init_AT86RF212+0x6a>
  * \param  delay:   (input) delay in CPU cycles before timeout.
  * \param  cpu_time: (output) internal information used by the timer API.
  */
 __always_inline static void cpu_set_timeout(unsigned long delay, t_cpu_time *cpu_time)
 {
   cpu_time->delay_start_cycle = Get_system_register(AVR32_COUNT);
-80003548:	e1 b8 00 42 	mfsr	r8,0x108
+80003540:	e1 b8 00 42 	mfsr	r8,0x108
   cpu_time->delay_end_cycle   = cpu_time->delay_start_cycle + delay;
-8000354c:	f0 ca ff ff 	sub	r10,r8,-1
+80003544:	f0 ca ff ff 	sub	r10,r8,-1
  *
  * \return true if timeout occurred, otherwise false.
  */
 __always_inline static unsigned long cpu_is_timeout(t_cpu_time *cpu_time)
 {
   unsigned long current_cycle_count = Get_system_register(AVR32_COUNT);
-80003550:	e1 b9 00 42 	mfsr	r9,0x108
+80003548:	e1 b9 00 42 	mfsr	r9,0x108
   // Test if the timeout as already occurred.
   else if (cpu_time->timer_state == CPU_TIMER_STATE_REACHED)
     return true;
 
   // If the ending cycle count of this timeout is wrapped, ...
   else if (cpu_time->delay_start_cycle > cpu_time->delay_end_cycle)
-80003554:	14 38       	cp.w	r8,r10
-80003556:	e0 88 00 09 	brls	80003568 <init_AT86RF212+0x94>
+8000354c:	14 38       	cp.w	r8,r10
+8000354e:	e0 88 00 09 	brls	80003560 <init_AT86RF212+0x94>
   {
     if (current_cycle_count < cpu_time->delay_start_cycle && current_cycle_count > cpu_time->delay_end_cycle)
-8000355a:	12 38       	cp.w	r8,r9
-8000355c:	fe 98 ff fa 	brls	80003550 <init_AT86RF212+0x7c>
-80003560:	12 3a       	cp.w	r10,r9
-80003562:	e0 83 00 aa 	brlo	800036b6 <init_AT86RF212+0x1e2>
-80003566:	cf 5b       	rjmp	80003550 <init_AT86RF212+0x7c>
+80003552:	12 38       	cp.w	r8,r9
+80003554:	fe 98 ff fa 	brls	80003548 <init_AT86RF212+0x7c>
+80003558:	12 3a       	cp.w	r10,r9
+8000355a:	e0 83 00 ab 	brlo	800036b0 <init_AT86RF212+0x1e4>
+8000355e:	cf 5b       	rjmp	80003548 <init_AT86RF212+0x7c>
     }
     return false;
   }
   else
   {
     if (current_cycle_count < cpu_time->delay_start_cycle || current_cycle_count > cpu_time->delay_end_cycle)
-80003568:	12 38       	cp.w	r8,r9
-8000356a:	e0 8b 00 a6 	brhi	800036b6 <init_AT86RF212+0x1e2>
-8000356e:	12 3a       	cp.w	r10,r9
-80003570:	e0 83 00 a3 	brlo	800036b6 <init_AT86RF212+0x1e2>
-80003574:	ce eb       	rjmp	80003550 <init_AT86RF212+0x7c>
+80003560:	12 38       	cp.w	r8,r9
+80003562:	e0 8b 00 a7 	brhi	800036b0 <init_AT86RF212+0x1e4>
+80003566:	12 3a       	cp.w	r10,r9
+80003568:	e0 83 00 a4 	brlo	800036b0 <init_AT86RF212+0x1e4>
+8000356c:	ce eb       	rjmp	80003548 <init_AT86RF212+0x7c>
  *
  * \return true if timeout occurred, otherwise false.
  */
 __always_inline static unsigned long cpu_is_timeout(t_cpu_time *cpu_time)
 {
   unsigned long current_cycle_count = Get_system_register(AVR32_COUNT);
-80003576:	e1 b9 00 42 	mfsr	r9,0x108
+8000356e:	e1 b9 00 42 	mfsr	r9,0x108
   // Test if the timeout as already occurred.
   else if (cpu_time->timer_state == CPU_TIMER_STATE_REACHED)
     return true;
 
   // If the ending cycle count of this timeout is wrapped, ...
   else if (cpu_time->delay_start_cycle > cpu_time->delay_end_cycle)
-8000357a:	14 38       	cp.w	r8,r10
-8000357c:	e0 88 00 09 	brls	8000358e <init_AT86RF212+0xba>
+80003572:	14 38       	cp.w	r8,r10
+80003574:	e0 88 00 09 	brls	80003586 <init_AT86RF212+0xba>
   {
     if (current_cycle_count < cpu_time->delay_start_cycle && current_cycle_count > cpu_time->delay_end_cycle)
-80003580:	12 38       	cp.w	r8,r9
-80003582:	fe 98 ff fa 	brls	80003576 <init_AT86RF212+0xa2>
-80003586:	12 3a       	cp.w	r10,r9
-80003588:	e0 83 00 a0 	brlo	800036c8 <init_AT86RF212+0x1f4>
-8000358c:	cf 5b       	rjmp	80003576 <init_AT86RF212+0xa2>
+80003578:	12 38       	cp.w	r8,r9
+8000357a:	fe 98 ff fa 	brls	8000356e <init_AT86RF212+0xa2>
+8000357e:	12 3a       	cp.w	r10,r9
+80003580:	e0 83 00 a1 	brlo	800036c2 <init_AT86RF212+0x1f6>
+80003584:	cf 5b       	rjmp	8000356e <init_AT86RF212+0xa2>
     }
     return false;
   }
   else
   {
     if (current_cycle_count < cpu_time->delay_start_cycle || current_cycle_count > cpu_time->delay_end_cycle)
-8000358e:	12 38       	cp.w	r8,r9
-80003590:	e0 8b 00 9c 	brhi	800036c8 <init_AT86RF212+0x1f4>
-80003594:	12 3a       	cp.w	r10,r9
-80003596:	e0 83 00 99 	brlo	800036c8 <init_AT86RF212+0x1f4>
-8000359a:	ce eb       	rjmp	80003576 <init_AT86RF212+0xa2>
+80003586:	12 38       	cp.w	r8,r9
+80003588:	e0 8b 00 9d 	brhi	800036c2 <init_AT86RF212+0x1f6>
+8000358c:	12 3a       	cp.w	r10,r9
+8000358e:	e0 83 00 9a 	brlo	800036c2 <init_AT86RF212+0x1f6>
+80003592:	ce eb       	rjmp	8000356e <init_AT86RF212+0xa2>
  *
  * \return true if timeout occurred, otherwise false.
  */
 __always_inline static unsigned long cpu_is_timeout(t_cpu_time *cpu_time)
 {
   unsigned long current_cycle_count = Get_system_register(AVR32_COUNT);
-8000359c:	e1 b9 00 42 	mfsr	r9,0x108
+80003594:	e1 b9 00 42 	mfsr	r9,0x108
   // Test if the timeout as already occurred.
   else if (cpu_time->timer_state == CPU_TIMER_STATE_REACHED)
     return true;
 
   // If the ending cycle count of this timeout is wrapped, ...
   else if (cpu_time->delay_start_cycle > cpu_time->delay_end_cycle)
-800035a0:	14 38       	cp.w	r8,r10
-800035a2:	e0 88 00 09 	brls	800035b4 <init_AT86RF212+0xe0>
+80003598:	14 38       	cp.w	r8,r10
+8000359a:	e0 88 00 09 	brls	800035ac <init_AT86RF212+0xe0>
   {
     if (current_cycle_count < cpu_time->delay_start_cycle && current_cycle_count > cpu_time->delay_end_cycle)
-800035a6:	12 38       	cp.w	r8,r9
-800035a8:	fe 98 ff fa 	brls	8000359c <init_AT86RF212+0xc8>
-800035ac:	12 3a       	cp.w	r10,r9
-800035ae:	e0 83 00 96 	brlo	800036da <init_AT86RF212+0x206>
-800035b2:	cf 5b       	rjmp	8000359c <init_AT86RF212+0xc8>
+8000359e:	12 38       	cp.w	r8,r9
+800035a0:	fe 98 ff fa 	brls	80003594 <init_AT86RF212+0xc8>
+800035a4:	12 3a       	cp.w	r10,r9
+800035a6:	e0 83 00 97 	brlo	800036d4 <init_AT86RF212+0x208>
+800035aa:	cf 5b       	rjmp	80003594 <init_AT86RF212+0xc8>
     }
     return false;
   }
   else
   {
     if (current_cycle_count < cpu_time->delay_start_cycle || current_cycle_count > cpu_time->delay_end_cycle)
-800035b4:	12 38       	cp.w	r8,r9
-800035b6:	e0 8b 00 92 	brhi	800036da <init_AT86RF212+0x206>
-800035ba:	12 3a       	cp.w	r10,r9
-800035bc:	e0 83 00 8f 	brlo	800036da <init_AT86RF212+0x206>
-800035c0:	ce eb       	rjmp	8000359c <init_AT86RF212+0xc8>
+800035ac:	12 38       	cp.w	r8,r9
+800035ae:	e0 8b 00 93 	brhi	800036d4 <init_AT86RF212+0x208>
+800035b2:	12 3a       	cp.w	r10,r9
+800035b4:	e0 83 00 90 	brlo	800036d4 <init_AT86RF212+0x208>
+800035b8:	ce eb       	rjmp	80003594 <init_AT86RF212+0xc8>
  *
  * \return true if timeout occurred, otherwise false.
  */
 __always_inline static unsigned long cpu_is_timeout(t_cpu_time *cpu_time)
 {
   unsigned long current_cycle_count = Get_system_register(AVR32_COUNT);
-800035c2:	e1 b9 00 42 	mfsr	r9,0x108
+800035ba:	e1 b9 00 42 	mfsr	r9,0x108
   // Test if the timeout as already occurred.
   else if (cpu_time->timer_state == CPU_TIMER_STATE_REACHED)
     return true;
 
   // If the ending cycle count of this timeout is wrapped, ...
   else if (cpu_time->delay_start_cycle > cpu_time->delay_end_cycle)
-800035c6:	14 38       	cp.w	r8,r10
-800035c8:	e0 88 00 09 	brls	800035da <init_AT86RF212+0x106>
+800035be:	14 38       	cp.w	r8,r10
+800035c0:	e0 88 00 09 	brls	800035d2 <init_AT86RF212+0x106>
   {
     if (current_cycle_count < cpu_time->delay_start_cycle && current_cycle_count > cpu_time->delay_end_cycle)
-800035cc:	12 38       	cp.w	r8,r9
-800035ce:	fe 98 ff fa 	brls	800035c2 <init_AT86RF212+0xee>
-800035d2:	12 3a       	cp.w	r10,r9
-800035d4:	e0 83 00 8c 	brlo	800036ec <init_AT86RF212+0x218>
-800035d8:	cf 5b       	rjmp	800035c2 <init_AT86RF212+0xee>
+800035c4:	12 38       	cp.w	r8,r9
+800035c6:	fe 98 ff fa 	brls	800035ba <init_AT86RF212+0xee>
+800035ca:	12 3a       	cp.w	r10,r9
+800035cc:	e0 83 00 8d 	brlo	800036e6 <init_AT86RF212+0x21a>
+800035d0:	cf 5b       	rjmp	800035ba <init_AT86RF212+0xee>
     }
     return false;
   }
   else
   {
     if (current_cycle_count < cpu_time->delay_start_cycle || current_cycle_count > cpu_time->delay_end_cycle)
-800035da:	12 38       	cp.w	r8,r9
-800035dc:	e0 8b 00 88 	brhi	800036ec <init_AT86RF212+0x218>
-800035e0:	12 3a       	cp.w	r10,r9
-800035e2:	e0 83 00 85 	brlo	800036ec <init_AT86RF212+0x218>
-800035e6:	ce eb       	rjmp	800035c2 <init_AT86RF212+0xee>
+800035d2:	12 38       	cp.w	r8,r9
+800035d4:	e0 8b 00 89 	brhi	800036e6 <init_AT86RF212+0x21a>
+800035d8:	12 3a       	cp.w	r10,r9
+800035da:	e0 83 00 86 	brlo	800036e6 <init_AT86RF212+0x21a>
+800035de:	ce eb       	rjmp	800035ba <init_AT86RF212+0xee>
  *
  * \return true if timeout occurred, otherwise false.
  */
 __always_inline static unsigned long cpu_is_timeout(t_cpu_time *cpu_time)
 {
   unsigned long current_cycle_count = Get_system_register(AVR32_COUNT);
-800035e8:	e1 b9 00 42 	mfsr	r9,0x108
+800035e0:	e1 b9 00 42 	mfsr	r9,0x108
   // Test if the timeout as already occurred.
   else if (cpu_time->timer_state == CPU_TIMER_STATE_REACHED)
     return true;
 
   // If the ending cycle count of this timeout is wrapped, ...
   else if (cpu_time->delay_start_cycle > cpu_time->delay_end_cycle)
-800035ec:	14 38       	cp.w	r8,r10
-800035ee:	e0 88 00 08 	brls	800035fe <init_AT86RF212+0x12a>
+800035e4:	14 38       	cp.w	r8,r10
+800035e6:	e0 88 00 09 	brls	800035f8 <init_AT86RF212+0x12c>
   {
     if (current_cycle_count < cpu_time->delay_start_cycle && current_cycle_count > cpu_time->delay_end_cycle)
-800035f2:	12 38       	cp.w	r8,r9
-800035f4:	fe 98 ff fa 	brls	800035e8 <init_AT86RF212+0x114>
-800035f8:	12 3a       	cp.w	r10,r9
-800035fa:	c7 e3       	brcs	800036f6 <init_AT86RF212+0x222>
-800035fc:	cf 6b       	rjmp	800035e8 <init_AT86RF212+0x114>
+800035ea:	12 38       	cp.w	r8,r9
+800035ec:	fe 98 ff fa 	brls	800035e0 <init_AT86RF212+0x114>
+800035f0:	12 3a       	cp.w	r10,r9
+800035f2:	e0 83 00 83 	brlo	800036f8 <init_AT86RF212+0x22c>
+800035f6:	cf 5b       	rjmp	800035e0 <init_AT86RF212+0x114>
     }
     return false;
   }
   else
   {
     if (current_cycle_count < cpu_time->delay_start_cycle || current_cycle_count > cpu_time->delay_end_cycle)
-800035fe:	12 38       	cp.w	r8,r9
-80003600:	e0 8b 00 7b 	brhi	800036f6 <init_AT86RF212+0x222>
-80003604:	12 3a       	cp.w	r10,r9
-80003606:	c7 83       	brcs	800036f6 <init_AT86RF212+0x222>
-80003608:	cf 0b       	rjmp	800035e8 <init_AT86RF212+0x114>
+800035f8:	12 38       	cp.w	r8,r9
+800035fa:	e0 8b 00 7f 	brhi	800036f8 <init_AT86RF212+0x22c>
+800035fe:	12 3a       	cp.w	r10,r9
+80003600:	c7 c3       	brcs	800036f8 <init_AT86RF212+0x22c>
+80003602:	ce fb       	rjmp	800035e0 <init_AT86RF212+0x114>
  *
  * \return true if timeout occurred, otherwise false.
  */
 __always_inline static unsigned long cpu_is_timeout(t_cpu_time *cpu_time)
 {
   unsigned long current_cycle_count = Get_system_register(AVR32_COUNT);
-8000360a:	e1 b9 00 42 	mfsr	r9,0x108
+80003604:	e1 b9 00 42 	mfsr	r9,0x108
   // Test if the timeout as already occurred.
   else if (cpu_time->timer_state == CPU_TIMER_STATE_REACHED)
     return true;
 
   // If the ending cycle count of this timeout is wrapped, ...
   else if (cpu_time->delay_start_cycle > cpu_time->delay_end_cycle)
-8000360e:	14 38       	cp.w	r8,r10
-80003610:	e0 88 00 08 	brls	80003620 <init_AT86RF212+0x14c>
+80003608:	14 38       	cp.w	r8,r10
+8000360a:	e0 88 00 08 	brls	8000361a <init_AT86RF212+0x14e>
   {
     if (current_cycle_count < cpu_time->delay_start_cycle && current_cycle_count > cpu_time->delay_end_cycle)
-80003614:	12 38       	cp.w	r8,r9
-80003616:	fe 98 ff fa 	brls	8000360a <init_AT86RF212+0x136>
-8000361a:	12 3a       	cp.w	r10,r9
-8000361c:	c7 43       	brcs	80003704 <init_AT86RF212+0x230>
-8000361e:	cf 6b       	rjmp	8000360a <init_AT86RF212+0x136>
+8000360e:	12 38       	cp.w	r8,r9
+80003610:	fe 98 ff fa 	brls	80003604 <init_AT86RF212+0x138>
+80003614:	12 3a       	cp.w	r10,r9
+80003616:	c7 83       	brcs	80003706 <init_AT86RF212+0x23a>
+80003618:	cf 6b       	rjmp	80003604 <init_AT86RF212+0x138>
     }
     return false;
   }
   else
   {
     if (current_cycle_count < cpu_time->delay_start_cycle || current_cycle_count > cpu_time->delay_end_cycle)
-80003620:	12 38       	cp.w	r8,r9
-80003622:	e0 8b 00 71 	brhi	80003704 <init_AT86RF212+0x230>
-80003626:	12 3a       	cp.w	r10,r9
-80003628:	c6 e3       	brcs	80003704 <init_AT86RF212+0x230>
-8000362a:	cf 0b       	rjmp	8000360a <init_AT86RF212+0x136>
+8000361a:	12 38       	cp.w	r8,r9
+8000361c:	e0 8b 00 75 	brhi	80003706 <init_AT86RF212+0x23a>
+80003620:	12 3a       	cp.w	r10,r9
+80003622:	c7 23       	brcs	80003706 <init_AT86RF212+0x23a>
+80003624:	cf 0b       	rjmp	80003604 <init_AT86RF212+0x138>
  *
  * \return true if timeout occurred, otherwise false.
  */
 __always_inline static unsigned long cpu_is_timeout(t_cpu_time *cpu_time)
 {
   unsigned long current_cycle_count = Get_system_register(AVR32_COUNT);
-8000362c:	e1 b9 00 42 	mfsr	r9,0x108
+80003626:	e1 b9 00 42 	mfsr	r9,0x108
   // Test if the timeout as already occurred.
   else if (cpu_time->timer_state == CPU_TIMER_STATE_REACHED)
     return true;
 
   // If the ending cycle count of this timeout is wrapped, ...
   else if (cpu_time->delay_start_cycle > cpu_time->delay_end_cycle)
-80003630:	14 38       	cp.w	r8,r10
-80003632:	e0 88 00 08 	brls	80003642 <init_AT86RF212+0x16e>
+8000362a:	14 38       	cp.w	r8,r10
+8000362c:	e0 88 00 08 	brls	8000363c <init_AT86RF212+0x170>
   {
     if (current_cycle_count < cpu_time->delay_start_cycle && current_cycle_count > cpu_time->delay_end_cycle)
-80003636:	12 38       	cp.w	r8,r9
-80003638:	fe 98 ff fa 	brls	8000362c <init_AT86RF212+0x158>
-8000363c:	12 3a       	cp.w	r10,r9
-8000363e:	c0 73       	brcs	8000364c <init_AT86RF212+0x178>
-80003640:	cf 6b       	rjmp	8000362c <init_AT86RF212+0x158>
+80003630:	12 38       	cp.w	r8,r9
+80003632:	fe 98 ff fa 	brls	80003626 <init_AT86RF212+0x15a>
+80003636:	12 3a       	cp.w	r10,r9
+80003638:	c0 73       	brcs	80003646 <init_AT86RF212+0x17a>
+8000363a:	cf 6b       	rjmp	80003626 <init_AT86RF212+0x15a>
     }
     return false;
   }
   else
   {
     if (current_cycle_count < cpu_time->delay_start_cycle || current_cycle_count > cpu_time->delay_end_cycle)
-80003642:	12 38       	cp.w	r8,r9
-80003644:	e0 8b 00 04 	brhi	8000364c <init_AT86RF212+0x178>
-80003648:	12 3a       	cp.w	r10,r9
-8000364a:	cf 12       	brcc	8000362c <init_AT86RF212+0x158>
+8000363c:	12 38       	cp.w	r8,r9
+8000363e:	e0 8b 00 04 	brhi	80003646 <init_AT86RF212+0x17a>
+80003642:	12 3a       	cp.w	r10,r9
+80003644:	cf 12       	brcc	80003626 <init_AT86RF212+0x15a>
 	promiscuous_mode();
 	PAL_WAIT_1_US();
 	pal_trx_reg_write(RG_TRX_STATE, CMD_FORCE_PLL_ON);// seteo el tran en
 	DELAY_US(TIME_PLL_ON_RX_ON);
 
 	while (getStateAT86RF212()!=CMD_PLL_ON);
-8000364c:	30 97       	mov	r7,9
-8000364e:	f0 1f 00 3f 	mcall	80003748 <init_AT86RF212+0x274>
-80003652:	ee 0c 18 00 	cp.b	r12,r7
-80003656:	cf c1       	brne	8000364e <init_AT86RF212+0x17a>
+80003646:	30 97       	mov	r7,9
+80003648:	f0 1f 00 40 	mcall	80003748 <init_AT86RF212+0x27c>
+8000364c:	ee 0c 18 00 	cp.b	r12,r7
+80003650:	cf c1       	brne	80003648 <init_AT86RF212+0x17c>
  * \param  delay:   (input) delay in CPU cycles before timeout.
  * \param  cpu_time: (output) internal information used by the timer API.
  */
 __always_inline static void cpu_set_timeout(unsigned long delay, t_cpu_time *cpu_time)
 {
   cpu_time->delay_start_cycle = Get_system_register(AVR32_COUNT);
-80003658:	e1 b8 00 42 	mfsr	r8,0x108
+80003652:	e1 b8 00 42 	mfsr	r8,0x108
   cpu_time->delay_end_cycle   = cpu_time->delay_start_cycle + delay;
-8000365c:	f0 ca ff ff 	sub	r10,r8,-1
+80003656:	f0 ca ff ff 	sub	r10,r8,-1
  *
  * \return true if timeout occurred, otherwise false.
  */
 __always_inline static unsigned long cpu_is_timeout(t_cpu_time *cpu_time)
 {
   unsigned long current_cycle_count = Get_system_register(AVR32_COUNT);
-80003660:	e1 b9 00 42 	mfsr	r9,0x108
+8000365a:	e1 b9 00 42 	mfsr	r9,0x108
   // Test if the timeout as already occurred.
   else if (cpu_time->timer_state == CPU_TIMER_STATE_REACHED)
     return true;
 
   // If the ending cycle count of this timeout is wrapped, ...
   else if (cpu_time->delay_start_cycle > cpu_time->delay_end_cycle)
-80003664:	14 38       	cp.w	r8,r10
-80003666:	e0 88 00 08 	brls	80003676 <init_AT86RF212+0x1a2>
+8000365e:	14 38       	cp.w	r8,r10
+80003660:	e0 88 00 08 	brls	80003670 <init_AT86RF212+0x1a4>
   {
     if (current_cycle_count < cpu_time->delay_start_cycle && current_cycle_count > cpu_time->delay_end_cycle)
-8000366a:	12 38       	cp.w	r8,r9
-8000366c:	fe 98 ff fa 	brls	80003660 <init_AT86RF212+0x18c>
-80003670:	12 3a       	cp.w	r10,r9
-80003672:	c5 23       	brcs	80003716 <init_AT86RF212+0x242>
-80003674:	cf 6b       	rjmp	80003660 <init_AT86RF212+0x18c>
+80003664:	12 38       	cp.w	r8,r9
+80003666:	fe 98 ff fa 	brls	8000365a <init_AT86RF212+0x18e>
+8000366a:	12 3a       	cp.w	r10,r9
+8000366c:	c5 63       	brcs	80003718 <init_AT86RF212+0x24c>
+8000366e:	cf 6b       	rjmp	8000365a <init_AT86RF212+0x18e>
     }
     return false;
   }
   else
   {
     if (current_cycle_count < cpu_time->delay_start_cycle || current_cycle_count > cpu_time->delay_end_cycle)
-80003676:	12 38       	cp.w	r8,r9
-80003678:	e0 8b 00 4f 	brhi	80003716 <init_AT86RF212+0x242>
-8000367c:	12 3a       	cp.w	r10,r9
-8000367e:	c4 c3       	brcs	80003716 <init_AT86RF212+0x242>
-80003680:	cf 0b       	rjmp	80003660 <init_AT86RF212+0x18c>
+80003670:	12 38       	cp.w	r8,r9
+80003672:	e0 8b 00 53 	brhi	80003718 <init_AT86RF212+0x24c>
+80003676:	12 3a       	cp.w	r10,r9
+80003678:	c5 03       	brcs	80003718 <init_AT86RF212+0x24c>
+8000367a:	cf 0b       	rjmp	8000365a <init_AT86RF212+0x18e>
  *
  * \return true if timeout occurred, otherwise false.
  */
 __always_inline static unsigned long cpu_is_timeout(t_cpu_time *cpu_time)
 {
   unsigned long current_cycle_count = Get_system_register(AVR32_COUNT);
-80003682:	e1 b9 00 42 	mfsr	r9,0x108
+8000367c:	e1 b9 00 42 	mfsr	r9,0x108
   // Test if the timeout as already occurred.
   else if (cpu_time->timer_state == CPU_TIMER_STATE_REACHED)
     return true;
 
   // If the ending cycle count of this timeout is wrapped, ...
   else if (cpu_time->delay_start_cycle > cpu_time->delay_end_cycle)
-80003686:	14 38       	cp.w	r8,r10
-80003688:	e0 88 00 08 	brls	80003698 <init_AT86RF212+0x1c4>
+80003680:	14 38       	cp.w	r8,r10
+80003682:	e0 88 00 08 	brls	80003692 <init_AT86RF212+0x1c6>
   {
     if (current_cycle_count < cpu_time->delay_start_cycle && current_cycle_count > cpu_time->delay_end_cycle)
-8000368c:	12 38       	cp.w	r8,r9
-8000368e:	fe 98 ff fa 	brls	80003682 <init_AT86RF212+0x1ae>
-80003692:	12 3a       	cp.w	r10,r9
-80003694:	c4 a3       	brcs	80003728 <init_AT86RF212+0x254>
-80003696:	cf 6b       	rjmp	80003682 <init_AT86RF212+0x1ae>
+80003686:	12 38       	cp.w	r8,r9
+80003688:	fe 98 ff fa 	brls	8000367c <init_AT86RF212+0x1b0>
+8000368c:	12 3a       	cp.w	r10,r9
+8000368e:	c4 e3       	brcs	8000372a <init_AT86RF212+0x25e>
+80003690:	cf 6b       	rjmp	8000367c <init_AT86RF212+0x1b0>
     }
     return false;
   }
   else
   {
     if (current_cycle_count < cpu_time->delay_start_cycle || current_cycle_count > cpu_time->delay_end_cycle)
-80003698:	12 38       	cp.w	r8,r9
-8000369a:	e0 8b 00 47 	brhi	80003728 <init_AT86RF212+0x254>
-8000369e:	12 3a       	cp.w	r10,r9
-800036a0:	c4 43       	brcs	80003728 <init_AT86RF212+0x254>
-800036a2:	cf 0b       	rjmp	80003682 <init_AT86RF212+0x1ae>
+80003692:	12 38       	cp.w	r8,r9
+80003694:	e0 8b 00 4b 	brhi	8000372a <init_AT86RF212+0x25e>
+80003698:	12 3a       	cp.w	r10,r9
+8000369a:	c4 83       	brcs	8000372a <init_AT86RF212+0x25e>
+8000369c:	cf 0b       	rjmp	8000367c <init_AT86RF212+0x1b0>
 	//estadoPorPc();
 	RESET();
 	//PAL_WAIT_1_US();
 	pal_trx_reg_write(RG_IRQ_MASK, 0x00);
 	PAL_WAIT_1_US();
 	pal_trx_reg_write(RG_TRX_STATE, CMD_FORCE_TRX_OFF); // Forzar el estado off
-800036a4:	30 3b       	mov	r11,3
-800036a6:	30 2c       	mov	r12,2
-800036a8:	f0 1f 00 27 	mcall	80003744 <init_AT86RF212+0x270>
+8000369e:	30 3b       	mov	r11,3
+800036a0:	30 2c       	mov	r12,2
+800036a2:	f0 1f 00 29 	mcall	80003744 <init_AT86RF212+0x278>
  * \param  delay:   (input) delay in CPU cycles before timeout.
  * \param  cpu_time: (output) internal information used by the timer API.
  */
 __always_inline static void cpu_set_timeout(unsigned long delay, t_cpu_time *cpu_time)
 {
   cpu_time->delay_start_cycle = Get_system_register(AVR32_COUNT);
-800036ac:	e1 b8 00 42 	mfsr	r8,0x108
+800036a6:	e1 b8 00 42 	mfsr	r8,0x108
   cpu_time->delay_end_cycle   = cpu_time->delay_start_cycle + delay;
-800036b0:	f0 ca ff ff 	sub	r10,r8,-1
-800036b4:	c3 4b       	rjmp	8000351c <init_AT86RF212+0x48>
+800036aa:	f0 ca ff ff 	sub	r10,r8,-1
+800036ae:	c3 3b       	rjmp	80003514 <init_AT86RF212+0x48>
 	DELAY_US(RST_PULSE_WIDTH_US); //tTR10
 	
 	//variable1=getStateAT86RF212();
 	while(getStateAT86RF212()!= CMD_TRX_OFF); // espero el estado off
 	PAL_WAIT_1_US();
 	pal_trx_reg_write(RG_TRX_CTRL_0, 0x08);
-800036b6:	30 8b       	mov	r11,8
-800036b8:	30 3c       	mov	r12,3
-800036ba:	f0 1f 00 23 	mcall	80003744 <init_AT86RF212+0x270>
+800036b0:	30 8b       	mov	r11,8
+800036b2:	30 3c       	mov	r12,3
+800036b4:	f0 1f 00 24 	mcall	80003744 <init_AT86RF212+0x278>
  * \param  delay:   (input) delay in CPU cycles before timeout.
  * \param  cpu_time: (output) internal information used by the timer API.
  */
 __always_inline static void cpu_set_timeout(unsigned long delay, t_cpu_time *cpu_time)
 {
   cpu_time->delay_start_cycle = Get_system_register(AVR32_COUNT);
-800036be:	e1 b8 00 42 	mfsr	r8,0x108
+800036b8:	e1 b8 00 42 	mfsr	r8,0x108
   cpu_time->delay_end_cycle   = cpu_time->delay_start_cycle + delay;
-800036c2:	f0 ca ff ff 	sub	r10,r8,-1
-800036c6:	c5 8b       	rjmp	80003576 <init_AT86RF212+0xa2>
+800036bc:	f0 ca ff ff 	sub	r10,r8,-1
+800036c0:	c5 7b       	rjmp	8000356e <init_AT86RF212+0xa2>
 	//pal_trx_reg_write(RG_PHY_CC_CCA,||SR_SUB_MODE); // 914Mhz set channel ->
 	PAL_WAIT_1_US();
 	pal_trx_reg_write(RG_TRX_CTRL_1, 0x22); // 1 -> TX AUTO_CRC && 1-> IRQ_MASK_MODE
-800036c8:	32 2b       	mov	r11,34
-800036ca:	30 4c       	mov	r12,4
-800036cc:	f0 1f 00 1e 	mcall	80003744 <init_AT86RF212+0x270>
+800036c2:	32 2b       	mov	r11,34
+800036c4:	30 4c       	mov	r12,4
+800036c6:	f0 1f 00 20 	mcall	80003744 <init_AT86RF212+0x278>
  * \param  delay:   (input) delay in CPU cycles before timeout.
  * \param  cpu_time: (output) internal information used by the timer API.
  */
 __always_inline static void cpu_set_timeout(unsigned long delay, t_cpu_time *cpu_time)
 {
   cpu_time->delay_start_cycle = Get_system_register(AVR32_COUNT);
-800036d0:	e1 b8 00 42 	mfsr	r8,0x108
+800036ca:	e1 b8 00 42 	mfsr	r8,0x108
   cpu_time->delay_end_cycle   = cpu_time->delay_start_cycle + delay;
-800036d4:	f0 ca ff ff 	sub	r10,r8,-1
-800036d8:	c6 2b       	rjmp	8000359c <init_AT86RF212+0xc8>
+800036ce:	f0 ca ff ff 	sub	r10,r8,-1
+800036d2:	c6 1b       	rjmp	80003594 <init_AT86RF212+0xc8>
 	PAL_WAIT_1_US();
 	//pal_trx_reg_write(RG_RX_CTRL, 0x20);
 	pal_trx_reg_write(RG_IRQ_MASK, 0x0C);
-800036da:	30 cb       	mov	r11,12
-800036dc:	30 ec       	mov	r12,14
-800036de:	f0 1f 00 1a 	mcall	80003744 <init_AT86RF212+0x270>
+800036d4:	30 cb       	mov	r11,12
+800036d6:	30 ec       	mov	r12,14
+800036d8:	f0 1f 00 1b 	mcall	80003744 <init_AT86RF212+0x278>
  * \param  delay:   (input) delay in CPU cycles before timeout.
  * \param  cpu_time: (output) internal information used by the timer API.
  */
 __always_inline static void cpu_set_timeout(unsigned long delay, t_cpu_time *cpu_time)
 {
   cpu_time->delay_start_cycle = Get_system_register(AVR32_COUNT);
-800036e2:	e1 b8 00 42 	mfsr	r8,0x108
+800036dc:	e1 b8 00 42 	mfsr	r8,0x108
   cpu_time->delay_end_cycle   = cpu_time->delay_start_cycle + delay;
-800036e6:	f0 ca ff ff 	sub	r10,r8,-1
-800036ea:	c6 cb       	rjmp	800035c2 <init_AT86RF212+0xee>
- * \param  delay:   (input) delay in CPU cycles before timeout.
- * \param  cpu_time: (output) internal information used by the timer API.
- */
-__always_inline static void cpu_set_timeout(unsigned long delay, t_cpu_time *cpu_time)
-{
-  cpu_time->delay_start_cycle = Get_system_register(AVR32_COUNT);
-800036ec:	e1 b8 00 42 	mfsr	r8,0x108
-  cpu_time->delay_end_cycle   = cpu_time->delay_start_cycle + delay;
-800036f0:	f0 ca ff ff 	sub	r10,r8,-1
-800036f4:	c7 ab       	rjmp	800035e8 <init_AT86RF212+0x114>
-//	pal_trx_reg_write(RG_TRX_CTRL_2, 0x00); // configuracion de velocidad y frec
+800036e0:	f0 ca ff ff 	sub	r10,r8,-1
+800036e4:	c6 bb       	rjmp	800035ba <init_AT86RF212+0xee>
 	PAL_WAIT_1_US();
+	pal_trx_reg_write(RG_TRX_CTRL_2, 0x68); // O-QPSK 100kb/s
+800036e6:	36 8b       	mov	r11,104
+800036e8:	30 cc       	mov	r12,12
+800036ea:	f0 1f 00 17 	mcall	80003744 <init_AT86RF212+0x278>
+ * \param  delay:   (input) delay in CPU cycles before timeout.
+ * \param  cpu_time: (output) internal information used by the timer API.
+ */
+__always_inline static void cpu_set_timeout(unsigned long delay, t_cpu_time *cpu_time)
+{
+  cpu_time->delay_start_cycle = Get_system_register(AVR32_COUNT);
+800036ee:	e1 b8 00 42 	mfsr	r8,0x108
+  cpu_time->delay_end_cycle   = cpu_time->delay_start_cycle + delay;
+800036f2:	f0 ca ff ff 	sub	r10,r8,-1
+800036f6:	c7 5b       	rjmp	800035e0 <init_AT86RF212+0x114>
+	//pal_trx_reg_write(RG_TRX_CTRL_2, 0x29); // O-QPSK 200kb/s
+	
 	//pal_trx_reg_write(RG_XOSC_CTRL, 0x40); // manejo del cristal externo y capacitores se muere cuando se activa
 	PAL_WAIT_1_US();
 	promiscuous_mode();
-800036f6:	f0 1f 00 16 	mcall	8000374c <init_AT86RF212+0x278>
+800036f8:	f0 1f 00 15 	mcall	8000374c <init_AT86RF212+0x280>
  * \param  delay:   (input) delay in CPU cycles before timeout.
  * \param  cpu_time: (output) internal information used by the timer API.
  */
 __always_inline static void cpu_set_timeout(unsigned long delay, t_cpu_time *cpu_time)
 {
   cpu_time->delay_start_cycle = Get_system_register(AVR32_COUNT);
-800036fa:	e1 b8 00 42 	mfsr	r8,0x108
+800036fc:	e1 b8 00 42 	mfsr	r8,0x108
   cpu_time->delay_end_cycle   = cpu_time->delay_start_cycle + delay;
-800036fe:	f0 ca ff ff 	sub	r10,r8,-1
-80003702:	c8 4b       	rjmp	8000360a <init_AT86RF212+0x136>
+80003700:	f0 ca ff ff 	sub	r10,r8,-1
+80003704:	c8 0b       	rjmp	80003604 <init_AT86RF212+0x138>
 	PAL_WAIT_1_US();
 	pal_trx_reg_write(RG_TRX_STATE, CMD_FORCE_PLL_ON);// seteo el tran en
-80003704:	30 4b       	mov	r11,4
-80003706:	30 2c       	mov	r12,2
-80003708:	f0 1f 00 0f 	mcall	80003744 <init_AT86RF212+0x270>
+80003706:	30 4b       	mov	r11,4
+80003708:	30 2c       	mov	r12,2
+8000370a:	f0 1f 00 0f 	mcall	80003744 <init_AT86RF212+0x278>
  * \param  delay:   (input) delay in CPU cycles before timeout.
  * \param  cpu_time: (output) internal information used by the timer API.
  */
 __always_inline static void cpu_set_timeout(unsigned long delay, t_cpu_time *cpu_time)
 {
   cpu_time->delay_start_cycle = Get_system_register(AVR32_COUNT);
-8000370c:	e1 b8 00 42 	mfsr	r8,0x108
+8000370e:	e1 b8 00 42 	mfsr	r8,0x108
   cpu_time->delay_end_cycle   = cpu_time->delay_start_cycle + delay;
-80003710:	f0 ca ff ff 	sub	r10,r8,-1
-80003714:	c8 cb       	rjmp	8000362c <init_AT86RF212+0x158>
+80003712:	f0 ca ff ff 	sub	r10,r8,-1
+80003716:	c8 8b       	rjmp	80003626 <init_AT86RF212+0x15a>
 	DELAY_US(TIME_PLL_ON_RX_ON);
 
 	while (getStateAT86RF212()!=CMD_PLL_ON);
 	PAL_WAIT_1_US();
 	pal_trx_reg_write(RG_TRX_STATE, CMD_RX_ON);
-80003716:	30 6b       	mov	r11,6
-80003718:	30 2c       	mov	r12,2
-8000371a:	f0 1f 00 0b 	mcall	80003744 <init_AT86RF212+0x270>
+80003718:	30 6b       	mov	r11,6
+8000371a:	30 2c       	mov	r12,2
+8000371c:	f0 1f 00 0a 	mcall	80003744 <init_AT86RF212+0x278>
  * \param  delay:   (input) delay in CPU cycles before timeout.
  * \param  cpu_time: (output) internal information used by the timer API.
  */
 __always_inline static void cpu_set_timeout(unsigned long delay, t_cpu_time *cpu_time)
 {
   cpu_time->delay_start_cycle = Get_system_register(AVR32_COUNT);
-8000371e:	e1 b8 00 42 	mfsr	r8,0x108
+80003720:	e1 b8 00 42 	mfsr	r8,0x108
   cpu_time->delay_end_cycle   = cpu_time->delay_start_cycle + delay;
-80003722:	f0 ca ff ff 	sub	r10,r8,-1
-80003726:	ca eb       	rjmp	80003682 <init_AT86RF212+0x1ae>
+80003724:	f0 ca ff ff 	sub	r10,r8,-1
+80003728:	ca ab       	rjmp	8000367c <init_AT86RF212+0x1b0>
 	PAL_WAIT_1_US();
  	
 	cpu_irq_enable();
-80003728:	d5 03       	csrf	0x10
-	Enable_global_interrupt();
 8000372a:	d5 03       	csrf	0x10
+	Enable_global_interrupt();
+8000372c:	d5 03       	csrf	0x10
 	
 	escribir_linea_pc("\n Terminando configuracion AT86RF212 \n\n");
-8000372c:	48 9c       	lddpc	r12,80003750 <init_AT86RF212+0x27c>
-8000372e:	f0 1f 00 04 	mcall	8000373c <init_AT86RF212+0x268>
+8000372e:	48 9c       	lddpc	r12,80003750 <init_AT86RF212+0x284>
+80003730:	f0 1f 00 03 	mcall	8000373c <init_AT86RF212+0x270>
 }
-80003732:	e3 cd 80 80 	ldm	sp++,r7,pc
-80003736:	00 00       	add	r0,r0
+80003734:	e3 cd 80 80 	ldm	sp++,r7,pc
 80003738:	80 00       	ld.sh	r0,r0[0x0]
-8000373a:	99 98       	st.w	r12[0x24],r8
+8000373a:	99 bc       	st.w	r12[0x2c],r12
 8000373c:	80 00       	ld.sh	r0,r0[0x0]
 8000373e:	33 c8       	mov	r8,60
 80003740:	80 00       	ld.sh	r0,r0[0x0]
@@ -4914,7 +4916,7 @@ __always_inline static void cpu_set_timeout(unsigned long delay, t_cpu_time *cpu
 8000374c:	80 00       	ld.sh	r0,r0[0x0]
 8000374e:	30 c0       	mov	r0,12
 80003750:	80 00       	ld.sh	r0,r0[0x0]
-80003752:	99 b8       	st.w	r12[0x2c],r8
+80003752:	99 dc       	st.w	r12[0x34],r12
 
 80003754 <init_i2c_module>:
 	gpio_enable_module (TWI_GPIO_MAP,
@@ -4978,11 +4980,11 @@ static inline void sysclk_enable_pba_module(unsigned int index)
 80003798:	80 00       	ld.sh	r0,r0[0x0]
 8000379a:	23 40       	sub	r0,52
 8000379c:	80 00       	ld.sh	r0,r0[0x0]
-8000379e:	9c 74       	ld.sh	r4,lr[0xe]
+8000379e:	9c 98       	ld.uh	r8,lr[0x2]
 800037a0:	80 00       	ld.sh	r0,r0[0x0]
 800037a2:	33 c8       	mov	r8,60
 800037a4:	80 00       	ld.sh	r0,r0[0x0]
-800037a6:	9c 88       	ld.uh	r8,lr[0x0]
+800037a6:	9c ac       	ld.uh	r12,lr[0x4]
 
 800037a8 <spi_init_module>:
 	};
@@ -5489,7 +5491,7 @@ __always_inline static unsigned long cpu_is_timeout(t_cpu_time *cpu_time)
 80003a34:	00 00       	add	r0,r0
 80003a36:	00 18       	sub	r8,r0
 80003a38:	80 00       	ld.sh	r0,r0[0x0]
-80003a3a:	9d 10       	st.w	lr[0x4],r0
+80003a3a:	9d 34       	st.w	lr[0xc],r4
 80003a3c:	80 00       	ld.sh	r0,r0[0x0]
 80003a3e:	29 66       	sub	r6,-106
 80003a40:	80 00       	ld.sh	r0,r0[0x0]
@@ -5505,19 +5507,19 @@ __always_inline static unsigned long cpu_is_timeout(t_cpu_time *cpu_time)
 80003a54:	00 00       	add	r0,r0
 80003a56:	06 35       	cp.w	r5,r3
 80003a58:	80 00       	ld.sh	r0,r0[0x0]
-80003a5a:	9c a0       	ld.uh	r0,lr[0x4]
+80003a5a:	9c c4       	ld.uh	r4,lr[0x8]
 80003a5c:	80 00       	ld.sh	r0,r0[0x0]
 80003a5e:	33 c8       	mov	r8,60
 80003a60:	80 00       	ld.sh	r0,r0[0x0]
-80003a62:	9c b4       	ld.uh	r4,lr[0x6]
+80003a62:	9c d8       	ld.uh	r8,lr[0xa]
 80003a64:	80 00       	ld.sh	r0,r0[0x0]
 80003a66:	33 0c       	mov	r12,48
 80003a68:	80 00       	ld.sh	r0,r0[0x0]
 80003a6a:	37 54       	mov	r4,117
 80003a6c:	80 00       	ld.sh	r0,r0[0x0]
-80003a6e:	34 d4       	mov	r4,77
+80003a6e:	34 cc       	mov	r12,76
 80003a70:	80 00       	ld.sh	r0,r0[0x0]
-80003a72:	9c c8       	ld.uh	r8,lr[0x8]
+80003a72:	9c ec       	ld.uh	r12,lr[0xc]
 80003a74:	00 00       	add	r0,r0
 80003a76:	06 36       	cp.w	r6,r3
 80003a78:	00 00       	add	r0,r0
@@ -5529,13 +5531,13 @@ __always_inline static unsigned long cpu_is_timeout(t_cpu_time *cpu_time)
 80003a84:	80 00       	ld.sh	r0,r0[0x0]
 80003a86:	31 78       	mov	r8,23
 80003a88:	80 00       	ld.sh	r0,r0[0x0]
-80003a8a:	9c e0       	ld.uh	r0,lr[0xc]
+80003a8a:	9d 04       	st.w	lr[0x0],r4
 80003a8c:	80 00       	ld.sh	r0,r0[0x0]
-80003a8e:	9c e8       	ld.uh	r8,lr[0xc]
+80003a8e:	9d 0c       	st.w	lr[0x0],r12
 80003a90:	00 00       	add	r0,r0
 80003a92:	06 38       	cp.w	r8,r3
 80003a94:	80 00       	ld.sh	r0,r0[0x0]
-80003a96:	34 68       	mov	r8,70
+80003a96:	34 60       	mov	r0,70
 
 80003a98 <__avr32_f64_mul>:
 80003a98:	f5 eb 10 1c 	or	r12,r10,r11<<0x1
@@ -6289,22 +6291,22 @@ __always_inline static unsigned long cpu_is_timeout(t_cpu_time *cpu_time)
 80004284:	f8 0c 00 3c 	add	r12,r12,r12<<0x3
 80004288:	16 97       	mov	r7,r11
 8000428a:	50 7c       	stdsp	sp[0x1c],r12
-8000428c:	fe cc a2 a0 	sub	r12,pc,-23904
+8000428c:	fe cc a2 7c 	sub	r12,pc,-23940
 80004290:	0f 3a       	ld.ub	r10,r7++
 80004292:	f8 0a 07 0e 	ld.ub	lr,r12[r10]
 80004296:	40 7c       	lddsp	r12,sp[0x1c]
 80004298:	1c 0c       	add	r12,lr
-8000429a:	fe ce a3 76 	sub	lr,pc,-23690
+8000429a:	fe ce a3 52 	sub	lr,pc,-23726
 8000429e:	fc 0c 07 0e 	ld.ub	lr,lr[r12]
 800042a2:	20 1e       	sub	lr,1
 800042a4:	50 0e       	stdsp	sp[0x0],lr
-800042a6:	fe ce a3 ee 	sub	lr,pc,-23570
+800042a6:	fe ce a3 ca 	sub	lr,pc,-23606
 800042aa:	fc 0c 07 0c 	ld.ub	r12,lr[r12]
 800042ae:	50 7c       	stdsp	sp[0x1c],r12
 800042b0:	40 0c       	lddsp	r12,sp[0x0]
 800042b2:	58 7c       	cp.w	r12,7
 800042b4:	e0 8b 00 ef 	brhi	80004492 <get_arg+0x262>
-800042b8:	fe ce a5 a0 	sub	lr,pc,-23136
+800042b8:	fe ce a5 7c 	sub	lr,pc,-23172
 800042bc:	fc 0c 03 2f 	ld.w	pc,lr[r12<<0x2]
 800042c0:	36 8b       	mov	r11,104
 800042c2:	f6 0a 18 00 	cp.b	r10,r11
@@ -6405,7 +6407,7 @@ __always_inline static unsigned long cpu_is_timeout(t_cpu_time *cpu_time)
 800043ba:	e0 8b 00 6c 	brhi	80004492 <get_arg+0x262>
 800043be:	6c 0a       	ld.w	r10,r6[0x0]
 800043c0:	ea cc ff ff 	sub	r12,r5,-1
-800043c4:	fe ce a6 8c 	sub	lr,pc,-22900
+800043c4:	fe ce a6 68 	sub	lr,pc,-22936
 800043c8:	fc 00 03 2f 	ld.w	pc,lr[r0<<0x2]
 800043cc:	f4 cb ff f8 	sub	r11,r10,-8
 800043d0:	8d 0b       	st.w	r6[0x0],r11
@@ -6585,17 +6587,17 @@ __always_inline static unsigned long cpu_is_timeout(t_cpu_time *cpu_time)
 8000457a:	c0 41       	brne	80004582 <_vfprintf_r+0x26>
 8000457c:	0a 9c       	mov	r12,r5
 8000457e:	e0 a0 17 3d 	rcall	800073f8 <__sinit>
-80004582:	fe c8 a4 86 	sub	r8,pc,-23418
+80004582:	fe c8 a4 62 	sub	r8,pc,-23454
 80004586:	10 31       	cp.w	r1,r8
 80004588:	c0 31       	brne	8000458e <_vfprintf_r+0x32>
 8000458a:	6a 01       	ld.w	r1,r5[0x0]
 8000458c:	c0 c8       	rjmp	800045a4 <_vfprintf_r+0x48>
-8000458e:	fe c8 a4 72 	sub	r8,pc,-23438
+8000458e:	fe c8 a4 4e 	sub	r8,pc,-23474
 80004592:	10 31       	cp.w	r1,r8
 80004594:	c0 31       	brne	8000459a <_vfprintf_r+0x3e>
 80004596:	6a 11       	ld.w	r1,r5[0x4]
 80004598:	c0 68       	rjmp	800045a4 <_vfprintf_r+0x48>
-8000459a:	fe c8 a4 5e 	sub	r8,pc,-23458
+8000459a:	fe c8 a4 3a 	sub	r8,pc,-23494
 8000459e:	10 31       	cp.w	r1,r8
 800045a0:	eb f1 00 02 	ld.weq	r1,r5[0x8]
 800045a4:	82 68       	ld.sh	r8,r1[0xc]
@@ -6745,7 +6747,7 @@ __always_inline static unsigned long cpu_is_timeout(t_cpu_time *cpu_time)
 80004722:	f0 c9 00 20 	sub	r9,r8,32
 80004726:	e0 49 00 58 	cp.w	r9,88
 8000472a:	e0 8b 0a 30 	brhi	80005b8a <_vfprintf_r+0x162e>
-8000472e:	fe ca a9 da 	sub	r10,pc,-22054
+8000472e:	fe ca a9 b6 	sub	r10,pc,-22090
 80004732:	f4 09 03 2f 	ld.w	pc,r10[r9<<0x2]
 80004736:	50 a7       	stdsp	sp[0x28],r7
 80004738:	50 80       	stdsp	sp[0x20],r0
@@ -6753,7 +6755,7 @@ __always_inline static unsigned long cpu_is_timeout(t_cpu_time *cpu_time)
 8000473c:	04 94       	mov	r4,r2
 8000473e:	06 96       	mov	r6,r3
 80004740:	02 92       	mov	r2,r1
-80004742:	fe c9 a7 b2 	sub	r9,pc,-22606
+80004742:	fe c9 a7 8e 	sub	r9,pc,-22642
 80004746:	40 93       	lddsp	r3,sp[0x24]
 80004748:	10 90       	mov	r0,r8
 8000474a:	40 41       	lddsp	r1,sp[0x10]
@@ -7390,8 +7392,8 @@ __always_inline static unsigned long cpu_is_timeout(t_cpu_time *cpu_time)
 80004dfc:	c0 40       	breq	80004e04 <_vfprintf_r+0x8a8>
 80004dfe:	32 d8       	mov	r8,45
 80004e00:	fb 68 06 bb 	st.b	sp[1723],r8
-80004e04:	fe c8 ae 60 	sub	r8,pc,-20896
-80004e08:	fe c6 ae 60 	sub	r6,pc,-20896
+80004e04:	fe c8 ae 3c 	sub	r8,pc,-20932
+80004e08:	fe c6 ae 3c 	sub	r6,pc,-20932
 80004e0c:	a7 d5       	cbr	r5,0x7
 80004e0e:	e0 40 00 47 	cp.w	r0,71
 80004e12:	f0 06 17 a0 	movle	r6,r8
@@ -7402,8 +7404,8 @@ __always_inline static unsigned long cpu_is_timeout(t_cpu_time *cpu_time)
 80004e20:	e0 a0 1c cf 	rcall	800087be <__isnand>
 80004e24:	c0 e0       	breq	80004e40 <_vfprintf_r+0x8e4>
 80004e26:	50 26       	stdsp	sp[0x8],r6
-80004e28:	fe c8 ae 7c 	sub	r8,pc,-20868
-80004e2c:	fe c6 ae 7c 	sub	r6,pc,-20868
+80004e28:	fe c8 ae 58 	sub	r8,pc,-20904
+80004e2c:	fe c6 ae 58 	sub	r6,pc,-20904
 80004e30:	a7 d5       	cbr	r5,0x7
 80004e32:	e0 40 00 47 	cp.w	r0,71
 80004e36:	f0 06 17 a0 	movle	r6,r8
@@ -8071,7 +8073,7 @@ __always_inline static unsigned long cpu_is_timeout(t_cpu_time *cpu_time)
 80005536:	37 88       	mov	r8,120
 80005538:	30 0e       	mov	lr,0
 8000553a:	fb 68 06 b9 	st.b	sp[1721],r8
-8000553e:	fe cc b5 8a 	sub	r12,pc,-19062
+8000553e:	fe cc b5 66 	sub	r12,pc,-19098
 80005542:	50 19       	stdsp	sp[0x4],r9
 80005544:	a1 b5       	sbr	r5,0x1
 80005546:	50 0e       	stdsp	sp[0x0],lr
@@ -8367,7 +8369,7 @@ __always_inline static unsigned long cpu_is_timeout(t_cpu_time *cpu_time)
 80005858:	04 94       	mov	r4,r2
 8000585a:	06 96       	mov	r6,r3
 8000585c:	02 92       	mov	r2,r1
-8000585e:	fe cc b8 aa 	sub	r12,pc,-18262
+8000585e:	fe cc b8 86 	sub	r12,pc,-18298
 80005862:	40 93       	lddsp	r3,sp[0x24]
 80005864:	10 90       	mov	r0,r8
 80005866:	40 41       	lddsp	r1,sp[0x10]
@@ -8714,7 +8716,7 @@ __always_inline static unsigned long cpu_is_timeout(t_cpu_time *cpu_time)
 80005c0c:	c3 f8       	rjmp	80005c8a <_vfprintf_r+0x172e>
 80005c0e:	2f 09       	sub	r9,-16
 80005c10:	2f f8       	sub	r8,-1
-80005c12:	fe ce bc 46 	sub	lr,pc,-17338
+80005c12:	fe ce bc 22 	sub	lr,pc,-17374
 80005c16:	31 0c       	mov	r12,16
 80005c18:	fb 49 06 90 	st.w	sp[1680],r9
 80005c1c:	87 0e       	st.w	r3[0x0],lr
@@ -8735,7 +8737,7 @@ __always_inline static unsigned long cpu_is_timeout(t_cpu_time *cpu_time)
 80005c46:	50 4b       	stdsp	sp[0x10],r11
 80005c48:	fa f9 06 90 	ld.w	r9,sp[1680]
 80005c4c:	fa f8 06 8c 	ld.w	r8,sp[1676]
-80005c50:	fe ca bc 84 	sub	r10,pc,-17276
+80005c50:	fe ca bc 60 	sub	r10,pc,-17312
 80005c54:	40 4e       	lddsp	lr,sp[0x10]
 80005c56:	59 0e       	cp.w	lr,16
 80005c58:	fe 99 ff db 	brgt	80005c0e <_vfprintf_r+0x16b2>
@@ -8814,7 +8816,7 @@ __always_inline static unsigned long cpu_is_timeout(t_cpu_time *cpu_time)
 80005d2a:	c3 f8       	rjmp	80005da8 <_vfprintf_r+0x184c>
 80005d2c:	2f 09       	sub	r9,-16
 80005d2e:	2f f8       	sub	r8,-1
-80005d30:	fe ce bd 54 	sub	lr,pc,-17068
+80005d30:	fe ce bd 30 	sub	lr,pc,-17104
 80005d34:	31 0c       	mov	r12,16
 80005d36:	fb 49 06 90 	st.w	sp[1680],r9
 80005d3a:	87 0e       	st.w	r3[0x0],lr
@@ -8835,7 +8837,7 @@ __always_inline static unsigned long cpu_is_timeout(t_cpu_time *cpu_time)
 80005d64:	50 4b       	stdsp	sp[0x10],r11
 80005d66:	fa f9 06 90 	ld.w	r9,sp[1680]
 80005d6a:	fa f8 06 8c 	ld.w	r8,sp[1676]
-80005d6e:	fe ca bd 92 	sub	r10,pc,-17006
+80005d6e:	fe ca bd 6e 	sub	r10,pc,-17042
 80005d72:	40 4e       	lddsp	lr,sp[0x10]
 80005d74:	59 0e       	cp.w	lr,16
 80005d76:	fe 99 ff db 	brgt	80005d2c <_vfprintf_r+0x17d0>
@@ -8863,7 +8865,7 @@ __always_inline static unsigned long cpu_is_timeout(t_cpu_time *cpu_time)
 80005db4:	c3 f8       	rjmp	80005e32 <_vfprintf_r+0x18d6>
 80005db6:	2f 09       	sub	r9,-16
 80005db8:	2f f8       	sub	r8,-1
-80005dba:	fe cb bd de 	sub	r11,pc,-16930
+80005dba:	fe cb bd ba 	sub	r11,pc,-16966
 80005dbe:	31 0a       	mov	r10,16
 80005dc0:	fb 49 06 90 	st.w	sp[1680],r9
 80005dc4:	87 0b       	st.w	r3[0x0],r11
@@ -8884,7 +8886,7 @@ __always_inline static unsigned long cpu_is_timeout(t_cpu_time *cpu_time)
 80005dee:	50 29       	stdsp	sp[0x8],r9
 80005df0:	fa f9 06 90 	ld.w	r9,sp[1680]
 80005df4:	fa f8 06 8c 	ld.w	r8,sp[1676]
-80005df8:	fe ca be 1c 	sub	r10,pc,-16868
+80005df8:	fe ca bd f8 	sub	r10,pc,-16904
 80005dfc:	40 2e       	lddsp	lr,sp[0x8]
 80005dfe:	59 0e       	cp.w	lr,16
 80005e00:	fe 99 ff db 	brgt	80005db6 <_vfprintf_r+0x185a>
@@ -8921,7 +8923,7 @@ __always_inline static unsigned long cpu_is_timeout(t_cpu_time *cpu_time)
 80005e5c:	e0 a0 17 ed 	rcall	80008e36 <__avr32_f64_cmp_eq>
 80005e60:	c7 90       	breq	80005f52 <_vfprintf_r+0x19f6>
 80005e62:	fa f8 06 90 	ld.w	r8,sp[1680]
-80005e66:	fe c9 be 9e 	sub	r9,pc,-16738
+80005e66:	fe c9 be 7a 	sub	r9,pc,-16774
 80005e6a:	2f f8       	sub	r8,-1
 80005e6c:	87 09       	st.w	r3[0x0],r9
 80005e6e:	fb 48 06 90 	st.w	sp[1680],r8
@@ -8990,11 +8992,11 @@ __always_inline static unsigned long cpu_is_timeout(t_cpu_time *cpu_time)
 80005f24:	fa c3 f9 e0 	sub	r3,sp,-1568
 80005f28:	21 06       	sub	r6,16
 80005f2a:	c0 48       	rjmp	80005f32 <_vfprintf_r+0x19d6>
-80005f2c:	fe c2 bf 50 	sub	r2,pc,-16560
+80005f2c:	fe c2 bf 2c 	sub	r2,pc,-16596
 80005f30:	31 00       	mov	r0,16
 80005f32:	fa f9 06 90 	ld.w	r9,sp[1680]
 80005f36:	fa f8 06 8c 	ld.w	r8,sp[1676]
-80005f3a:	fe ca bf 5e 	sub	r10,pc,-16546
+80005f3a:	fe ca bf 3a 	sub	r10,pc,-16582
 80005f3e:	59 06       	cp.w	r6,16
 80005f40:	fe 99 ff dd 	brgt	80005efa <_vfprintf_r+0x199e>
 80005f44:	0c 09       	add	r9,r6
@@ -9007,7 +9009,7 @@ __always_inline static unsigned long cpu_is_timeout(t_cpu_time *cpu_time)
 80005f56:	58 0a       	cp.w	r10,0
 80005f58:	e0 89 00 92 	brgt	8000607c <_vfprintf_r+0x1b20>
 80005f5c:	fa f8 06 90 	ld.w	r8,sp[1680]
-80005f60:	fe c9 bf 98 	sub	r9,pc,-16488
+80005f60:	fe c9 bf 74 	sub	r9,pc,-16524
 80005f64:	2f f8       	sub	r8,-1
 80005f66:	87 09       	st.w	r3[0x0],r9
 80005f68:	fb 48 06 90 	st.w	sp[1680],r8
@@ -9078,10 +9080,10 @@ __always_inline static unsigned long cpu_is_timeout(t_cpu_time *cpu_time)
 80006022:	fa c3 f9 e0 	sub	r3,sp,-1568
 80006026:	21 02       	sub	r2,16
 80006028:	c0 38       	rjmp	8000602e <_vfprintf_r+0x1ad2>
-8000602a:	fe c0 c0 4e 	sub	r0,pc,-16306
+8000602a:	fe c0 c0 2a 	sub	r0,pc,-16342
 8000602e:	fa f9 06 90 	ld.w	r9,sp[1680]
 80006032:	fa f8 06 8c 	ld.w	r8,sp[1676]
-80006036:	fe ca c0 5a 	sub	r10,pc,-16294
+80006036:	fe ca c0 36 	sub	r10,pc,-16330
 8000603a:	59 02       	cp.w	r2,16
 8000603c:	fe 99 ff dd 	brgt	80005ff6 <_vfprintf_r+0x1a9a>
 80006040:	04 09       	add	r9,r2
@@ -9151,11 +9153,11 @@ __always_inline static unsigned long cpu_is_timeout(t_cpu_time *cpu_time)
 800060f2:	fa c3 f9 e0 	sub	r3,sp,-1568
 800060f6:	21 06       	sub	r6,16
 800060f8:	c0 48       	rjmp	80006100 <_vfprintf_r+0x1ba4>
-800060fa:	fe c2 c1 1e 	sub	r2,pc,-16098
+800060fa:	fe c2 c0 fa 	sub	r2,pc,-16134
 800060fe:	31 00       	mov	r0,16
 80006100:	fa f9 06 90 	ld.w	r9,sp[1680]
 80006104:	fa f8 06 8c 	ld.w	r8,sp[1676]
-80006108:	fe ca c1 2c 	sub	r10,pc,-16084
+80006108:	fe ca c1 08 	sub	r10,pc,-16120
 8000610c:	59 06       	cp.w	r6,16
 8000610e:	fe 99 ff dd 	brgt	800060c8 <_vfprintf_r+0x1b6c>
 80006112:	0c 09       	add	r9,r6
@@ -9324,11 +9326,11 @@ __always_inline static unsigned long cpu_is_timeout(t_cpu_time *cpu_time)
 800062e0:	fa c3 f9 e0 	sub	r3,sp,-1568
 800062e4:	21 06       	sub	r6,16
 800062e6:	c0 48       	rjmp	800062ee <_vfprintf_r+0x1d92>
-800062e8:	fe c2 c3 0c 	sub	r2,pc,-15604
+800062e8:	fe c2 c2 e8 	sub	r2,pc,-15640
 800062ec:	31 00       	mov	r0,16
 800062ee:	fa f9 06 90 	ld.w	r9,sp[1680]
 800062f2:	fa f8 06 8c 	ld.w	r8,sp[1676]
-800062f6:	fe ca c3 1a 	sub	r10,pc,-15590
+800062f6:	fe ca c2 f6 	sub	r10,pc,-15626
 800062fa:	59 06       	cp.w	r6,16
 800062fc:	fe 99 ff dd 	brgt	800062b6 <_vfprintf_r+0x1d5a>
 80006300:	0c 09       	add	r9,r6
@@ -9403,12 +9405,12 @@ __always_inline static unsigned long cpu_is_timeout(t_cpu_time *cpu_time)
 800063be:	fa c3 f9 e0 	sub	r3,sp,-1568
 800063c2:	21 06       	sub	r6,16
 800063c4:	c0 68       	rjmp	800063d0 <_vfprintf_r+0x1e74>
-800063c6:	fe c5 c3 fa 	sub	r5,pc,-15366
+800063c6:	fe c5 c3 d6 	sub	r5,pc,-15402
 800063ca:	31 02       	mov	r2,16
 800063cc:	fa c0 f9 78 	sub	r0,sp,-1672
 800063d0:	fa f9 06 90 	ld.w	r9,sp[1680]
 800063d4:	fa f8 06 8c 	ld.w	r8,sp[1676]
-800063d8:	fe ca c4 0c 	sub	r10,pc,-15348
+800063d8:	fe ca c3 e8 	sub	r10,pc,-15384
 800063dc:	59 06       	cp.w	r6,16
 800063de:	fe 99 ff dd 	brgt	80006398 <_vfprintf_r+0x1e3c>
 800063e2:	0c 09       	add	r9,r6
@@ -9477,21 +9479,21 @@ __always_inline static unsigned long cpu_is_timeout(t_cpu_time *cpu_time)
 80006482:	58 08       	cp.w	r8,0
 80006484:	c0 31       	brne	8000648a <__swsetup_r+0x1a>
 80006486:	e0 a0 07 b9 	rcall	800073f8 <__sinit>
-8000648a:	fe c8 c3 8e 	sub	r8,pc,-15474
+8000648a:	fe c8 c3 6a 	sub	r8,pc,-15510
 8000648e:	10 37       	cp.w	r7,r8
 80006490:	c0 61       	brne	8000649c <__swsetup_r+0x2c>
 80006492:	e0 68 01 18 	mov	r8,280
 80006496:	70 08       	ld.w	r8,r8[0x0]
 80006498:	70 07       	ld.w	r7,r8[0x0]
 8000649a:	c1 28       	rjmp	800064be <__swsetup_r+0x4e>
-8000649c:	fe c8 c3 80 	sub	r8,pc,-15488
+8000649c:	fe c8 c3 5c 	sub	r8,pc,-15524
 800064a0:	10 37       	cp.w	r7,r8
 800064a2:	c0 61       	brne	800064ae <__swsetup_r+0x3e>
 800064a4:	e0 68 01 18 	mov	r8,280
 800064a8:	70 08       	ld.w	r8,r8[0x0]
 800064aa:	70 17       	ld.w	r7,r8[0x4]
 800064ac:	c0 98       	rjmp	800064be <__swsetup_r+0x4e>
-800064ae:	fe c8 c3 72 	sub	r8,pc,-15502
+800064ae:	fe c8 c3 4e 	sub	r8,pc,-15538
 800064b2:	10 37       	cp.w	r7,r8
 800064b4:	c0 51       	brne	800064be <__swsetup_r+0x4e>
 800064b6:	e0 68 01 18 	mov	r8,280
@@ -9733,9 +9735,9 @@ __always_inline static unsigned long cpu_is_timeout(t_cpu_time *cpu_time)
 800066f8:	c0 71       	brne	80006706 <_dtoa_r+0x9a>
 800066fa:	ed d6 c0 14 	bfextu	r6,r6,0x0,0x14
 800066fe:	c0 41       	brne	80006706 <_dtoa_r+0x9a>
-80006700:	fe cc c6 14 	sub	r12,pc,-14828
+80006700:	fe cc c5 f0 	sub	r12,pc,-14864
 80006704:	c0 38       	rjmp	8000670a <_dtoa_r+0x9e>
-80006706:	fe cc c6 0e 	sub	r12,pc,-14834
+80006706:	fe cc c5 ea 	sub	r12,pc,-14870
 8000670a:	41 29       	lddsp	r9,sp[0x48]
 8000670c:	58 09       	cp.w	r9,0
 8000670e:	e0 80 05 9a 	breq	80007242 <_dtoa_r+0xbd6>
@@ -9756,7 +9758,7 @@ __always_inline static unsigned long cpu_is_timeout(t_cpu_time *cpu_time)
 8000673c:	30 18       	mov	r8,1
 8000673e:	41 5a       	lddsp	r10,sp[0x54]
 80006740:	95 08       	st.w	r10[0x0],r8
-80006742:	fe cc c7 7a 	sub	r12,pc,-14470
+80006742:	fe cc c7 56 	sub	r12,pc,-14506
 80006746:	41 29       	lddsp	r9,sp[0x48]
 80006748:	f8 08 00 08 	add	r8,r12,r8
 8000674c:	58 09       	cp.w	r9,0
@@ -9854,7 +9856,7 @@ __always_inline static unsigned long cpu_is_timeout(t_cpu_time *cpu_time)
 80006866:	30 18       	mov	r8,1
 80006868:	51 48       	stdsp	sp[0x50],r8
 8000686a:	c1 38       	rjmp	80006890 <_dtoa_r+0x224>
-8000686c:	fe c8 c6 bc 	sub	r8,pc,-14660
+8000686c:	fe c8 c6 98 	sub	r8,pc,-14696
 80006870:	fa ea 00 3c 	ld.d	r10,sp[60]
 80006874:	f0 06 02 38 	ld.d	r8,r8[r6<<0x3]
 80006878:	e0 a0 13 26 	rcall	80008ec4 <__avr32_f64_cmp_lt>
@@ -9978,7 +9980,7 @@ __always_inline static unsigned long cpu_is_timeout(t_cpu_time *cpu_time)
 800069a0:	58 06       	cp.w	r6,0
 800069a2:	e0 8a 00 43 	brle	80006a28 <_dtoa_r+0x3bc>
 800069a6:	f3 d6 c0 04 	bfextu	r9,r6,0x0,0x4
-800069aa:	fe c8 c7 fa 	sub	r8,pc,-14342
+800069aa:	fe c8 c7 d6 	sub	r8,pc,-14378
 800069ae:	f0 09 02 34 	ld.d	r4,r8[r9<<0x3]
 800069b2:	fa e5 00 18 	st.d	sp[24],r4
 800069b6:	ec 04 14 04 	asr	r4,r6,0x4
@@ -9986,7 +9988,7 @@ __always_inline static unsigned long cpu_is_timeout(t_cpu_time *cpu_time)
 800069be:	c0 30       	breq	800069c4 <_dtoa_r+0x358>
 800069c0:	30 25       	mov	r5,2
 800069c2:	c1 08       	rjmp	800069e2 <_dtoa_r+0x376>
-800069c4:	fe c8 c7 4c 	sub	r8,pc,-14516
+800069c4:	fe c8 c7 28 	sub	r8,pc,-14552
 800069c8:	f0 e8 00 20 	ld.d	r8,r8[32]
 800069cc:	fa ea 00 3c 	ld.d	r10,sp[60]
 800069d0:	e9 d4 c0 04 	bfextu	r4,r4,0x0,0x4
@@ -9995,7 +9997,7 @@ __always_inline static unsigned long cpu_is_timeout(t_cpu_time *cpu_time)
 800069da:	14 98       	mov	r8,r10
 800069dc:	16 99       	mov	r9,r11
 800069de:	fa e9 00 08 	st.d	sp[8],r8
-800069e2:	fe cc c7 6a 	sub	r12,pc,-14486
+800069e2:	fe cc c7 46 	sub	r12,pc,-14522
 800069e6:	50 a3       	stdsp	sp[0x28],r3
 800069e8:	0c 93       	mov	r3,r6
 800069ea:	18 96       	mov	r6,r12
@@ -10024,11 +10026,11 @@ __always_inline static unsigned long cpu_is_timeout(t_cpu_time *cpu_time)
 80006a2c:	c0 31       	brne	80006a32 <_dtoa_r+0x3c6>
 80006a2e:	30 25       	mov	r5,2
 80006a30:	c2 a8       	rjmp	80006a84 <_dtoa_r+0x418>
-80006a32:	fe cc c7 ba 	sub	r12,pc,-14406
+80006a32:	fe cc c7 96 	sub	r12,pc,-14442
 80006a36:	f0 04 14 04 	asr	r4,r8,0x4
 80006a3a:	50 1c       	stdsp	sp[0x4],r12
 80006a3c:	f1 d8 c0 04 	bfextu	r8,r8,0x0,0x4
-80006a40:	fe c9 c8 90 	sub	r9,pc,-14192
+80006a40:	fe c9 c8 6c 	sub	r9,pc,-14228
 80006a44:	fa ea 00 3c 	ld.d	r10,sp[60]
 80006a48:	f2 08 02 38 	ld.d	r8,r9[r8<<0x3]
 80006a4c:	fe b0 e8 26 	rcall	80003a98 <__avr32_f64_mul>
@@ -10122,7 +10124,7 @@ __always_inline static unsigned long cpu_is_timeout(t_cpu_time *cpu_time)
 80006b44:	e0 a0 11 c0 	rcall	80008ec4 <__avr32_f64_cmp_lt>
 80006b48:	e0 81 02 3e 	brne	80006fc4 <_dtoa_r+0x958>
 80006b4c:	ca 68       	rjmp	80006c98 <_dtoa_r+0x62c>
-80006b4e:	fe c9 c9 9e 	sub	r9,pc,-13922
+80006b4e:	fe c9 c9 7a 	sub	r9,pc,-13958
 80006b52:	e8 c8 00 01 	sub	r8,r4,1
 80006b56:	40 d5       	lddsp	r5,sp[0x34]
 80006b58:	58 05       	cp.w	r5,0
@@ -10244,7 +10246,7 @@ __always_inline static unsigned long cpu_is_timeout(t_cpu_time *cpu_time)
 80006cba:	58 01       	cp.w	r1,0
 80006cbc:	5f a9       	srle	r9
 80006cbe:	f3 ea 03 f9 	and	r9,r9,r10>>0x1f
-80006cc2:	fe ca cb 12 	sub	r10,pc,-13550
+80006cc2:	fe ca ca ee 	sub	r10,pc,-13586
 80006cc6:	f4 06 02 34 	ld.d	r4,r10[r6<<0x3]
 80006cca:	fa e5 00 10 	st.d	sp[16],r4
 80006cce:	f0 09 18 00 	cp.b	r9,r8
@@ -10834,17 +10836,17 @@ __always_inline static unsigned long cpu_is_timeout(t_cpu_time *cpu_time)
 8000725a:	58 08       	cp.w	r8,0
 8000725c:	c0 21       	brne	80007260 <_fflush_r+0x18>
 8000725e:	cc dc       	rcall	800073f8 <__sinit>
-80007260:	fe c8 d1 64 	sub	r8,pc,-11932
+80007260:	fe c8 d1 40 	sub	r8,pc,-11968
 80007264:	10 37       	cp.w	r7,r8
 80007266:	c0 31       	brne	8000726c <_fflush_r+0x24>
 80007268:	6c 07       	ld.w	r7,r6[0x0]
 8000726a:	c0 c8       	rjmp	80007282 <_fflush_r+0x3a>
-8000726c:	fe c8 d1 50 	sub	r8,pc,-11952
+8000726c:	fe c8 d1 2c 	sub	r8,pc,-11988
 80007270:	10 37       	cp.w	r7,r8
 80007272:	c0 31       	brne	80007278 <_fflush_r+0x30>
 80007274:	6c 17       	ld.w	r7,r6[0x4]
 80007276:	c0 68       	rjmp	80007282 <_fflush_r+0x3a>
-80007278:	fe c8 d1 3c 	sub	r8,pc,-11972
+80007278:	fe c8 d1 18 	sub	r8,pc,-12008
 8000727c:	10 37       	cp.w	r7,r8
 8000727e:	ed f7 00 02 	ld.weq	r7,r6[0x8]
 80007282:	8e 6a       	ld.sh	r10,r7[0xc]
@@ -10971,7 +10973,7 @@ __always_inline static unsigned long cpu_is_timeout(t_cpu_time *cpu_time)
 
 8000738c <__sfp>:
 8000738c:	d4 21       	pushm	r4-r7,lr
-8000738e:	fe c8 d2 2e 	sub	r8,pc,-11730
+8000738e:	fe c8 d2 0a 	sub	r8,pc,-11766
 80007392:	18 96       	mov	r6,r12
 80007394:	70 07       	ld.w	r7,r8[0x0]
 80007396:	6e 68       	ld.w	r8,r7[0x18]
@@ -11631,7 +11633,7 @@ __always_inline static unsigned long cpu_is_timeout(t_cpu_time *cpu_time)
 800079a2:	d7 03       	nop
 
 800079a4 <_localeconv_r>:
-800079a4:	fe cc d8 40 	sub	r12,pc,-10176
+800079a4:	fe cc d8 1c 	sub	r12,pc,-10212
 800079a8:	5e fc       	retal	r12
 800079aa:	d7 03       	nop
 
@@ -12744,7 +12746,7 @@ __always_inline static unsigned long cpu_is_timeout(t_cpu_time *cpu_time)
 80008450:	f1 da c0 02 	bfextu	r8,r10,0x0,0x2
 80008454:	c0 90       	breq	80008466 <__pow5mult+0x1e>
 80008456:	20 18       	sub	r8,1
-80008458:	fe c9 e2 b4 	sub	r9,pc,-7500
+80008458:	fe c9 e2 90 	sub	r9,pc,-7536
 8000845c:	f2 08 03 2a 	ld.w	r10,r9[r8<<0x2]
 80008460:	30 09       	mov	r9,0
 80008462:	cb 5f       	rcall	800083cc <__multadd>
@@ -13418,17 +13420,17 @@ __always_inline static unsigned long cpu_is_timeout(t_cpu_time *cpu_time)
 80008a42:	c0 41       	brne	80008a4a <_fclose_r+0x22>
 80008a44:	0c 9c       	mov	r12,r6
 80008a46:	fe b0 f4 d9 	rcall	800073f8 <__sinit>
-80008a4a:	fe c8 e9 4e 	sub	r8,pc,-5810
+80008a4a:	fe c8 e9 2a 	sub	r8,pc,-5846
 80008a4e:	10 37       	cp.w	r7,r8
 80008a50:	c0 31       	brne	80008a56 <_fclose_r+0x2e>
 80008a52:	6c 07       	ld.w	r7,r6[0x0]
 80008a54:	c0 c8       	rjmp	80008a6c <_fclose_r+0x44>
-80008a56:	fe c8 e9 3a 	sub	r8,pc,-5830
+80008a56:	fe c8 e9 16 	sub	r8,pc,-5866
 80008a5a:	10 37       	cp.w	r7,r8
 80008a5c:	c0 31       	brne	80008a62 <_fclose_r+0x3a>
 80008a5e:	6c 17       	ld.w	r7,r6[0x4]
 80008a60:	c0 68       	rjmp	80008a6c <_fclose_r+0x44>
-80008a62:	fe c8 e9 26 	sub	r8,pc,-5850
+80008a62:	fe c8 e9 02 	sub	r8,pc,-5886
 80008a66:	10 37       	cp.w	r7,r8
 80008a68:	ed f7 00 02 	ld.weq	r7,r6[0x8]
 80008a6c:	8e 69       	ld.sh	r9,r7[0xc]
