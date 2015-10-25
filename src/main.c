@@ -534,6 +534,7 @@ uint8_t getStateAT86RF212(void)
 
 uint8_t txTramaManual(uint8_t *data)
 {
+	uint8_t colado[15]="hola soy colado";
 	uint8_t state = getStateAT86RF212();
 	//Set register bit TX_AUTO_CRC_ON = 1 register 0x04, TRX_CTRL_1
 	//Set MAX_FRAME_RETRIES register 0x2C, XAH_CTRL_0
@@ -553,7 +554,8 @@ uint8_t txTramaManual(uint8_t *data)
 	//	estadoPorPc();
 		pal_trx_reg_write(RG_IRQ_MASK,0x0C);
 		variable1=pal_trx_reg_read(RG_IRQ_MASK);
-		pal_trx_frame_write(data,90);  // 200kbps
+		pal_trx_frame_write(data,120);  // 200kbps
+		pal_trx_frame_write(colado,15);  // 200kbps
 		//pal_trx_frame_write(data,120);  // 100kbps
 		//escribo la trama de datos en el buffer - segun pag 158
 		pal_trx_reg_write(RG_TRX_STATE,CMD_TX_START); // inicio tx - segun manual: Write TRX_CMD = TX_START, or assert pin 11 (SLP_TR)
@@ -820,7 +822,7 @@ int main (void)
 // 			}
 // 		}
 		
-		txTramaManual(tx_buffer90); // 90 bytes 200kbps
+		txTramaManual(tx_buffer120); // 90 bytes 200kbps
 		delay_ms(1000); // espero 1s 
 		
  	}

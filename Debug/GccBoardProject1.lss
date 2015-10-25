@@ -7,7 +7,7 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
   1 .rela.got     00000000  80002004  80002004  00002404  2**2
                   CONTENTS, ALLOC, LOAD, READONLY, DATA
-  2 .text         00001838  80002004  80002004  00002404  2**2
+  2 .text         00001880  80002004  80002004  00002404  2**2
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
   3 .exception    00000200  80003a00  80003a00  00003e00  2**9
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
@@ -15,37 +15,37 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, ALLOC, LOAD, READONLY, DATA
   5 .dalign       00000004  00000004  00000004  00000000  2**0
                   ALLOC
-  6 .data         0000007c  00000008  80004138  00004808  2**2
+  6 .data         00000096  00000008  80004138  00004808  2**2
                   CONTENTS, ALLOC, LOAD, DATA
-  7 .balign       00000004  00000084  800041b4  00004884  2**0
+  7 .balign       00000002  0000009e  800041ce  0000489e  2**0
                   ALLOC
-  8 .bss          000001e0  00000088  00000088  00000000  2**2
+  8 .bss          000001e0  000000a0  000000a0  00000000  2**2
                   ALLOC
-  9 .heap         00002d98  00000268  00000268  00000000  2**0
+  9 .heap         00002d80  00000280  00000280  00000000  2**0
                   ALLOC
- 10 .comment      00000030  00000000  00000000  00004884  2**0
+ 10 .comment      00000030  00000000  00000000  0000489e  2**0
                   CONTENTS, READONLY
- 11 .debug_aranges 000006a0  00000000  00000000  000048b8  2**3
+ 11 .debug_aranges 000006a0  00000000  00000000  000048d0  2**3
                   CONTENTS, READONLY, DEBUGGING
- 12 .debug_pubnames 0000108c  00000000  00000000  00004f58  2**0
+ 12 .debug_pubnames 0000108c  00000000  00000000  00004f70  2**0
                   CONTENTS, READONLY, DEBUGGING
- 13 .debug_info   000138d9  00000000  00000000  00005fe4  2**0
+ 13 .debug_info   000138f8  00000000  00000000  00005ffc  2**0
                   CONTENTS, READONLY, DEBUGGING
- 14 .debug_abbrev 00001d6f  00000000  00000000  000198bd  2**0
+ 14 .debug_abbrev 00001d6f  00000000  00000000  000198f4  2**0
                   CONTENTS, READONLY, DEBUGGING
- 15 .debug_line   00006a31  00000000  00000000  0001b62c  2**0
+ 15 .debug_line   00006a35  00000000  00000000  0001b663  2**0
                   CONTENTS, READONLY, DEBUGGING
- 16 .debug_frame  00000f60  00000000  00000000  00022060  2**2
+ 16 .debug_frame  00000f64  00000000  00000000  00022098  2**2
                   CONTENTS, READONLY, DEBUGGING
- 17 .debug_str    00003404  00000000  00000000  00022fc0  2**0
+ 17 .debug_str    0000340b  00000000  00000000  00022ffc  2**0
                   CONTENTS, READONLY, DEBUGGING
- 18 .debug_loc    0000293f  00000000  00000000  000263c4  2**0
+ 18 .debug_loc    0000294b  00000000  00000000  00026407  2**0
                   CONTENTS, READONLY, DEBUGGING
- 19 .debug_macinfo 00797142  00000000  00000000  00028d03  2**0
+ 19 .debug_macinfo 00797142  00000000  00000000  00028d52  2**0
                   CONTENTS, READONLY, DEBUGGING
  20 .stack        00001000  00003000  00003000  00000000  2**0
                   ALLOC
- 21 .debug_ranges 00000720  00000000  00000000  007bfe45  2**0
+ 21 .debug_ranges 00000720  00000000  00000000  007bfe94  2**0
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .reset:
@@ -196,23 +196,23 @@ ISR(twim_master_interrupt_handler,CONF_TWIM_IRQ_GROUP,CONF_TWIM_IRQ_LEVEL)
 800020b8:	91 09       	st.w	r8[0x0],r9
 800020ba:	d6 03       	rete
 800020bc:	00 00       	add	r0,r0
-800020be:	00 88       	andn	r8,r0
+800020be:	00 a0       	st.w	r0++,r0
 800020c0:	00 00       	add	r0,r0
-800020c2:	00 9c       	mov	r12,r0
+800020c2:	00 b4       	st.h	r0++,r4
 800020c4:	00 00       	add	r0,r0
-800020c6:	00 94       	mov	r4,r0
+800020c6:	00 ac       	st.w	r0++,r12
 800020c8:	00 00       	add	r0,r0
-800020ca:	00 a0       	st.w	r0++,r0
+800020ca:	00 b8       	st.h	r0++,r8
 800020cc:	00 00       	add	r0,r0
-800020ce:	00 8c       	andn	r12,r0
+800020ce:	00 a4       	st.w	r0++,r4
 800020d0:	00 00       	add	r0,r0
-800020d2:	00 90       	mov	r0,r0
+800020d2:	00 a8       	st.w	r0++,r8
 800020d4:	00 00       	add	r0,r0
-800020d6:	00 a8       	st.w	r0++,r8
+800020d6:	00 c0       	st.b	r0++,r0
 800020d8:	00 00       	add	r0,r0
-800020da:	00 98       	mov	r8,r0
+800020da:	00 b0       	st.h	r0++,r0
 800020dc:	00 00       	add	r0,r0
-800020de:	00 a4       	st.w	r0++,r4
+800020de:	00 bc       	st.h	r0++,r12
 
 800020e0 <twim_set_speed>:
  * \retval STATUS_OK        Transaction is successful
@@ -306,7 +306,7 @@ uint8_t twim_status ( void )
 8000214a:	f9 dc c0 81 	bfextu	r12,r12,0x4,0x1
 8000214e:	5e fc       	retal	r12
 80002150:	00 00       	add	r0,r0
-80002152:	00 88       	andn	r8,r0
+80002152:	00 a0       	st.w	r0++,r0
 
 80002154 <twim_disable_interrupt>:
  *
@@ -457,19 +457,19 @@ status_code_t twim_write (volatile avr32_twim_t *twim, uint8_t const *buffer,
 800021ec:	e3 cf 80 fc 	ldm	sp++,r2-r7,pc,r12=0
 800021f0:	e3 cf c0 fc 	ldm	sp++,r2-r7,pc,r12=-1
 800021f4:	00 00       	add	r0,r0
-800021f6:	00 88       	andn	r8,r0
+800021f6:	00 a0       	st.w	r0++,r0
 800021f8:	80 00       	ld.sh	r0,r0[0x0]
 800021fa:	21 54       	sub	r4,21
 800021fc:	00 00       	add	r0,r0
-800021fe:	00 98       	mov	r8,r0
+800021fe:	00 b0       	st.h	r0++,r0
 80002200:	00 00       	add	r0,r0
-80002202:	00 a8       	st.w	r0++,r8
+80002202:	00 c0       	st.b	r0++,r0
 80002204:	00 00       	add	r0,r0
-80002206:	00 a0       	st.w	r0++,r0
+80002206:	00 b8       	st.h	r0++,r8
 80002208:	00 00       	add	r0,r0
-8000220a:	00 94       	mov	r4,r0
+8000220a:	00 ac       	st.w	r0++,r12
 8000220c:	00 00       	add	r0,r0
-8000220e:	00 9c       	mov	r12,r0
+8000220e:	00 b4       	st.h	r0++,r4
 80002210:	80 00       	ld.sh	r0,r0[0x0]
 80002212:	21 44       	sub	r4,20
 
@@ -651,7 +651,7 @@ static inline void cpu_irq_restore(irqflags_t flags)
 800022ce:	e3 cd 80 e0 	ldm	sp++,r5-r7,pc
 800022d2:	00 00       	add	r0,r0
 800022d4:	00 00       	add	r0,r0
-800022d6:	00 94       	mov	r4,r0
+800022d6:	00 ac       	st.w	r0++,r12
 800022d8:	80 00       	ld.sh	r0,r0[0x0]
 800022da:	20 04       	sub	r4,0
 800022dc:	80 00       	ld.sh	r0,r0[0x0]
@@ -2559,7 +2559,7 @@ _stext:
   cp      r0, r1
 80002c4e:	30 80       	mov	r0,8
   brhs    idata_load_loop_end
-80002c50:	e0 61 00 88 	mov	r1,136
+80002c50:	e0 61 00 a0 	mov	r1,160
   lda.w   r2, _data_lma
 idata_load_loop:
   ld.d    r4, r2++
@@ -2585,11 +2585,11 @@ idata_load_loop_end:
 
 80002c64 <idata_load_loop_end>:
   mov     r2, 0
-80002c64:	e0 60 00 88 	mov	r0,136
+80002c64:	e0 60 00 a0 	mov	r0,160
   mov     r3, 0
 udata_clear_loop:
   st.d    r0++, r2
-80002c68:	e0 61 02 68 	mov	r1,616
+80002c68:	e0 61 02 80 	mov	r1,640
   cp      r0, r1
   brlo    udata_clear_loop
 80002c6c:	02 30       	cp.w	r0,r1
@@ -2609,7 +2609,7 @@ udata_clear_loop:
 80002c78:	cf e3       	brcs	80002c74 <udata_clear_loop>
 
 80002c7a <udata_clear_loop_end>:
-80002c7a:	fe cf f4 96 	sub	pc,pc,-2922
+80002c7a:	fe cf f4 4e 	sub	pc,pc,-2994
 80002c7e:	d7 03       	nop
 
 80002c80 <pal_trx_frame_write>:
@@ -3115,2016 +3115,2045 @@ static inline void spi_put(volatile avr32_spi_t *spi, uint16_t data)
 80002e86:	cf 81       	brne	80002e76 <spi_write_packet+0x18>
 80002e88:	d8 0a       	popm	pc,r12=0
 80002e8a:	d7 03       	nop
+80002e8c:	68 6f       	ld.w	pc,r4[0x18]
+80002e8e:	6c 61       	ld.w	r1,r6[0x18]
+80002e90:	20 73       	sub	r3,7
+80002e92:	6f 79       	ld.w	r9,r7[0x5c]
+80002e94:	20 63       	sub	r3,6
+80002e96:	6f 6c       	ld.w	r12,r7[0x58]
+80002e98:	61 64       	ld.w	r4,r0[0x58]
+80002e9a:	6f 00       	ld.w	r0,r7[0x40]
 
-80002e8c <promiscuous_mode>:
+80002e9c <promiscuous_mode>:
 	pal_trx_reg_write(RG_TRX_STATE,CMD_RX_ON); //vuelvo a estador RX ON
 	estadoPorPc();
 }
 
 void promiscuous_mode()
 {
-80002e8c:	eb cd 40 e0 	pushm	r5-r7,lr
+80002e9c:	eb cd 40 e0 	pushm	r5-r7,lr
 	for (address=0x20; address<0x2C; address++)
-80002e90:	32 09       	mov	r9,32
-80002e92:	4a f8       	lddpc	r8,80002f4c <promiscuous_mode+0xc0>
-80002e94:	b0 89       	st.b	r8[0x0],r9
-80002e96:	32 0c       	mov	r12,32
+80002ea0:	32 09       	mov	r9,32
+80002ea2:	4a f8       	lddpc	r8,80002f5c <promiscuous_mode+0xc0>
+80002ea4:	b0 89       	st.b	r8[0x0],r9
+80002ea6:	32 0c       	mov	r12,32
 	{
 		pal_trx_reg_write(address, 0x00);
-80002e98:	30 05       	mov	r5,0
+80002ea8:	30 05       	mov	r5,0
 	estadoPorPc();
 }
 
 void promiscuous_mode()
 {
 	for (address=0x20; address<0x2C; address++)
-80002e9a:	10 97       	mov	r7,r8
-80002e9c:	32 b6       	mov	r6,43
+80002eaa:	10 97       	mov	r7,r8
+80002eac:	32 b6       	mov	r6,43
 	{
 		pal_trx_reg_write(address, 0x00);
-80002e9e:	0a 9b       	mov	r11,r5
-80002ea0:	f0 1f 00 2c 	mcall	80002f50 <promiscuous_mode+0xc4>
+80002eae:	0a 9b       	mov	r11,r5
+80002eb0:	f0 1f 00 2c 	mcall	80002f60 <promiscuous_mode+0xc4>
  * \param  delay:   (input) delay in CPU cycles before timeout.
  * \param  cpu_time: (output) internal information used by the timer API.
  */
 __always_inline static void cpu_set_timeout(unsigned long delay, t_cpu_time *cpu_time)
 {
   cpu_time->delay_start_cycle = Get_system_register(AVR32_COUNT);
-80002ea4:	e1 b8 00 42 	mfsr	r8,0x108
+80002eb4:	e1 b8 00 42 	mfsr	r8,0x108
   cpu_time->delay_end_cycle   = cpu_time->delay_start_cycle + delay;
-80002ea8:	f0 ca fd c1 	sub	r10,r8,-575
+80002eb8:	f0 ca fd c1 	sub	r10,r8,-575
  *
  * \return true if timeout occurred, otherwise false.
  */
 __always_inline static unsigned long cpu_is_timeout(t_cpu_time *cpu_time)
 {
   unsigned long current_cycle_count = Get_system_register(AVR32_COUNT);
-80002eac:	e1 b9 00 42 	mfsr	r9,0x108
+80002ebc:	e1 b9 00 42 	mfsr	r9,0x108
   // Test if the timeout as already occurred.
   else if (cpu_time->timer_state == CPU_TIMER_STATE_REACHED)
     return true;
 
   // If the ending cycle count of this timeout is wrapped, ...
   else if (cpu_time->delay_start_cycle > cpu_time->delay_end_cycle)
-80002eb0:	14 38       	cp.w	r8,r10
-80002eb2:	e0 88 00 08 	brls	80002ec2 <promiscuous_mode+0x36>
+80002ec0:	14 38       	cp.w	r8,r10
+80002ec2:	e0 88 00 08 	brls	80002ed2 <promiscuous_mode+0x36>
   {
     if (current_cycle_count < cpu_time->delay_start_cycle && current_cycle_count > cpu_time->delay_end_cycle)
-80002eb6:	12 38       	cp.w	r8,r9
-80002eb8:	fe 98 ff fa 	brls	80002eac <promiscuous_mode+0x20>
-80002ebc:	12 3a       	cp.w	r10,r9
-80002ebe:	c3 23       	brcs	80002f22 <promiscuous_mode+0x96>
-80002ec0:	cf 6b       	rjmp	80002eac <promiscuous_mode+0x20>
+80002ec6:	12 38       	cp.w	r8,r9
+80002ec8:	fe 98 ff fa 	brls	80002ebc <promiscuous_mode+0x20>
+80002ecc:	12 3a       	cp.w	r10,r9
+80002ece:	c3 23       	brcs	80002f32 <promiscuous_mode+0x96>
+80002ed0:	cf 6b       	rjmp	80002ebc <promiscuous_mode+0x20>
     }
     return false;
   }
   else
   {
     if (current_cycle_count < cpu_time->delay_start_cycle || current_cycle_count > cpu_time->delay_end_cycle)
-80002ec2:	12 38       	cp.w	r8,r9
-80002ec4:	e0 8b 00 2f 	brhi	80002f22 <promiscuous_mode+0x96>
-80002ec8:	12 3a       	cp.w	r10,r9
-80002eca:	c2 c3       	brcs	80002f22 <promiscuous_mode+0x96>
-80002ecc:	cf 0b       	rjmp	80002eac <promiscuous_mode+0x20>
+80002ed2:	12 38       	cp.w	r8,r9
+80002ed4:	e0 8b 00 2f 	brhi	80002f32 <promiscuous_mode+0x96>
+80002ed8:	12 3a       	cp.w	r10,r9
+80002eda:	c2 c3       	brcs	80002f32 <promiscuous_mode+0x96>
+80002edc:	cf 0b       	rjmp	80002ebc <promiscuous_mode+0x20>
 		delay_ms(5);
 	}
 	pal_trx_reg_write(RG_XAH_CTRL_1, 0x02);	// AACK_PROM_MODE Promiscuous mode is enabled
-80002ece:	30 2b       	mov	r11,2
-80002ed0:	31 7c       	mov	r12,23
-80002ed2:	f0 1f 00 20 	mcall	80002f50 <promiscuous_mode+0xc4>
+80002ede:	30 2b       	mov	r11,2
+80002ee0:	31 7c       	mov	r12,23
+80002ee2:	f0 1f 00 20 	mcall	80002f60 <promiscuous_mode+0xc4>
  * \param  delay:   (input) delay in CPU cycles before timeout.
  * \param  cpu_time: (output) internal information used by the timer API.
  */
 __always_inline static void cpu_set_timeout(unsigned long delay, t_cpu_time *cpu_time)
 {
   cpu_time->delay_start_cycle = Get_system_register(AVR32_COUNT);
-80002ed6:	e1 b8 00 42 	mfsr	r8,0x108
+80002ee6:	e1 b8 00 42 	mfsr	r8,0x108
   cpu_time->delay_end_cycle   = cpu_time->delay_start_cycle + delay;
-80002eda:	f0 ca ff ff 	sub	r10,r8,-1
+80002eea:	f0 ca ff ff 	sub	r10,r8,-1
  *
  * \return true if timeout occurred, otherwise false.
  */
 __always_inline static unsigned long cpu_is_timeout(t_cpu_time *cpu_time)
 {
   unsigned long current_cycle_count = Get_system_register(AVR32_COUNT);
-80002ede:	e1 b9 00 42 	mfsr	r9,0x108
+80002eee:	e1 b9 00 42 	mfsr	r9,0x108
   // Test if the timeout as already occurred.
   else if (cpu_time->timer_state == CPU_TIMER_STATE_REACHED)
     return true;
 
   // If the ending cycle count of this timeout is wrapped, ...
   else if (cpu_time->delay_start_cycle > cpu_time->delay_end_cycle)
-80002ee2:	14 38       	cp.w	r8,r10
-80002ee4:	e0 88 00 08 	brls	80002ef4 <promiscuous_mode+0x68>
+80002ef2:	14 38       	cp.w	r8,r10
+80002ef4:	e0 88 00 08 	brls	80002f04 <promiscuous_mode+0x68>
   {
     if (current_cycle_count < cpu_time->delay_start_cycle && current_cycle_count > cpu_time->delay_end_cycle)
-80002ee8:	12 38       	cp.w	r8,r9
-80002eea:	fe 98 ff fa 	brls	80002ede <promiscuous_mode+0x52>
-80002eee:	12 3a       	cp.w	r10,r9
-80002ef0:	c2 23       	brcs	80002f34 <promiscuous_mode+0xa8>
-80002ef2:	cf 6b       	rjmp	80002ede <promiscuous_mode+0x52>
+80002ef8:	12 38       	cp.w	r8,r9
+80002efa:	fe 98 ff fa 	brls	80002eee <promiscuous_mode+0x52>
+80002efe:	12 3a       	cp.w	r10,r9
+80002f00:	c2 23       	brcs	80002f44 <promiscuous_mode+0xa8>
+80002f02:	cf 6b       	rjmp	80002eee <promiscuous_mode+0x52>
     }
     return false;
   }
   else
   {
     if (current_cycle_count < cpu_time->delay_start_cycle || current_cycle_count > cpu_time->delay_end_cycle)
-80002ef4:	12 38       	cp.w	r8,r9
-80002ef6:	e0 8b 00 1f 	brhi	80002f34 <promiscuous_mode+0xa8>
-80002efa:	12 3a       	cp.w	r10,r9
-80002efc:	c1 c3       	brcs	80002f34 <promiscuous_mode+0xa8>
-80002efe:	cf 0b       	rjmp	80002ede <promiscuous_mode+0x52>
+80002f04:	12 38       	cp.w	r8,r9
+80002f06:	e0 8b 00 1f 	brhi	80002f44 <promiscuous_mode+0xa8>
+80002f0a:	12 3a       	cp.w	r10,r9
+80002f0c:	c1 c3       	brcs	80002f44 <promiscuous_mode+0xa8>
+80002f0e:	cf 0b       	rjmp	80002eee <promiscuous_mode+0x52>
  *
  * \return true if timeout occurred, otherwise false.
  */
 __always_inline static unsigned long cpu_is_timeout(t_cpu_time *cpu_time)
 {
   unsigned long current_cycle_count = Get_system_register(AVR32_COUNT);
-80002f00:	e1 b9 00 42 	mfsr	r9,0x108
+80002f10:	e1 b9 00 42 	mfsr	r9,0x108
   // Test if the timeout as already occurred.
   else if (cpu_time->timer_state == CPU_TIMER_STATE_REACHED)
     return true;
 
   // If the ending cycle count of this timeout is wrapped, ...
   else if (cpu_time->delay_start_cycle > cpu_time->delay_end_cycle)
-80002f04:	14 38       	cp.w	r8,r10
-80002f06:	e0 88 00 08 	brls	80002f16 <promiscuous_mode+0x8a>
+80002f14:	14 38       	cp.w	r8,r10
+80002f16:	e0 88 00 08 	brls	80002f26 <promiscuous_mode+0x8a>
   {
     if (current_cycle_count < cpu_time->delay_start_cycle && current_cycle_count > cpu_time->delay_end_cycle)
-80002f0a:	12 38       	cp.w	r8,r9
-80002f0c:	fe 98 ff fa 	brls	80002f00 <promiscuous_mode+0x74>
-80002f10:	12 3a       	cp.w	r10,r9
-80002f12:	c1 b3       	brcs	80002f48 <promiscuous_mode+0xbc>
-80002f14:	cf 6b       	rjmp	80002f00 <promiscuous_mode+0x74>
+80002f1a:	12 38       	cp.w	r8,r9
+80002f1c:	fe 98 ff fa 	brls	80002f10 <promiscuous_mode+0x74>
+80002f20:	12 3a       	cp.w	r10,r9
+80002f22:	c1 b3       	brcs	80002f58 <promiscuous_mode+0xbc>
+80002f24:	cf 6b       	rjmp	80002f10 <promiscuous_mode+0x74>
     }
     return false;
   }
   else
   {
     if (current_cycle_count < cpu_time->delay_start_cycle || current_cycle_count > cpu_time->delay_end_cycle)
-80002f16:	12 38       	cp.w	r8,r9
-80002f18:	e0 8b 00 18 	brhi	80002f48 <promiscuous_mode+0xbc>
-80002f1c:	12 3a       	cp.w	r10,r9
-80002f1e:	c1 53       	brcs	80002f48 <promiscuous_mode+0xbc>
-80002f20:	cf 0b       	rjmp	80002f00 <promiscuous_mode+0x74>
+80002f26:	12 38       	cp.w	r8,r9
+80002f28:	e0 8b 00 18 	brhi	80002f58 <promiscuous_mode+0xbc>
+80002f2c:	12 3a       	cp.w	r10,r9
+80002f2e:	c1 53       	brcs	80002f58 <promiscuous_mode+0xbc>
+80002f30:	cf 0b       	rjmp	80002f10 <promiscuous_mode+0x74>
 	estadoPorPc();
 }
 
 void promiscuous_mode()
 {
 	for (address=0x20; address<0x2C; address++)
-80002f22:	0f 8c       	ld.ub	r12,r7[0x0]
-80002f24:	2f fc       	sub	r12,-1
-80002f26:	5c 5c       	castu.b	r12
-80002f28:	ae 8c       	st.b	r7[0x0],r12
-80002f2a:	ec 0c 18 00 	cp.b	r12,r6
-80002f2e:	fe 98 ff b8 	brls	80002e9e <promiscuous_mode+0x12>
-80002f32:	cc eb       	rjmp	80002ece <promiscuous_mode+0x42>
+80002f32:	0f 8c       	ld.ub	r12,r7[0x0]
+80002f34:	2f fc       	sub	r12,-1
+80002f36:	5c 5c       	castu.b	r12
+80002f38:	ae 8c       	st.b	r7[0x0],r12
+80002f3a:	ec 0c 18 00 	cp.b	r12,r6
+80002f3e:	fe 98 ff b8 	brls	80002eae <promiscuous_mode+0x12>
+80002f42:	cc eb       	rjmp	80002ede <promiscuous_mode+0x42>
 		pal_trx_reg_write(address, 0x00);
 		delay_ms(5);
 	}
 	pal_trx_reg_write(RG_XAH_CTRL_1, 0x02);	// AACK_PROM_MODE Promiscuous mode is enabled
 	PAL_WAIT_1_US();
 	pal_trx_reg_write(RG_CSMA_SEED_1, 0xD2); // AACK_DIS_ACK = 1 && AACK_FVN_MODE = 3
-80002f34:	e0 6b 00 d2 	mov	r11,210
-80002f38:	32 ec       	mov	r12,46
-80002f3a:	f0 1f 00 06 	mcall	80002f50 <promiscuous_mode+0xc4>
+80002f44:	e0 6b 00 d2 	mov	r11,210
+80002f48:	32 ec       	mov	r12,46
+80002f4a:	f0 1f 00 06 	mcall	80002f60 <promiscuous_mode+0xc4>
  * \param  delay:   (input) delay in CPU cycles before timeout.
  * \param  cpu_time: (output) internal information used by the timer API.
  */
 __always_inline static void cpu_set_timeout(unsigned long delay, t_cpu_time *cpu_time)
 {
   cpu_time->delay_start_cycle = Get_system_register(AVR32_COUNT);
-80002f3e:	e1 b8 00 42 	mfsr	r8,0x108
+80002f4e:	e1 b8 00 42 	mfsr	r8,0x108
   cpu_time->delay_end_cycle   = cpu_time->delay_start_cycle + delay;
-80002f42:	f0 ca ff ff 	sub	r10,r8,-1
-80002f46:	cd db       	rjmp	80002f00 <promiscuous_mode+0x74>
-80002f48:	e3 cd 80 e0 	ldm	sp++,r5-r7,pc
-80002f4c:	00 00       	add	r0,r0
-80002f4e:	01 91       	ld.ub	r1,r0[0x1]
-80002f50:	80 00       	ld.sh	r0,r0[0x0]
-80002f52:	2c e4       	sub	r4,-50
+80002f52:	f0 ca ff ff 	sub	r10,r8,-1
+80002f56:	cd db       	rjmp	80002f10 <promiscuous_mode+0x74>
+80002f58:	e3 cd 80 e0 	ldm	sp++,r5-r7,pc
+80002f5c:	00 00       	add	r0,r0
+80002f5e:	01 a9       	ld.ub	r9,r0[0x2]
+80002f60:	80 00       	ld.sh	r0,r0[0x0]
+80002f62:	2c e4       	sub	r4,-50
 
-80002f54 <getStateAT86RF212>:
+80002f64 <getStateAT86RF212>:
 	
 	else
 		sprintf(temps,"%s","X");
 }
 uint8_t getStateAT86RF212(void)
 {
-80002f54:	d4 01       	pushm	lr
+80002f64:	d4 01       	pushm	lr
 	return pal_trx_reg_read(RG_TRX_STATUS) & 0x1F;
-80002f56:	30 1c       	mov	r12,1
-80002f58:	f0 1f 00 03 	mcall	80002f64 <getStateAT86RF212+0x10>
+80002f66:	30 1c       	mov	r12,1
+80002f68:	f0 1f 00 03 	mcall	80002f74 <getStateAT86RF212+0x10>
 }
-80002f5c:	f9 dc c0 05 	bfextu	r12,r12,0x0,0x5
-80002f60:	d8 02       	popm	pc
-80002f62:	00 00       	add	r0,r0
-80002f64:	80 00       	ld.sh	r0,r0[0x0]
-80002f66:	2d 50       	sub	r0,-43
+80002f6c:	f9 dc c0 05 	bfextu	r12,r12,0x0,0x5
+80002f70:	d8 02       	popm	pc
+80002f72:	00 00       	add	r0,r0
+80002f74:	80 00       	ld.sh	r0,r0[0x0]
+80002f76:	2d 50       	sub	r0,-43
 
-80002f68 <tc_irq>:
+80002f78 <tc_irq>:
 __interrupt
 #endif
 
 // Existe la variable timer_eneable que controla la ejecucion de los procesos dentro de la interrupcion
 static void tc_irq(void)
 {
-80002f68:	d4 01       	pushm	lr
+80002f78:	d4 01       	pushm	lr
 	// Clear the interrupt flag. This is a side effect of reading the TC SR.
 	tc_read_sr(EXAMPLE_TC, EXAMPLE_TC_CHANNEL);
-80002f6a:	30 0b       	mov	r11,0
-80002f6c:	fe 7c 5c 00 	mov	r12,-41984
-80002f70:	f0 1f 00 17 	mcall	80002fcc <tc_irq+0x64>
+80002f7a:	30 0b       	mov	r11,0
+80002f7c:	fe 7c 5c 00 	mov	r12,-41984
+80002f80:	f0 1f 00 17 	mcall	80002fdc <tc_irq+0x64>
 
 	tc_tick++;	// contador para controlar el tiempo de las interrupciones
-80002f74:	49 78       	lddpc	r8,80002fd0 <tc_irq+0x68>
-80002f76:	70 09       	ld.w	r9,r8[0x0]
-80002f78:	2f f9       	sub	r9,-1
-80002f7a:	91 09       	st.w	r8[0x0],r9
+80002f84:	49 78       	lddpc	r8,80002fe0 <tc_irq+0x68>
+80002f86:	70 09       	ld.w	r9,r8[0x0]
+80002f88:	2f f9       	sub	r9,-1
+80002f8a:	91 09       	st.w	r8[0x0],r9
 	
 	if (tc_tick < 20)
-80002f7c:	70 08       	ld.w	r8,r8[0x0]
-80002f7e:	59 38       	cp.w	r8,19
-80002f80:	e0 8b 00 0c 	brhi	80002f98 <tc_irq+0x30>
+80002f8c:	70 08       	ld.w	r8,r8[0x0]
+80002f8e:	59 38       	cp.w	r8,19
+80002f90:	e0 8b 00 0c 	brhi	80002fa8 <tc_irq+0x30>
 	{
 		// la funcion toggle pin (parece) que pone el pin en 1
 		gpio_toggle_pin(AVR32_PIN_PB09); // PB09 = led 3
-80002f84:	32 9c       	mov	r12,41
-80002f86:	f0 1f 00 14 	mcall	80002fd4 <tc_irq+0x6c>
+80002f94:	32 9c       	mov	r12,41
+80002f96:	f0 1f 00 14 	mcall	80002fe4 <tc_irq+0x6c>
 		gpio_toggle_pin(AVR32_PIN_PA04); // PA04 = led 1
-80002f8a:	30 4c       	mov	r12,4
-80002f8c:	f0 1f 00 12 	mcall	80002fd4 <tc_irq+0x6c>
+80002f9a:	30 4c       	mov	r12,4
+80002f9c:	f0 1f 00 12 	mcall	80002fe4 <tc_irq+0x6c>
 		gpio_toggle_pin(AVR32_PIN_PA11); // PA11 = led 2 
-80002f90:	30 bc       	mov	r12,11
-80002f92:	f0 1f 00 11 	mcall	80002fd4 <tc_irq+0x6c>
+80002fa0:	30 bc       	mov	r12,11
+80002fa2:	f0 1f 00 11 	mcall	80002fe4 <tc_irq+0x6c>
 		return;
-80002f96:	c1 98       	rjmp	80002fc8 <tc_irq+0x60>
+80002fa6:	c1 98       	rjmp	80002fd8 <tc_irq+0x60>
 	}
 	
 	if (tc_tick == 21)	
-80002f98:	48 e8       	lddpc	r8,80002fd0 <tc_irq+0x68>
-80002f9a:	70 08       	ld.w	r8,r8[0x0]
-80002f9c:	59 58       	cp.w	r8,21
-80002f9e:	c0 41       	brne	80002fa6 <tc_irq+0x3e>
+80002fa8:	48 e8       	lddpc	r8,80002fe0 <tc_irq+0x68>
+80002faa:	70 08       	ld.w	r8,r8[0x0]
+80002fac:	59 58       	cp.w	r8,21
+80002fae:	c0 41       	brne	80002fb6 <tc_irq+0x3e>
 		gpio_toggle_pin(AVR32_PIN_PB09);
-80002fa0:	32 9c       	mov	r12,41
-80002fa2:	f0 1f 00 0d 	mcall	80002fd4 <tc_irq+0x6c>
+80002fb0:	32 9c       	mov	r12,41
+80002fb2:	f0 1f 00 0d 	mcall	80002fe4 <tc_irq+0x6c>
 		
 	if (tc_tick == 22)
-80002fa6:	48 b8       	lddpc	r8,80002fd0 <tc_irq+0x68>
-80002fa8:	70 08       	ld.w	r8,r8[0x0]
-80002faa:	59 68       	cp.w	r8,22
-80002fac:	c0 41       	brne	80002fb4 <tc_irq+0x4c>
+80002fb6:	48 b8       	lddpc	r8,80002fe0 <tc_irq+0x68>
+80002fb8:	70 08       	ld.w	r8,r8[0x0]
+80002fba:	59 68       	cp.w	r8,22
+80002fbc:	c0 41       	brne	80002fc4 <tc_irq+0x4c>
 		gpio_toggle_pin(AVR32_PIN_PA04);
-80002fae:	30 4c       	mov	r12,4
-80002fb0:	f0 1f 00 09 	mcall	80002fd4 <tc_irq+0x6c>
+80002fbe:	30 4c       	mov	r12,4
+80002fc0:	f0 1f 00 09 	mcall	80002fe4 <tc_irq+0x6c>
 	
 	if (tc_tick == 23)
-80002fb4:	48 78       	lddpc	r8,80002fd0 <tc_irq+0x68>
-80002fb6:	70 08       	ld.w	r8,r8[0x0]
-80002fb8:	59 78       	cp.w	r8,23
-80002fba:	c0 71       	brne	80002fc8 <tc_irq+0x60>
+80002fc4:	48 78       	lddpc	r8,80002fe0 <tc_irq+0x68>
+80002fc6:	70 08       	ld.w	r8,r8[0x0]
+80002fc8:	59 78       	cp.w	r8,23
+80002fca:	c0 71       	brne	80002fd8 <tc_irq+0x60>
 	{
 		gpio_toggle_pin(AVR32_PIN_PA11);	
-80002fbc:	30 bc       	mov	r12,11
-80002fbe:	f0 1f 00 06 	mcall	80002fd4 <tc_irq+0x6c>
+80002fcc:	30 bc       	mov	r12,11
+80002fce:	f0 1f 00 06 	mcall	80002fe4 <tc_irq+0x6c>
 		tc_tick = 1;
-80002fc2:	30 19       	mov	r9,1
-80002fc4:	48 38       	lddpc	r8,80002fd0 <tc_irq+0x68>
-80002fc6:	91 09       	st.w	r8[0x0],r9
+80002fd2:	30 19       	mov	r9,1
+80002fd4:	48 38       	lddpc	r8,80002fe0 <tc_irq+0x68>
+80002fd6:	91 09       	st.w	r8[0x0],r9
 	}
 }
-80002fc8:	d4 02       	popm	lr
-80002fca:	d6 03       	rete
-80002fcc:	80 00       	ld.sh	r0,r0[0x0]
-80002fce:	29 16       	sub	r6,-111
-80002fd0:	00 00       	add	r0,r0
-80002fd2:	00 1c       	sub	r12,r0
-80002fd4:	80 00       	ld.sh	r0,r0[0x0]
-80002fd6:	25 90       	sub	r0,89
+80002fd8:	d4 02       	popm	lr
+80002fda:	d6 03       	rete
+80002fdc:	80 00       	ld.sh	r0,r0[0x0]
+80002fde:	29 16       	sub	r6,-111
+80002fe0:	00 00       	add	r0,r0
+80002fe2:	00 1c       	sub	r12,r0
+80002fe4:	80 00       	ld.sh	r0,r0[0x0]
+80002fe6:	25 90       	sub	r0,89
 
-80002fd8 <usart_int_handler_RS232>:
+80002fe8 <usart_int_handler_RS232>:
 #endif
 
 
 // Manejo INTERRUPCION UART
 static void usart_int_handler_RS232(void)
 {
-80002fd8:	d4 01       	pushm	lr
-80002fda:	20 1d       	sub	sp,4
+80002fe8:	d4 01       	pushm	lr
+80002fea:	20 1d       	sub	sp,4
 	// TDW sensor de temperatura -> RX UART2 Pin 24 MCU
 	tc_stop(tc,EXAMPLE_TC_CHANNEL);
-80002fdc:	30 0b       	mov	r11,0
-80002fde:	49 b8       	lddpc	r8,80003048 <usart_int_handler_RS232+0x70>
-80002fe0:	70 0c       	ld.w	r12,r8[0x0]
-80002fe2:	f0 1f 00 1b 	mcall	8000304c <usart_int_handler_RS232+0x74>
+80002fec:	30 0b       	mov	r11,0
+80002fee:	49 b8       	lddpc	r8,80003058 <usart_int_handler_RS232+0x70>
+80002ff0:	70 0c       	ld.w	r12,r8[0x0]
+80002ff2:	f0 1f 00 1b 	mcall	8000305c <usart_int_handler_RS232+0x74>
 	
 	uint8_t c=0;
-80002fe6:	fa cb ff fc 	sub	r11,sp,-4
-80002fea:	30 08       	mov	r8,0
-80002fec:	16 f8       	st.b	--r11,r8
+80002ff6:	fa cb ff fc 	sub	r11,sp,-4
+80002ffa:	30 08       	mov	r8,0
+80002ffc:	16 f8       	st.b	--r11,r8
 	 * as the call to usart_putchar will take enough time for this before
 	 * the interrupt handler is left and the interrupt priority level is
 	 * unmasked by the CPU.
 	 */
 		
 	if (usart_read_char(&AVR32_USART2, &c) != USART_SUCCESS) //aqui lee el caracter por el puerto uart2
-80002fee:	fe 7c 38 00 	mov	r12,-51200
-80002ff2:	f0 1f 00 18 	mcall	80003050 <usart_int_handler_RS232+0x78>
-80002ff6:	c2 61       	brne	80003042 <usart_int_handler_RS232+0x6a>
+80002ffe:	fe 7c 38 00 	mov	r12,-51200
+80003002:	f0 1f 00 18 	mcall	80003060 <usart_int_handler_RS232+0x78>
+80003006:	c2 61       	brne	80003052 <usart_int_handler_RS232+0x6a>
 		return;
 	
 	cola_PC[cola_PC_nw] = c;
-80002ff8:	49 78       	lddpc	r8,80003054 <usart_int_handler_RS232+0x7c>
-80002ffa:	11 88       	ld.ub	r8,r8[0x0]
-80002ffc:	1b b9       	ld.ub	r9,sp[0x3]
-80002ffe:	49 7a       	lddpc	r10,80003058 <usart_int_handler_RS232+0x80>
-80003000:	f4 08 0b 09 	st.b	r10[r8],r9
+80003008:	49 78       	lddpc	r8,80003064 <usart_int_handler_RS232+0x7c>
+8000300a:	11 88       	ld.ub	r8,r8[0x0]
+8000300c:	1b b9       	ld.ub	r9,sp[0x3]
+8000300e:	49 7a       	lddpc	r10,80003068 <usart_int_handler_RS232+0x80>
+80003010:	f4 08 0b 09 	st.b	r10[r8],r9
 	
 	if (cola_PC[cola_PC_nw] == 0x01)
-80003004:	30 1a       	mov	r10,1
-80003006:	f4 09 18 00 	cp.b	r9,r10
-8000300a:	c0 c1       	brne	80003022 <usart_int_handler_RS232+0x4a>
+80003014:	30 1a       	mov	r10,1
+80003016:	f4 09 18 00 	cp.b	r9,r10
+8000301a:	c0 c1       	brne	80003032 <usart_int_handler_RS232+0x4a>
 	{	
 		if (!configuracion){
-8000300c:	49 49       	lddpc	r9,8000305c <usart_int_handler_RS232+0x84>
-8000300e:	13 8a       	ld.ub	r10,r9[0x0]
-80003010:	30 09       	mov	r9,0
-80003012:	f2 0a 18 00 	cp.b	r10,r9
-80003016:	c0 31       	brne	8000301c <usart_int_handler_RS232+0x44>
+8000301c:	49 49       	lddpc	r9,8000306c <usart_int_handler_RS232+0x84>
+8000301e:	13 8a       	ld.ub	r10,r9[0x0]
+80003020:	30 09       	mov	r9,0
+80003022:	f2 0a 18 00 	cp.b	r10,r9
+80003026:	c0 31       	brne	8000302c <usart_int_handler_RS232+0x44>
 			pConfiguracion = cola_PC_nw;
-80003018:	49 29       	lddpc	r9,80003060 <usart_int_handler_RS232+0x88>
-8000301a:	b2 88       	st.b	r9[0x0],r8
+80003028:	49 29       	lddpc	r9,80003070 <usart_int_handler_RS232+0x88>
+8000302a:	b2 88       	st.b	r9[0x0],r8
 		}
 		configuracion = true;
-8000301c:	30 1a       	mov	r10,1
-8000301e:	49 09       	lddpc	r9,8000305c <usart_int_handler_RS232+0x84>
-80003020:	b2 8a       	st.b	r9[0x0],r10
+8000302c:	30 1a       	mov	r10,1
+8000302e:	49 09       	lddpc	r9,8000306c <usart_int_handler_RS232+0x84>
+80003030:	b2 8a       	st.b	r9[0x0],r10
 		
 	}
 	cola_PC_nw++;
-80003022:	2f f8       	sub	r8,-1
-80003024:	48 c9       	lddpc	r9,80003054 <usart_int_handler_RS232+0x7c>
-80003026:	b2 88       	st.b	r9[0x0],r8
+80003032:	2f f8       	sub	r8,-1
+80003034:	48 c9       	lddpc	r9,80003064 <usart_int_handler_RS232+0x7c>
+80003036:	b2 88       	st.b	r9[0x0],r8
 	
 	if (cola_PC_nw >= tamano_cola)
-80003028:	3c 79       	mov	r9,-57
-8000302a:	f2 08 18 00 	cp.b	r8,r9
-8000302e:	e0 88 00 05 	brls	80003038 <usart_int_handler_RS232+0x60>
+80003038:	3c 79       	mov	r9,-57
+8000303a:	f2 08 18 00 	cp.b	r8,r9
+8000303e:	e0 88 00 05 	brls	80003048 <usart_int_handler_RS232+0x60>
 	cola_PC_nw = 0;
-80003032:	30 09       	mov	r9,0
-80003034:	48 88       	lddpc	r8,80003054 <usart_int_handler_RS232+0x7c>
-80003036:	b0 89       	st.b	r8[0x0],r9
+80003042:	30 09       	mov	r9,0
+80003044:	48 88       	lddpc	r8,80003064 <usart_int_handler_RS232+0x7c>
+80003046:	b0 89       	st.b	r8[0x0],r9
 	
 	tc_start(tc,EXAMPLE_TC_CHANNEL);
-80003038:	30 0b       	mov	r11,0
-8000303a:	48 48       	lddpc	r8,80003048 <usart_int_handler_RS232+0x70>
-8000303c:	70 0c       	ld.w	r12,r8[0x0]
-8000303e:	f0 1f 00 0a 	mcall	80003064 <usart_int_handler_RS232+0x8c>
+80003048:	30 0b       	mov	r11,0
+8000304a:	48 48       	lddpc	r8,80003058 <usart_int_handler_RS232+0x70>
+8000304c:	70 0c       	ld.w	r12,r8[0x0]
+8000304e:	f0 1f 00 0a 	mcall	80003074 <usart_int_handler_RS232+0x8c>
 	return;
 
 	
 }
-80003042:	2f fd       	sub	sp,-4
-80003044:	d4 02       	popm	lr
-80003046:	d6 03       	rete
-80003048:	00 00       	add	r0,r0
-8000304a:	00 18       	sub	r8,r0
-8000304c:	80 00       	ld.sh	r0,r0[0x0]
-8000304e:	29 04       	sub	r4,-112
-80003050:	80 00       	ld.sh	r0,r0[0x0]
-80003052:	2b 00       	sub	r0,-80
-80003054:	00 00       	add	r0,r0
-80003056:	01 8e       	ld.ub	lr,r0[0x0]
+80003052:	2f fd       	sub	sp,-4
+80003054:	d4 02       	popm	lr
+80003056:	d6 03       	rete
 80003058:	00 00       	add	r0,r0
-8000305a:	01 9c       	ld.ub	r12,r0[0x1]
-8000305c:	00 00       	add	r0,r0
-8000305e:	01 8c       	ld.ub	r12,r0[0x0]
-80003060:	00 00       	add	r0,r0
-80003062:	01 8f       	ld.ub	pc,r0[0x0]
-80003064:	80 00       	ld.sh	r0,r0[0x0]
-80003066:	28 f2       	sub	r2,-113
+8000305a:	00 18       	sub	r8,r0
+8000305c:	80 00       	ld.sh	r0,r0[0x0]
+8000305e:	29 04       	sub	r4,-112
+80003060:	80 00       	ld.sh	r0,r0[0x0]
+80003062:	2b 00       	sub	r0,-80
+80003064:	00 00       	add	r0,r0
+80003066:	01 a6       	ld.ub	r6,r0[0x2]
+80003068:	00 00       	add	r0,r0
+8000306a:	01 b4       	ld.ub	r4,r0[0x3]
+8000306c:	00 00       	add	r0,r0
+8000306e:	01 a4       	ld.ub	r4,r0[0x2]
+80003070:	00 00       	add	r0,r0
+80003072:	01 a7       	ld.ub	r7,r0[0x2]
+80003074:	80 00       	ld.sh	r0,r0[0x0]
+80003076:	28 f2       	sub	r2,-113
 
-80003068 <reset>:
+80003078 <reset>:
 	RST_HIGH();
 	
 	delay_ms(1);
 }
 void reset()
 {
-80003068:	d4 01       	pushm	lr
+80003078:	d4 01       	pushm	lr
 	SLP_TR_LOW();
-8000306a:	32 7c       	mov	r12,39
-8000306c:	f0 1f 00 1e 	mcall	800030e4 <reset+0x7c>
+8000307a:	32 7c       	mov	r12,39
+8000307c:	f0 1f 00 1e 	mcall	800030f4 <reset+0x7c>
 	RST_HIGH();
-80003070:	32 8c       	mov	r12,40
-80003072:	f0 1f 00 1e 	mcall	800030e8 <reset+0x80>
+80003080:	32 8c       	mov	r12,40
+80003082:	f0 1f 00 1e 	mcall	800030f8 <reset+0x80>
  * \param  delay:   (input) delay in CPU cycles before timeout.
  * \param  cpu_time: (output) internal information used by the timer API.
  */
 __always_inline static void cpu_set_timeout(unsigned long delay, t_cpu_time *cpu_time)
 {
   cpu_time->delay_start_cycle = Get_system_register(AVR32_COUNT);
-80003076:	e1 b8 00 42 	mfsr	r8,0x108
+80003086:	e1 b8 00 42 	mfsr	r8,0x108
   cpu_time->delay_end_cycle   = cpu_time->delay_start_cycle + delay;
-8000307a:	f0 ca ff d2 	sub	r10,r8,-46
+8000308a:	f0 ca ff d2 	sub	r10,r8,-46
  *
  * \return true if timeout occurred, otherwise false.
  */
 __always_inline static unsigned long cpu_is_timeout(t_cpu_time *cpu_time)
 {
   unsigned long current_cycle_count = Get_system_register(AVR32_COUNT);
-8000307e:	e1 b9 00 42 	mfsr	r9,0x108
+8000308e:	e1 b9 00 42 	mfsr	r9,0x108
   // Test if the timeout as already occurred.
   else if (cpu_time->timer_state == CPU_TIMER_STATE_REACHED)
     return true;
 
   // If the ending cycle count of this timeout is wrapped, ...
   else if (cpu_time->delay_start_cycle > cpu_time->delay_end_cycle)
-80003082:	14 38       	cp.w	r8,r10
-80003084:	e0 88 00 08 	brls	80003094 <reset+0x2c>
+80003092:	14 38       	cp.w	r8,r10
+80003094:	e0 88 00 08 	brls	800030a4 <reset+0x2c>
   {
     if (current_cycle_count < cpu_time->delay_start_cycle && current_cycle_count > cpu_time->delay_end_cycle)
-80003088:	12 38       	cp.w	r8,r9
-8000308a:	fe 98 ff fa 	brls	8000307e <reset+0x16>
-8000308e:	12 3a       	cp.w	r10,r9
-80003090:	c1 93       	brcs	800030c2 <reset+0x5a>
-80003092:	cf 6b       	rjmp	8000307e <reset+0x16>
+80003098:	12 38       	cp.w	r8,r9
+8000309a:	fe 98 ff fa 	brls	8000308e <reset+0x16>
+8000309e:	12 3a       	cp.w	r10,r9
+800030a0:	c1 93       	brcs	800030d2 <reset+0x5a>
+800030a2:	cf 6b       	rjmp	8000308e <reset+0x16>
     }
     return false;
   }
   else
   {
     if (current_cycle_count < cpu_time->delay_start_cycle || current_cycle_count > cpu_time->delay_end_cycle)
-80003094:	12 38       	cp.w	r8,r9
-80003096:	e0 8b 00 16 	brhi	800030c2 <reset+0x5a>
-8000309a:	12 3a       	cp.w	r10,r9
-8000309c:	c1 33       	brcs	800030c2 <reset+0x5a>
-8000309e:	cf 0b       	rjmp	8000307e <reset+0x16>
+800030a4:	12 38       	cp.w	r8,r9
+800030a6:	e0 8b 00 16 	brhi	800030d2 <reset+0x5a>
+800030aa:	12 3a       	cp.w	r10,r9
+800030ac:	c1 33       	brcs	800030d2 <reset+0x5a>
+800030ae:	cf 0b       	rjmp	8000308e <reset+0x16>
  *
  * \return true if timeout occurred, otherwise false.
  */
 __always_inline static unsigned long cpu_is_timeout(t_cpu_time *cpu_time)
 {
   unsigned long current_cycle_count = Get_system_register(AVR32_COUNT);
-800030a0:	e1 b9 00 42 	mfsr	r9,0x108
+800030b0:	e1 b9 00 42 	mfsr	r9,0x108
   // Test if the timeout as already occurred.
   else if (cpu_time->timer_state == CPU_TIMER_STATE_REACHED)
     return true;
 
   // If the ending cycle count of this timeout is wrapped, ...
   else if (cpu_time->delay_start_cycle > cpu_time->delay_end_cycle)
-800030a4:	14 38       	cp.w	r8,r10
-800030a6:	e0 88 00 08 	brls	800030b6 <reset+0x4e>
+800030b4:	14 38       	cp.w	r8,r10
+800030b6:	e0 88 00 08 	brls	800030c6 <reset+0x4e>
   {
     if (current_cycle_count < cpu_time->delay_start_cycle && current_cycle_count > cpu_time->delay_end_cycle)
-800030aa:	12 38       	cp.w	r8,r9
-800030ac:	fe 98 ff fa 	brls	800030a0 <reset+0x38>
-800030b0:	12 3a       	cp.w	r10,r9
-800030b2:	c1 03       	brcs	800030d2 <reset+0x6a>
-800030b4:	cf 6b       	rjmp	800030a0 <reset+0x38>
+800030ba:	12 38       	cp.w	r8,r9
+800030bc:	fe 98 ff fa 	brls	800030b0 <reset+0x38>
+800030c0:	12 3a       	cp.w	r10,r9
+800030c2:	c1 03       	brcs	800030e2 <reset+0x6a>
+800030c4:	cf 6b       	rjmp	800030b0 <reset+0x38>
     }
     return false;
   }
   else
   {
     if (current_cycle_count < cpu_time->delay_start_cycle || current_cycle_count > cpu_time->delay_end_cycle)
-800030b6:	12 38       	cp.w	r8,r9
-800030b8:	e0 8b 00 0d 	brhi	800030d2 <reset+0x6a>
-800030bc:	12 3a       	cp.w	r10,r9
-800030be:	c0 a3       	brcs	800030d2 <reset+0x6a>
-800030c0:	cf 0b       	rjmp	800030a0 <reset+0x38>
+800030c6:	12 38       	cp.w	r8,r9
+800030c8:	e0 8b 00 0d 	brhi	800030e2 <reset+0x6a>
+800030cc:	12 3a       	cp.w	r10,r9
+800030ce:	c0 a3       	brcs	800030e2 <reset+0x6a>
+800030d0:	cf 0b       	rjmp	800030b0 <reset+0x38>
 	DELAY_US(400);
 	RST_LOW();
-800030c2:	32 8c       	mov	r12,40
-800030c4:	f0 1f 00 08 	mcall	800030e4 <reset+0x7c>
+800030d2:	32 8c       	mov	r12,40
+800030d4:	f0 1f 00 08 	mcall	800030f4 <reset+0x7c>
  * \param  delay:   (input) delay in CPU cycles before timeout.
  * \param  cpu_time: (output) internal information used by the timer API.
  */
 __always_inline static void cpu_set_timeout(unsigned long delay, t_cpu_time *cpu_time)
 {
   cpu_time->delay_start_cycle = Get_system_register(AVR32_COUNT);
-800030c8:	e1 b8 00 42 	mfsr	r8,0x108
+800030d8:	e1 b8 00 42 	mfsr	r8,0x108
   cpu_time->delay_end_cycle   = cpu_time->delay_start_cycle + delay;
-800030cc:	f0 ca ff f8 	sub	r10,r8,-8
-800030d0:	ce 8b       	rjmp	800030a0 <reset+0x38>
+800030dc:	f0 ca ff f8 	sub	r10,r8,-8
+800030e0:	ce 8b       	rjmp	800030b0 <reset+0x38>
 	DELAY_US(63);
 	RST_LOW();
-800030d2:	32 8c       	mov	r12,40
-800030d4:	f0 1f 00 04 	mcall	800030e4 <reset+0x7c>
+800030e2:	32 8c       	mov	r12,40
+800030e4:	f0 1f 00 04 	mcall	800030f4 <reset+0x7c>
 	pal_trx_reg_write(RG_TRX_CTRL_0,0x08);
-800030d8:	30 8b       	mov	r11,8
-800030da:	30 3c       	mov	r12,3
-800030dc:	f0 1f 00 04 	mcall	800030ec <reset+0x84>
+800030e8:	30 8b       	mov	r11,8
+800030ea:	30 3c       	mov	r12,3
+800030ec:	f0 1f 00 04 	mcall	800030fc <reset+0x84>
 	//pal_trx_reg_write(RG_TRX_STATE,CMD_FORCE_TRX_OFF);
 	
 }
-800030e0:	d8 02       	popm	pc
-800030e2:	00 00       	add	r0,r0
-800030e4:	80 00       	ld.sh	r0,r0[0x0]
-800030e6:	25 7a       	sub	r10,87
-800030e8:	80 00       	ld.sh	r0,r0[0x0]
-800030ea:	25 64       	sub	r4,86
-800030ec:	80 00       	ld.sh	r0,r0[0x0]
-800030ee:	2c e4       	sub	r4,-50
+800030f0:	d8 02       	popm	pc
+800030f2:	00 00       	add	r0,r0
+800030f4:	80 00       	ld.sh	r0,r0[0x0]
+800030f6:	25 7a       	sub	r10,87
+800030f8:	80 00       	ld.sh	r0,r0[0x0]
+800030fa:	25 64       	sub	r4,86
+800030fc:	80 00       	ld.sh	r0,r0[0x0]
+800030fe:	2c e4       	sub	r4,-50
 
-800030f0 <sysclk_enable_pba_module>:
+80003100 <sysclk_enable_pba_module>:
 /**
  * \brief Enable a module clock derived from the PBA clock
  * \param index Index of the module clock in the PBAMASK register
  */
 static inline void sysclk_enable_pba_module(unsigned int index)
 {
-800030f0:	d4 01       	pushm	lr
+80003100:	d4 01       	pushm	lr
 	sysclk_priv_enable_module(AVR32_PM_CLK_GRP_PBA, index);
-800030f2:	18 9b       	mov	r11,r12
-800030f4:	30 2c       	mov	r12,2
-800030f6:	f0 1f 00 02 	mcall	800030fc <sysclk_enable_pba_module+0xc>
+80003102:	18 9b       	mov	r11,r12
+80003104:	30 2c       	mov	r12,2
+80003106:	f0 1f 00 02 	mcall	8000310c <sysclk_enable_pba_module+0xc>
 }
-800030fa:	d8 02       	popm	pc
-800030fc:	80 00       	ld.sh	r0,r0[0x0]
-800030fe:	2d d4       	sub	r4,-35
+8000310a:	d8 02       	popm	pc
+8000310c:	80 00       	ld.sh	r0,r0[0x0]
+8000310e:	2d d4       	sub	r4,-35
 
-80003100 <rs_232_init_usart>:
+80003110 <rs_232_init_usart>:
 	gpio_enable_module(COMPORT0_GPIO_MAP,sizeof(COMPORT0_GPIO_MAP) / sizeof (COMPORT0_GPIO_MAP[0]));
 }
 
 
 int rs_232_init_usart()
 {
-80003100:	d4 01       	pushm	lr
+80003110:	d4 01       	pushm	lr
 		case AVR32_USART1_ADDRESS:
 			sysclk_enable_pba_module(SYSCLK_USART1);
 			break;
 
 		case AVR32_USART2_ADDRESS:
 			sysclk_enable_pba_module(SYSCLK_USART2);
-80003102:	30 bc       	mov	r12,11
-80003104:	f0 1f 00 05 	mcall	80003118 <rs_232_init_usart+0x18>
+80003112:	30 bc       	mov	r12,11
+80003114:	f0 1f 00 05 	mcall	80003128 <rs_232_init_usart+0x18>
 	sysclk_enable_peripheral_clock(&AVR32_USART2);	
 	int estado_usart2 = usart_init_rs232(&AVR32_USART2, &usart_opt, sysclk_get_peripheral_bus_hz(&AVR32_USART2));	
-80003108:	e0 7a c1 38 	mov	r10,115000
-8000310c:	48 4b       	lddpc	r11,8000311c <rs_232_init_usart+0x1c>
-8000310e:	fe 7c 38 00 	mov	r12,-51200
-80003112:	f0 1f 00 04 	mcall	80003120 <rs_232_init_usart+0x20>
+80003118:	e0 7a c1 38 	mov	r10,115000
+8000311c:	48 4b       	lddpc	r11,8000312c <rs_232_init_usart+0x1c>
+8000311e:	fe 7c 38 00 	mov	r12,-51200
+80003122:	f0 1f 00 04 	mcall	80003130 <rs_232_init_usart+0x20>
 	return estado_usart2;
 }
-80003116:	d8 02       	popm	pc
-80003118:	80 00       	ld.sh	r0,r0[0x0]
-8000311a:	30 f0       	mov	r0,15
-8000311c:	00 00       	add	r0,r0
-8000311e:	00 0c       	add	r12,r0
-80003120:	80 00       	ld.sh	r0,r0[0x0]
-80003122:	2b 74       	sub	r4,-73
+80003126:	d8 02       	popm	pc
+80003128:	80 00       	ld.sh	r0,r0[0x0]
+8000312a:	31 00       	mov	r0,16
+8000312c:	00 00       	add	r0,r0
+8000312e:	00 0c       	add	r12,r0
+80003130:	80 00       	ld.sh	r0,r0[0x0]
+80003132:	2b 74       	sub	r4,-73
 
-80003124 <rs_232_init_pins>:
+80003134 <rs_232_init_pins>:
 	//
 
 }
 
 void rs_232_init_pins(void)
 {
-80003124:	d4 01       	pushm	lr
-80003126:	20 4d       	sub	sp,16
+80003134:	d4 01       	pushm	lr
+80003136:	20 4d       	sub	sp,16
 	gpio_map_t COMPORT0_GPIO_MAP =
 	{
 		{ USART2_RX_PIN, USART2_RX_FUNCTION },
 		{ USART2_TX_PIN, USART2_TX_FUNCTION }
 	};
-80003128:	48 88       	lddpc	r8,80003148 <rs_232_init_pins+0x24>
-8000312a:	1a 9c       	mov	r12,sp
-8000312c:	70 09       	ld.w	r9,r8[0x0]
-8000312e:	50 09       	stdsp	sp[0x0],r9
-80003130:	70 19       	ld.w	r9,r8[0x4]
-80003132:	50 19       	stdsp	sp[0x4],r9
-80003134:	70 29       	ld.w	r9,r8[0x8]
-80003136:	50 29       	stdsp	sp[0x8],r9
-80003138:	70 38       	ld.w	r8,r8[0xc]
-8000313a:	50 38       	stdsp	sp[0xc],r8
+80003138:	48 88       	lddpc	r8,80003158 <rs_232_init_pins+0x24>
+8000313a:	1a 9c       	mov	r12,sp
+8000313c:	70 09       	ld.w	r9,r8[0x0]
+8000313e:	50 09       	stdsp	sp[0x0],r9
+80003140:	70 19       	ld.w	r9,r8[0x4]
+80003142:	50 19       	stdsp	sp[0x4],r9
+80003144:	70 29       	ld.w	r9,r8[0x8]
+80003146:	50 29       	stdsp	sp[0x8],r9
+80003148:	70 38       	ld.w	r8,r8[0xc]
+8000314a:	50 38       	stdsp	sp[0xc],r8
 
 	gpio_enable_module(COMPORT0_GPIO_MAP,sizeof(COMPORT0_GPIO_MAP) / sizeof (COMPORT0_GPIO_MAP[0]));
-8000313c:	30 2b       	mov	r11,2
-8000313e:	f0 1f 00 04 	mcall	8000314c <rs_232_init_pins+0x28>
+8000314c:	30 2b       	mov	r11,2
+8000314e:	f0 1f 00 04 	mcall	8000315c <rs_232_init_pins+0x28>
 }
-80003142:	2f cd       	sub	sp,-16
-80003144:	d8 02       	popm	pc
-80003146:	00 00       	add	r0,r0
-80003148:	80 00       	ld.sh	r0,r0[0x0]
-8000314a:	41 10       	lddsp	r0,sp[0x44]
-8000314c:	80 00       	ld.sh	r0,r0[0x0]
-8000314e:	24 7c       	sub	r12,71
+80003152:	2f cd       	sub	sp,-16
+80003154:	d8 02       	popm	pc
+80003156:	00 00       	add	r0,r0
+80003158:	80 00       	ld.sh	r0,r0[0x0]
+8000315a:	41 10       	lddsp	r0,sp[0x44]
+8000315c:	80 00       	ld.sh	r0,r0[0x0]
+8000315e:	24 7c       	sub	r12,71
 
-80003150 <init_i2c_pins>:
+80003160 <init_i2c_pins>:
 		gpio_configure_pin(LED_2, (GPIO_DIR_OUTPUT | GPIO_PULL_UP));
 		gpio_configure_pin(LED_3, (GPIO_DIR_OUTPUT | GPIO_PULL_UP));
 }
 
 void init_i2c_pins(void)
 {
-80003150:	d4 01       	pushm	lr
-80003152:	20 4d       	sub	sp,16
+80003160:	d4 01       	pushm	lr
+80003162:	20 4d       	sub	sp,16
 	const gpio_map_t TWI_GPIO_MAP = {
 		{AVR32_TWIMS0_TWCK_0_3_PIN, AVR32_TWIMS0_TWCK_0_3_FUNCTION},
 		{AVR32_TWIMS0_TWD_0_1_PIN, AVR32_TWIMS0_TWD_0_1_FUNCTION}
 	};
-80003154:	48 88       	lddpc	r8,80003174 <init_i2c_pins+0x24>
-80003156:	1a 9c       	mov	r12,sp
-80003158:	70 09       	ld.w	r9,r8[0x0]
-8000315a:	50 09       	stdsp	sp[0x0],r9
-8000315c:	70 19       	ld.w	r9,r8[0x4]
-8000315e:	50 19       	stdsp	sp[0x4],r9
-80003160:	70 29       	ld.w	r9,r8[0x8]
-80003162:	50 29       	stdsp	sp[0x8],r9
-80003164:	70 38       	ld.w	r8,r8[0xc]
-80003166:	50 38       	stdsp	sp[0xc],r8
+80003164:	48 88       	lddpc	r8,80003184 <init_i2c_pins+0x24>
+80003166:	1a 9c       	mov	r12,sp
+80003168:	70 09       	ld.w	r9,r8[0x0]
+8000316a:	50 09       	stdsp	sp[0x0],r9
+8000316c:	70 19       	ld.w	r9,r8[0x4]
+8000316e:	50 19       	stdsp	sp[0x4],r9
+80003170:	70 29       	ld.w	r9,r8[0x8]
+80003172:	50 29       	stdsp	sp[0x8],r9
+80003174:	70 38       	ld.w	r8,r8[0xc]
+80003176:	50 38       	stdsp	sp[0xc],r8
 
 	gpio_enable_module (TWI_GPIO_MAP,
-80003168:	30 2b       	mov	r11,2
-8000316a:	f0 1f 00 04 	mcall	80003178 <init_i2c_pins+0x28>
+80003178:	30 2b       	mov	r11,2
+8000317a:	f0 1f 00 04 	mcall	80003188 <init_i2c_pins+0x28>
 			sizeof (TWI_GPIO_MAP) / sizeof (TWI_GPIO_MAP[0]));
 			
 }
-8000316e:	2f cd       	sub	sp,-16
-80003170:	d8 02       	popm	pc
-80003172:	00 00       	add	r0,r0
-80003174:	80 00       	ld.sh	r0,r0[0x0]
-80003176:	3d 98       	mov	r8,-39
-80003178:	80 00       	ld.sh	r0,r0[0x0]
-8000317a:	24 7c       	sub	r12,71
+8000317e:	2f cd       	sub	sp,-16
+80003180:	d8 02       	popm	pc
+80003182:	00 00       	add	r0,r0
+80003184:	80 00       	ld.sh	r0,r0[0x0]
+80003186:	3d 98       	mov	r8,-39
+80003188:	80 00       	ld.sh	r0,r0[0x0]
+8000318a:	24 7c       	sub	r12,71
 
-8000317c <spi_init_pins>:
+8000318c <spi_init_pins>:
 	tc_start(tc, EXAMPLE_TC_CHANNEL);
 }
 
 
 void spi_init_pins(void)
 {
-8000317c:	d4 01       	pushm	lr
-8000317e:	20 8d       	sub	sp,32
+8000318c:	d4 01       	pushm	lr
+8000318e:	20 8d       	sub	sp,32
 	{
 		{SPI_SCK_PIN,  SPI_SCK_FUNCTION },  // SPI Clock.
 		{SPI_MISO_PIN, SPI_MISO_FUNCTION},  // MISO.
 		{SPI_MOSI_PIN, SPI_MOSI_FUNCTION},  // MOSI.
 		{SPI_CS_PIN, SPI_CS_FUNCTION}  // CS.
 	};
-80003180:	48 d8       	lddpc	r8,800031b4 <spi_init_pins+0x38>
-80003182:	1a 9c       	mov	r12,sp
-80003184:	70 09       	ld.w	r9,r8[0x0]
-80003186:	50 09       	stdsp	sp[0x0],r9
-80003188:	70 19       	ld.w	r9,r8[0x4]
-8000318a:	50 19       	stdsp	sp[0x4],r9
-8000318c:	70 29       	ld.w	r9,r8[0x8]
-8000318e:	50 29       	stdsp	sp[0x8],r9
-80003190:	70 39       	ld.w	r9,r8[0xc]
-80003192:	50 39       	stdsp	sp[0xc],r9
-80003194:	fa c9 ff f0 	sub	r9,sp,-16
-80003198:	2f 08       	sub	r8,-16
-8000319a:	70 0a       	ld.w	r10,r8[0x0]
-8000319c:	93 0a       	st.w	r9[0x0],r10
-8000319e:	70 1a       	ld.w	r10,r8[0x4]
-800031a0:	93 1a       	st.w	r9[0x4],r10
-800031a2:	70 2a       	ld.w	r10,r8[0x8]
-800031a4:	93 2a       	st.w	r9[0x8],r10
-800031a6:	70 38       	ld.w	r8,r8[0xc]
-800031a8:	93 38       	st.w	r9[0xc],r8
+80003190:	48 d8       	lddpc	r8,800031c4 <spi_init_pins+0x38>
+80003192:	1a 9c       	mov	r12,sp
+80003194:	70 09       	ld.w	r9,r8[0x0]
+80003196:	50 09       	stdsp	sp[0x0],r9
+80003198:	70 19       	ld.w	r9,r8[0x4]
+8000319a:	50 19       	stdsp	sp[0x4],r9
+8000319c:	70 29       	ld.w	r9,r8[0x8]
+8000319e:	50 29       	stdsp	sp[0x8],r9
+800031a0:	70 39       	ld.w	r9,r8[0xc]
+800031a2:	50 39       	stdsp	sp[0xc],r9
+800031a4:	fa c9 ff f0 	sub	r9,sp,-16
+800031a8:	2f 08       	sub	r8,-16
+800031aa:	70 0a       	ld.w	r10,r8[0x0]
+800031ac:	93 0a       	st.w	r9[0x0],r10
+800031ae:	70 1a       	ld.w	r10,r8[0x4]
+800031b0:	93 1a       	st.w	r9[0x4],r10
+800031b2:	70 2a       	ld.w	r10,r8[0x8]
+800031b4:	93 2a       	st.w	r9[0x8],r10
+800031b6:	70 38       	ld.w	r8,r8[0xc]
+800031b8:	93 38       	st.w	r9[0xc],r8
 
 	gpio_enable_module( SPI_GPIO_MAP,sizeof (SPI_GPIO_MAP) / sizeof (SPI_GPIO_MAP[0]));
-800031aa:	30 4b       	mov	r11,4
-800031ac:	f0 1f 00 03 	mcall	800031b8 <spi_init_pins+0x3c>
+800031ba:	30 4b       	mov	r11,4
+800031bc:	f0 1f 00 03 	mcall	800031c8 <spi_init_pins+0x3c>
 }
-800031b0:	2f 8d       	sub	sp,-32
-800031b2:	d8 02       	popm	pc
-800031b4:	80 00       	ld.sh	r0,r0[0x0]
-800031b6:	40 f0       	lddsp	r0,sp[0x3c]
-800031b8:	80 00       	ld.sh	r0,r0[0x0]
-800031ba:	24 7c       	sub	r12,71
+800031c0:	2f 8d       	sub	sp,-32
+800031c2:	d8 02       	popm	pc
+800031c4:	80 00       	ld.sh	r0,r0[0x0]
+800031c6:	40 f0       	lddsp	r0,sp[0x3c]
+800031c8:	80 00       	ld.sh	r0,r0[0x0]
+800031ca:	24 7c       	sub	r12,71
 
-800031bc <led_init_pins>:
+800031cc <led_init_pins>:
 	spi_selectionMode(AT86RFX_SPI, 0, 0, 0);
 	spi_enable(AT86RFX_SPI);
 }
 
 void led_init_pins(void)
 {
-800031bc:	d4 01       	pushm	lr
+800031cc:	d4 01       	pushm	lr
 		gpio_configure_pin(LED_1, (GPIO_DIR_OUTPUT | GPIO_PULL_UP));	
-800031be:	30 5b       	mov	r11,5
-800031c0:	30 4c       	mov	r12,4
-800031c2:	f0 1f 00 06 	mcall	800031d8 <led_init_pins+0x1c>
-		gpio_configure_pin(LED_2, (GPIO_DIR_OUTPUT | GPIO_PULL_UP));
-800031c6:	30 5b       	mov	r11,5
-800031c8:	30 bc       	mov	r12,11
-800031ca:	f0 1f 00 04 	mcall	800031d8 <led_init_pins+0x1c>
-		gpio_configure_pin(LED_3, (GPIO_DIR_OUTPUT | GPIO_PULL_UP));
 800031ce:	30 5b       	mov	r11,5
-800031d0:	32 9c       	mov	r12,41
-800031d2:	f0 1f 00 02 	mcall	800031d8 <led_init_pins+0x1c>
+800031d0:	30 4c       	mov	r12,4
+800031d2:	f0 1f 00 06 	mcall	800031e8 <led_init_pins+0x1c>
+		gpio_configure_pin(LED_2, (GPIO_DIR_OUTPUT | GPIO_PULL_UP));
+800031d6:	30 5b       	mov	r11,5
+800031d8:	30 bc       	mov	r12,11
+800031da:	f0 1f 00 04 	mcall	800031e8 <led_init_pins+0x1c>
+		gpio_configure_pin(LED_3, (GPIO_DIR_OUTPUT | GPIO_PULL_UP));
+800031de:	30 5b       	mov	r11,5
+800031e0:	32 9c       	mov	r12,41
+800031e2:	f0 1f 00 02 	mcall	800031e8 <led_init_pins+0x1c>
 }
-800031d6:	d8 02       	popm	pc
-800031d8:	80 00       	ld.sh	r0,r0[0x0]
-800031da:	24 ac       	sub	r12,74
+800031e6:	d8 02       	popm	pc
+800031e8:	80 00       	ld.sh	r0,r0[0x0]
+800031ea:	24 ac       	sub	r12,74
 
-800031dc <init_rf_pins>:
+800031ec <init_rf_pins>:
 		escribir_linea_pc("Sensor Temp:\tFAILED\r\n");
 	}
 } 
 
 void init_rf_pins(void)
 {
-800031dc:	d4 01       	pushm	lr
+800031ec:	d4 01       	pushm	lr
 	//Configuracion de los pines para SPI
 	spi_init_pins();
-800031de:	f0 1f 00 08 	mcall	800031fc <init_rf_pins+0x20>
+800031ee:	f0 1f 00 08 	mcall	8000320c <init_rf_pins+0x20>
 
 	//PIN para interrupcion externa RF PA13-> IRQ2
 	gpio_configure_pin (AVR32_PIN_PA13, (GPIO_DIR_INPUT | GPIO_PULL_UP)); // PA13 IRQ2
-800031e2:	30 4b       	mov	r11,4
-800031e4:	30 dc       	mov	r12,13
-800031e6:	f0 1f 00 07 	mcall	80003200 <init_rf_pins+0x24>
+800031f2:	30 4b       	mov	r11,4
+800031f4:	30 dc       	mov	r12,13
+800031f6:	f0 1f 00 07 	mcall	80003210 <init_rf_pins+0x24>
 	gpio_enable_module_pin(AVR32_EIC_EXTINT_2_0_PIN, AVR32_EIC_EXTINT_2_0_FUNCTION); // Habilito interrupcion externa con este pin
-800031ea:	30 6b       	mov	r11,6
-800031ec:	30 dc       	mov	r12,13
-800031ee:	f0 1f 00 06 	mcall	80003204 <init_rf_pins+0x28>
+800031fa:	30 6b       	mov	r11,6
+800031fc:	30 dc       	mov	r12,13
+800031fe:	f0 1f 00 06 	mcall	80003214 <init_rf_pins+0x28>
 	//	gpio_enable_pin_interrupt(AT86RFX_IRQ_PIN, GPIO_RISING_EDGE);
 	gpio_clear_pin_interrupt_flag(AT86RFX_IRQ_PIN);
-800031f2:	30 dc       	mov	r12,13
-800031f4:	f0 1f 00 05 	mcall	80003208 <init_rf_pins+0x2c>
+80003202:	30 dc       	mov	r12,13
+80003204:	f0 1f 00 05 	mcall	80003218 <init_rf_pins+0x2c>
 
 	// 	gpio_configure_pin(AT86RFX_RST_PIN, GPIO_DIR_OUTPUT | GPIO_INIT_HIGH);
 	// 	gpio_configure_pin(AT86RFX_SLP_PIN, GPIO_DIR_OUTPUT | GPIO_INIT_HIGH);
 	//
 
 }
-800031f8:	d8 02       	popm	pc
-800031fa:	00 00       	add	r0,r0
-800031fc:	80 00       	ld.sh	r0,r0[0x0]
-800031fe:	31 7c       	mov	r12,23
-80003200:	80 00       	ld.sh	r0,r0[0x0]
-80003202:	24 ac       	sub	r12,74
-80003204:	80 00       	ld.sh	r0,r0[0x0]
-80003206:	23 e8       	sub	r8,62
-80003208:	80 00       	ld.sh	r0,r0[0x0]
-8000320a:	25 a6       	sub	r6,90
+80003208:	d8 02       	popm	pc
+8000320a:	00 00       	add	r0,r0
+8000320c:	80 00       	ld.sh	r0,r0[0x0]
+8000320e:	31 8c       	mov	r12,24
+80003210:	80 00       	ld.sh	r0,r0[0x0]
+80003212:	24 ac       	sub	r12,74
+80003214:	80 00       	ld.sh	r0,r0[0x0]
+80003216:	23 e8       	sub	r8,62
+80003218:	80 00       	ld.sh	r0,r0[0x0]
+8000321a:	25 a6       	sub	r6,90
 
-8000320c <escribir_linea_pc>:
+8000321c <escribir_linea_pc>:
 }
 
 
 
 void escribir_linea_pc (char *str)
 {
-8000320c:	d4 01       	pushm	lr
+8000321c:	d4 01       	pushm	lr
 	usart_write_line(&AVR32_USART2,str);
-8000320e:	18 9b       	mov	r11,r12
-80003210:	fe 7c 38 00 	mov	r12,-51200
-80003214:	f0 1f 00 02 	mcall	8000321c <escribir_linea_pc+0x10>
+8000321e:	18 9b       	mov	r11,r12
+80003220:	fe 7c 38 00 	mov	r12,-51200
+80003224:	f0 1f 00 02 	mcall	8000322c <escribir_linea_pc+0x10>
 }
-80003218:	d8 02       	popm	pc
-8000321a:	00 00       	add	r0,r0
-8000321c:	80 00       	ld.sh	r0,r0[0x0]
-8000321e:	2b 24       	sub	r4,-78
+80003228:	d8 02       	popm	pc
+8000322a:	00 00       	add	r0,r0
+8000322c:	80 00       	ld.sh	r0,r0[0x0]
+8000322e:	2b 24       	sub	r4,-78
 
-80003220 <eic_int_handler2>:
+80003230 <eic_int_handler2>:
 
 // Manejo INTERRUPCION externa 2 (RF)
 
 // PA13/GPIO 13/GLOC-OUT[0]/GLOC-IN[7]/TC0-A0/SCIF-GCLK[2]/PWMA-PWMA[13]/CAT-SMP/EIC-EXTINT[2]/CAT-CSA[0]/XIN32_2
 static void eic_int_handler2(void)
 {
-80003220:	eb cd 40 80 	pushm	r7,lr
+80003230:	eb cd 40 80 	pushm	r7,lr
 	IRQ_STATUS = pal_trx_reg_read(RG_IRQ_STATUS);
-80003224:	30 fc       	mov	r12,15
-80003226:	f0 1f 00 15 	mcall	80003278 <eic_int_handler2+0x58>
+80003234:	30 fc       	mov	r12,15
+80003236:	f0 1f 00 15 	mcall	80003288 <eic_int_handler2+0x58>
 	IRQ_STATUS &= 0x0C;
-8000322a:	49 57       	lddpc	r7,8000327c <eic_int_handler2+0x5c>
-8000322c:	e2 1c 00 0c 	andl	r12,0xc,COH
-80003230:	ae 8c       	st.b	r7[0x0],r12
+8000323a:	49 57       	lddpc	r7,8000328c <eic_int_handler2+0x5c>
+8000323c:	e2 1c 00 0c 	andl	r12,0xc,COH
+80003240:	ae 8c       	st.b	r7[0x0],r12
 	//variable1=pal_trx_reg_read(RG_IRQ_STATUS);
 	//variable2=pal_trx_reg_read(RG_IRQ_MASK);
 		
 		// Interrupt Line must be cleared to enable
 		eic_clear_interrupt_line(&AVR32_EIC, AVR32_EIC_INT2);
-80003232:	30 2b       	mov	r11,2
-80003234:	fe 7c 24 00 	mov	r12,-56320
-80003238:	f0 1f 00 12 	mcall	80003280 <eic_int_handler2+0x60>
+80003242:	30 2b       	mov	r11,2
+80003244:	fe 7c 24 00 	mov	r12,-56320
+80003248:	f0 1f 00 12 	mcall	80003290 <eic_int_handler2+0x60>
 		//IRQ2 Pin 26 MCU --> Pin 24 T
 		//IRQ_STATUS = pal_trx_reg_read(RG_IRQ_STATUS);
 		//variable1=pal_trx_reg_read(RG_IRQ_STATUS);
 		//variable2=pal_trx_reg_read(RG_IRQ_MASK);
 		switch (IRQ_STATUS)
-8000323c:	0f 88       	ld.ub	r8,r7[0x0]
-8000323e:	30 49       	mov	r9,4
-80003240:	f2 08 18 00 	cp.b	r8,r9
-80003244:	c1 10       	breq	80003266 <eic_int_handler2+0x46>
-80003246:	30 89       	mov	r9,8
-80003248:	f2 08 18 00 	cp.b	r8,r9
-8000324c:	c1 21       	brne	80003270 <eic_int_handler2+0x50>
+8000324c:	0f 88       	ld.ub	r8,r7[0x0]
+8000324e:	30 49       	mov	r9,4
+80003250:	f2 08 18 00 	cp.b	r8,r9
+80003254:	c1 10       	breq	80003276 <eic_int_handler2+0x46>
+80003256:	30 89       	mov	r9,8
+80003258:	f2 08 18 00 	cp.b	r8,r9
+8000325c:	c1 21       	brne	80003280 <eic_int_handler2+0x50>
 		{
 			case TRX_IRQ_TRX_END:
 				escribir_linea_pc("\n\n --> Trama enviada :) :) \r\n");
-8000324e:	48 ec       	lddpc	r12,80003284 <eic_int_handler2+0x64>
-80003250:	f0 1f 00 0e 	mcall	80003288 <eic_int_handler2+0x68>
+8000325e:	48 ec       	lddpc	r12,80003294 <eic_int_handler2+0x64>
+80003260:	f0 1f 00 0e 	mcall	80003298 <eic_int_handler2+0x68>
  * \return The data byte
  *
  */
 static inline uint16_t spi_get(volatile avr32_spi_t *spi)
 {
 	return (spi->rdr >> AVR32_SPI_RDR_RD_OFFSET);
-80003254:	fe 78 40 00 	mov	r8,-49152
-80003258:	70 2c       	ld.w	r12,r8[0x8]
+80003264:	fe 78 40 00 	mov	r8,-49152
+80003268:	70 2c       	ld.w	r12,r8[0x8]
 				spi = (uint8_t) spi_get(AT86RFX_SPI);
-8000325a:	5c 5c       	castu.b	r12
-8000325c:	48 c8       	lddpc	r8,8000328c <eic_int_handler2+0x6c>
-8000325e:	b0 8c       	st.b	r8[0x0],r12
+8000326a:	5c 5c       	castu.b	r12
+8000326c:	48 c8       	lddpc	r8,8000329c <eic_int_handler2+0x6c>
+8000326e:	b0 8c       	st.b	r8[0x0],r12
 				escribir_linea_pc(spi);
-80003260:	f0 1f 00 0a 	mcall	80003288 <eic_int_handler2+0x68>
+80003270:	f0 1f 00 0a 	mcall	80003298 <eic_int_handler2+0x68>
 				
 			break;
-80003264:	c0 68       	rjmp	80003270 <eic_int_handler2+0x50>
-80003266:	fe 78 40 00 	mov	r8,-49152
-8000326a:	70 29       	ld.w	r9,r8[0x8]
+80003274:	c0 68       	rjmp	80003280 <eic_int_handler2+0x50>
+80003276:	fe 78 40 00 	mov	r8,-49152
+8000327a:	70 29       	ld.w	r9,r8[0x8]
 			case TRX_IRQ_RX_START:
 				spi = spi_get(AT86RFX_SPI);
-8000326c:	48 88       	lddpc	r8,8000328c <eic_int_handler2+0x6c>
-8000326e:	b0 89       	st.b	r8[0x0],r9
+8000327c:	48 88       	lddpc	r8,8000329c <eic_int_handler2+0x6c>
+8000327e:	b0 89       	st.b	r8[0x0],r9
 				//escribir_linea_pc(rxTrama()); // creo q se tendria que leer la interrupcion de la SPI
 			break;
 		}
 }
-80003270:	e3 cd 40 80 	ldm	sp++,r7,lr
-80003274:	d6 03       	rete
-80003276:	00 00       	add	r0,r0
-80003278:	80 00       	ld.sh	r0,r0[0x0]
-8000327a:	2d 50       	sub	r0,-43
-8000327c:	00 00       	add	r0,r0
-8000327e:	02 66       	and	r6,r1
-80003280:	80 00       	ld.sh	r0,r0[0x0]
-80003282:	23 cc       	sub	r12,60
-80003284:	80 00       	ld.sh	r0,r0[0x0]
-80003286:	3d b8       	mov	r8,-37
+80003280:	e3 cd 40 80 	ldm	sp++,r7,lr
+80003284:	d6 03       	rete
+80003286:	00 00       	add	r0,r0
 80003288:	80 00       	ld.sh	r0,r0[0x0]
-8000328a:	32 0c       	mov	r12,32
+8000328a:	2d 50       	sub	r0,-43
 8000328c:	00 00       	add	r0,r0
-8000328e:	02 65       	and	r5,r1
+8000328e:	02 7e       	tst	lr,r1
+80003290:	80 00       	ld.sh	r0,r0[0x0]
+80003292:	23 cc       	sub	r12,60
+80003294:	80 00       	ld.sh	r0,r0[0x0]
+80003296:	3d b8       	mov	r8,-37
+80003298:	80 00       	ld.sh	r0,r0[0x0]
+8000329a:	32 1c       	mov	r12,33
+8000329c:	00 00       	add	r0,r0
+8000329e:	02 7d       	tst	sp,r1
 
-80003290 <init_AT86RF212>:
+800032a0 <init_AT86RF212>:
 	}
 	delay_ms(1);
 }
 
 uint8_t init_AT86RF212(void)
 {
-80003290:	eb cd 40 80 	pushm	r7,lr
+800032a0:	eb cd 40 80 	pushm	r7,lr
 	escribir_linea_pc("\n Inicializando AT86RF212 \n\n");
-80003294:	4c 5c       	lddpc	r12,800033a8 <init_AT86RF212+0x118>
-80003296:	f0 1f 00 46 	mcall	800033ac <init_AT86RF212+0x11c>
+800032a4:	4c 5c       	lddpc	r12,800033b8 <init_AT86RF212+0x118>
+800032a6:	f0 1f 00 46 	mcall	800033bc <init_AT86RF212+0x11c>
 	Disable_global_interrupt();
-8000329a:	d3 03       	ssrf	0x10
+800032aa:	d3 03       	ssrf	0x10
 	
 	//SLP_TR_LOW();
 	
 	
 	//estadoPorPc();
 	reset();
-8000329c:	f0 1f 00 45 	mcall	800033b0 <init_AT86RF212+0x120>
+800032ac:	f0 1f 00 45 	mcall	800033c0 <init_AT86RF212+0x120>
 	//PAL_WAIT_1_US();
 	pal_trx_reg_write(RG_IRQ_MASK, 0x00);
-800032a0:	30 0b       	mov	r11,0
-800032a2:	30 ec       	mov	r12,14
-800032a4:	f0 1f 00 44 	mcall	800033b4 <init_AT86RF212+0x124>
+800032b0:	30 0b       	mov	r11,0
+800032b2:	30 ec       	mov	r12,14
+800032b4:	f0 1f 00 44 	mcall	800033c4 <init_AT86RF212+0x124>
 	pal_trx_reg_write(RG_TRX_STATE, CMD_FORCE_TRX_OFF); // Forzar el estado off
-800032a8:	30 3b       	mov	r11,3
-800032aa:	30 2c       	mov	r12,2
-800032ac:	f0 1f 00 42 	mcall	800033b4 <init_AT86RF212+0x124>
+800032b8:	30 3b       	mov	r11,3
+800032ba:	30 2c       	mov	r12,2
+800032bc:	f0 1f 00 42 	mcall	800033c4 <init_AT86RF212+0x124>
  * \param  delay:   (input) delay in CPU cycles before timeout.
  * \param  cpu_time: (output) internal information used by the timer API.
  */
 __always_inline static void cpu_set_timeout(unsigned long delay, t_cpu_time *cpu_time)
 {
   cpu_time->delay_start_cycle = Get_system_register(AVR32_COUNT);
-800032b0:	e1 b8 00 42 	mfsr	r8,0x108
+800032c0:	e1 b8 00 42 	mfsr	r8,0x108
   cpu_time->delay_end_cycle   = cpu_time->delay_start_cycle + delay;
-800032b4:	f0 ca ff ff 	sub	r10,r8,-1
+800032c4:	f0 ca ff ff 	sub	r10,r8,-1
  *
  * \return true if timeout occurred, otherwise false.
  */
 __always_inline static unsigned long cpu_is_timeout(t_cpu_time *cpu_time)
 {
   unsigned long current_cycle_count = Get_system_register(AVR32_COUNT);
-800032b8:	e1 b9 00 42 	mfsr	r9,0x108
+800032c8:	e1 b9 00 42 	mfsr	r9,0x108
   // Test if the timeout as already occurred.
   else if (cpu_time->timer_state == CPU_TIMER_STATE_REACHED)
     return true;
 
   // If the ending cycle count of this timeout is wrapped, ...
   else if (cpu_time->delay_start_cycle > cpu_time->delay_end_cycle)
-800032bc:	14 38       	cp.w	r8,r10
-800032be:	e0 88 00 08 	brls	800032ce <init_AT86RF212+0x3e>
+800032cc:	14 38       	cp.w	r8,r10
+800032ce:	e0 88 00 08 	brls	800032de <init_AT86RF212+0x3e>
   {
     if (current_cycle_count < cpu_time->delay_start_cycle && current_cycle_count > cpu_time->delay_end_cycle)
-800032c2:	12 38       	cp.w	r8,r9
-800032c4:	fe 98 ff fa 	brls	800032b8 <init_AT86RF212+0x28>
-800032c8:	12 3a       	cp.w	r10,r9
-800032ca:	c0 73       	brcs	800032d8 <init_AT86RF212+0x48>
-800032cc:	cf 6b       	rjmp	800032b8 <init_AT86RF212+0x28>
+800032d2:	12 38       	cp.w	r8,r9
+800032d4:	fe 98 ff fa 	brls	800032c8 <init_AT86RF212+0x28>
+800032d8:	12 3a       	cp.w	r10,r9
+800032da:	c0 73       	brcs	800032e8 <init_AT86RF212+0x48>
+800032dc:	cf 6b       	rjmp	800032c8 <init_AT86RF212+0x28>
     }
     return false;
   }
   else
   {
     if (current_cycle_count < cpu_time->delay_start_cycle || current_cycle_count > cpu_time->delay_end_cycle)
-800032ce:	12 38       	cp.w	r8,r9
-800032d0:	e0 8b 00 04 	brhi	800032d8 <init_AT86RF212+0x48>
-800032d4:	12 3a       	cp.w	r10,r9
-800032d6:	cf 12       	brcc	800032b8 <init_AT86RF212+0x28>
+800032de:	12 38       	cp.w	r8,r9
+800032e0:	e0 8b 00 04 	brhi	800032e8 <init_AT86RF212+0x48>
+800032e4:	12 3a       	cp.w	r10,r9
+800032e6:	cf 12       	brcc	800032c8 <init_AT86RF212+0x28>
 	DELAY_US(RST_PULSE_WIDTH_US); //tTR10
 	
 	//variable1=getStateAT86RF212();
 	while(getStateAT86RF212()!= CMD_TRX_OFF); // espero el estado off
-800032d8:	30 87       	mov	r7,8
-800032da:	f0 1f 00 38 	mcall	800033b8 <init_AT86RF212+0x128>
-800032de:	ee 0c 18 00 	cp.b	r12,r7
-800032e2:	cf c1       	brne	800032da <init_AT86RF212+0x4a>
+800032e8:	30 87       	mov	r7,8
+800032ea:	f0 1f 00 38 	mcall	800033c8 <init_AT86RF212+0x128>
+800032ee:	ee 0c 18 00 	cp.b	r12,r7
+800032f2:	cf c1       	brne	800032ea <init_AT86RF212+0x4a>
 	pal_trx_reg_write(RG_TRX_CTRL_0, 0x08);
-800032e4:	30 8b       	mov	r11,8
-800032e6:	30 3c       	mov	r12,3
-800032e8:	f0 1f 00 33 	mcall	800033b4 <init_AT86RF212+0x124>
+800032f4:	30 8b       	mov	r11,8
+800032f6:	30 3c       	mov	r12,3
+800032f8:	f0 1f 00 33 	mcall	800033c4 <init_AT86RF212+0x124>
 	//pal_trx_reg_write(RG_PHY_CC_CCA,||SR_SUB_MODE); // 914Mhz set channel ->
 
 	pal_trx_reg_write(RG_TRX_CTRL_1, 0x2E); // 1 -> TX AUTO_CRC && SPI_CMD_MODE -> 3 && 1-> IRQ_MASK_MODE
-800032ec:	32 eb       	mov	r11,46
-800032ee:	30 4c       	mov	r12,4
-800032f0:	f0 1f 00 31 	mcall	800033b4 <init_AT86RF212+0x124>
+800032fc:	32 eb       	mov	r11,46
+800032fe:	30 4c       	mov	r12,4
+80003300:	f0 1f 00 31 	mcall	800033c4 <init_AT86RF212+0x124>
 	//PAL_WAIT_1_US();
 	pal_trx_reg_write(RG_IRQ_MASK, 0x0C);
-800032f4:	30 cb       	mov	r11,12
-800032f6:	30 ec       	mov	r12,14
-800032f8:	f0 1f 00 2f 	mcall	800033b4 <init_AT86RF212+0x124>
+80003304:	30 cb       	mov	r11,12
+80003306:	30 ec       	mov	r12,14
+80003308:	f0 1f 00 2f 	mcall	800033c4 <init_AT86RF212+0x124>
  * \param  delay:   (input) delay in CPU cycles before timeout.
  * \param  cpu_time: (output) internal information used by the timer API.
  */
 __always_inline static void cpu_set_timeout(unsigned long delay, t_cpu_time *cpu_time)
 {
   cpu_time->delay_start_cycle = Get_system_register(AVR32_COUNT);
-800032fc:	e1 b8 00 42 	mfsr	r8,0x108
+8000330c:	e1 b8 00 42 	mfsr	r8,0x108
   cpu_time->delay_end_cycle   = cpu_time->delay_start_cycle + delay;
-80003300:	f0 ca ff ff 	sub	r10,r8,-1
+80003310:	f0 ca ff ff 	sub	r10,r8,-1
  *
  * \return true if timeout occurred, otherwise false.
  */
 __always_inline static unsigned long cpu_is_timeout(t_cpu_time *cpu_time)
 {
   unsigned long current_cycle_count = Get_system_register(AVR32_COUNT);
-80003304:	e1 b9 00 42 	mfsr	r9,0x108
+80003314:	e1 b9 00 42 	mfsr	r9,0x108
   // Test if the timeout as already occurred.
   else if (cpu_time->timer_state == CPU_TIMER_STATE_REACHED)
     return true;
 
   // If the ending cycle count of this timeout is wrapped, ...
   else if (cpu_time->delay_start_cycle > cpu_time->delay_end_cycle)
-80003308:	14 38       	cp.w	r8,r10
-8000330a:	e0 88 00 08 	brls	8000331a <init_AT86RF212+0x8a>
+80003318:	14 38       	cp.w	r8,r10
+8000331a:	e0 88 00 08 	brls	8000332a <init_AT86RF212+0x8a>
   {
     if (current_cycle_count < cpu_time->delay_start_cycle && current_cycle_count > cpu_time->delay_end_cycle)
-8000330e:	12 38       	cp.w	r8,r9
-80003310:	fe 98 ff fa 	brls	80003304 <init_AT86RF212+0x74>
-80003314:	12 3a       	cp.w	r10,r9
-80003316:	c3 53       	brcs	80003380 <init_AT86RF212+0xf0>
-80003318:	cf 6b       	rjmp	80003304 <init_AT86RF212+0x74>
+8000331e:	12 38       	cp.w	r8,r9
+80003320:	fe 98 ff fa 	brls	80003314 <init_AT86RF212+0x74>
+80003324:	12 3a       	cp.w	r10,r9
+80003326:	c3 53       	brcs	80003390 <init_AT86RF212+0xf0>
+80003328:	cf 6b       	rjmp	80003314 <init_AT86RF212+0x74>
     }
     return false;
   }
   else
   {
     if (current_cycle_count < cpu_time->delay_start_cycle || current_cycle_count > cpu_time->delay_end_cycle)
-8000331a:	12 38       	cp.w	r8,r9
-8000331c:	e0 8b 00 32 	brhi	80003380 <init_AT86RF212+0xf0>
-80003320:	12 3a       	cp.w	r10,r9
-80003322:	c2 f3       	brcs	80003380 <init_AT86RF212+0xf0>
-80003324:	cf 0b       	rjmp	80003304 <init_AT86RF212+0x74>
+8000332a:	12 38       	cp.w	r8,r9
+8000332c:	e0 8b 00 32 	brhi	80003390 <init_AT86RF212+0xf0>
+80003330:	12 3a       	cp.w	r10,r9
+80003332:	c2 f3       	brcs	80003390 <init_AT86RF212+0xf0>
+80003334:	cf 0b       	rjmp	80003314 <init_AT86RF212+0x74>
  *
  * \return true if timeout occurred, otherwise false.
  */
 __always_inline static unsigned long cpu_is_timeout(t_cpu_time *cpu_time)
 {
   unsigned long current_cycle_count = Get_system_register(AVR32_COUNT);
-80003326:	e1 b9 00 42 	mfsr	r9,0x108
+80003336:	e1 b9 00 42 	mfsr	r9,0x108
   // Test if the timeout as already occurred.
   else if (cpu_time->timer_state == CPU_TIMER_STATE_REACHED)
     return true;
 
   // If the ending cycle count of this timeout is wrapped, ...
   else if (cpu_time->delay_start_cycle > cpu_time->delay_end_cycle)
-8000332a:	14 38       	cp.w	r8,r10
-8000332c:	e0 88 00 08 	brls	8000333c <init_AT86RF212+0xac>
+8000333a:	14 38       	cp.w	r8,r10
+8000333c:	e0 88 00 08 	brls	8000334c <init_AT86RF212+0xac>
   {
     if (current_cycle_count < cpu_time->delay_start_cycle && current_cycle_count > cpu_time->delay_end_cycle)
-80003330:	12 38       	cp.w	r8,r9
-80003332:	fe 98 ff fa 	brls	80003326 <init_AT86RF212+0x96>
-80003336:	12 3a       	cp.w	r10,r9
-80003338:	c2 d3       	brcs	80003392 <init_AT86RF212+0x102>
-8000333a:	cf 6b       	rjmp	80003326 <init_AT86RF212+0x96>
+80003340:	12 38       	cp.w	r8,r9
+80003342:	fe 98 ff fa 	brls	80003336 <init_AT86RF212+0x96>
+80003346:	12 3a       	cp.w	r10,r9
+80003348:	c2 d3       	brcs	800033a2 <init_AT86RF212+0x102>
+8000334a:	cf 6b       	rjmp	80003336 <init_AT86RF212+0x96>
     }
     return false;
   }
   else
   {
     if (current_cycle_count < cpu_time->delay_start_cycle || current_cycle_count > cpu_time->delay_end_cycle)
-8000333c:	12 38       	cp.w	r8,r9
-8000333e:	e0 8b 00 2a 	brhi	80003392 <init_AT86RF212+0x102>
-80003342:	12 3a       	cp.w	r10,r9
-80003344:	c2 73       	brcs	80003392 <init_AT86RF212+0x102>
-80003346:	cf 0b       	rjmp	80003326 <init_AT86RF212+0x96>
+8000334c:	12 38       	cp.w	r8,r9
+8000334e:	e0 8b 00 2a 	brhi	800033a2 <init_AT86RF212+0x102>
+80003352:	12 3a       	cp.w	r10,r9
+80003354:	c2 73       	brcs	800033a2 <init_AT86RF212+0x102>
+80003356:	cf 0b       	rjmp	80003336 <init_AT86RF212+0x96>
  *
  * \return true if timeout occurred, otherwise false.
  */
 __always_inline static unsigned long cpu_is_timeout(t_cpu_time *cpu_time)
 {
   unsigned long current_cycle_count = Get_system_register(AVR32_COUNT);
-80003348:	e1 b9 00 42 	mfsr	r9,0x108
+80003358:	e1 b9 00 42 	mfsr	r9,0x108
   // Test if the timeout as already occurred.
   else if (cpu_time->timer_state == CPU_TIMER_STATE_REACHED)
     return true;
 
   // If the ending cycle count of this timeout is wrapped, ...
   else if (cpu_time->delay_start_cycle > cpu_time->delay_end_cycle)
-8000334c:	14 38       	cp.w	r8,r10
-8000334e:	e0 88 00 08 	brls	8000335e <init_AT86RF212+0xce>
+8000335c:	14 38       	cp.w	r8,r10
+8000335e:	e0 88 00 08 	brls	8000336e <init_AT86RF212+0xce>
   {
     if (current_cycle_count < cpu_time->delay_start_cycle && current_cycle_count > cpu_time->delay_end_cycle)
-80003352:	12 38       	cp.w	r8,r9
-80003354:	fe 98 ff fa 	brls	80003348 <init_AT86RF212+0xb8>
-80003358:	12 3a       	cp.w	r10,r9
-8000335a:	c0 73       	brcs	80003368 <init_AT86RF212+0xd8>
-8000335c:	cf 6b       	rjmp	80003348 <init_AT86RF212+0xb8>
+80003362:	12 38       	cp.w	r8,r9
+80003364:	fe 98 ff fa 	brls	80003358 <init_AT86RF212+0xb8>
+80003368:	12 3a       	cp.w	r10,r9
+8000336a:	c0 73       	brcs	80003378 <init_AT86RF212+0xd8>
+8000336c:	cf 6b       	rjmp	80003358 <init_AT86RF212+0xb8>
     }
     return false;
   }
   else
   {
     if (current_cycle_count < cpu_time->delay_start_cycle || current_cycle_count > cpu_time->delay_end_cycle)
-8000335e:	12 38       	cp.w	r8,r9
-80003360:	e0 8b 00 04 	brhi	80003368 <init_AT86RF212+0xd8>
-80003364:	12 3a       	cp.w	r10,r9
-80003366:	cf 12       	brcc	80003348 <init_AT86RF212+0xb8>
+8000336e:	12 38       	cp.w	r8,r9
+80003370:	e0 8b 00 04 	brhi	80003378 <init_AT86RF212+0xd8>
+80003374:	12 3a       	cp.w	r10,r9
+80003376:	cf 12       	brcc	80003358 <init_AT86RF212+0xb8>
 	//PAL_WAIT_1_US();
 	promiscuous_mode();
 	pal_trx_reg_write(RG_TRX_STATE, CMD_FORCE_PLL_ON);// seteo el tran en 
 // 	variable1=getStateAT86RF212();
 	DELAY_US(TIME_TRX_OFF_PLL_ON );
  	while (getStateAT86RF212()!=CMD_PLL_ON);
-80003368:	30 97       	mov	r7,9
-8000336a:	f0 1f 00 14 	mcall	800033b8 <init_AT86RF212+0x128>
-8000336e:	ee 0c 18 00 	cp.b	r12,r7
-80003372:	cf c1       	brne	8000336a <init_AT86RF212+0xda>
+80003378:	30 97       	mov	r7,9
+8000337a:	f0 1f 00 14 	mcall	800033c8 <init_AT86RF212+0x128>
+8000337e:	ee 0c 18 00 	cp.b	r12,r7
+80003382:	cf c1       	brne	8000337a <init_AT86RF212+0xda>
 	//cpu_irq_enable();
 	Enable_global_interrupt();
-80003374:	d5 03       	csrf	0x10
+80003384:	d5 03       	csrf	0x10
 	escribir_linea_pc("\n Terminando configuracion AT86RF212 \n\n");
-80003376:	49 2c       	lddpc	r12,800033bc <init_AT86RF212+0x12c>
-80003378:	f0 1f 00 0d 	mcall	800033ac <init_AT86RF212+0x11c>
+80003386:	49 2c       	lddpc	r12,800033cc <init_AT86RF212+0x12c>
+80003388:	f0 1f 00 0d 	mcall	800033bc <init_AT86RF212+0x11c>
 }
-8000337c:	e3 cd 80 80 	ldm	sp++,r7,pc
+8000338c:	e3 cd 80 80 	ldm	sp++,r7,pc
 
 	pal_trx_reg_write(RG_TRX_CTRL_1, 0x2E); // 1 -> TX AUTO_CRC && SPI_CMD_MODE -> 3 && 1-> IRQ_MASK_MODE
 	//PAL_WAIT_1_US();
 	pal_trx_reg_write(RG_IRQ_MASK, 0x0C);
 	PAL_WAIT_1_US();
 	pal_trx_reg_write(RG_TRX_CTRL_2, 0x28); // O-QPSK 100kb/s
-80003380:	32 8b       	mov	r11,40
-80003382:	30 cc       	mov	r12,12
-80003384:	f0 1f 00 0c 	mcall	800033b4 <init_AT86RF212+0x124>
+80003390:	32 8b       	mov	r11,40
+80003392:	30 cc       	mov	r12,12
+80003394:	f0 1f 00 0c 	mcall	800033c4 <init_AT86RF212+0x124>
  * \param  delay:   (input) delay in CPU cycles before timeout.
  * \param  cpu_time: (output) internal information used by the timer API.
  */
 __always_inline static void cpu_set_timeout(unsigned long delay, t_cpu_time *cpu_time)
 {
   cpu_time->delay_start_cycle = Get_system_register(AVR32_COUNT);
-80003388:	e1 b8 00 42 	mfsr	r8,0x108
+80003398:	e1 b8 00 42 	mfsr	r8,0x108
   cpu_time->delay_end_cycle   = cpu_time->delay_start_cycle + delay;
-8000338c:	f0 ca ff ff 	sub	r10,r8,-1
-80003390:	cc bb       	rjmp	80003326 <init_AT86RF212+0x96>
+8000339c:	f0 ca ff ff 	sub	r10,r8,-1
+800033a0:	cc bb       	rjmp	80003336 <init_AT86RF212+0x96>
 	//pal_trx_reg_write(RG_TRX_CTRL_2, 0x29); // O-QPSK 200kb/s
 	PAL_WAIT_1_US();
 	//pal_trx_reg_write(RG_XOSC_CTRL, 0x40); // manejo del cristal externo y capacitores
 	//PAL_WAIT_1_US();
 	promiscuous_mode();
-80003392:	f0 1f 00 0c 	mcall	800033c0 <init_AT86RF212+0x130>
+800033a2:	f0 1f 00 0c 	mcall	800033d0 <init_AT86RF212+0x130>
 	pal_trx_reg_write(RG_TRX_STATE, CMD_FORCE_PLL_ON);// seteo el tran en 
-80003396:	30 4b       	mov	r11,4
-80003398:	30 2c       	mov	r12,2
-8000339a:	f0 1f 00 07 	mcall	800033b4 <init_AT86RF212+0x124>
+800033a6:	30 4b       	mov	r11,4
+800033a8:	30 2c       	mov	r12,2
+800033aa:	f0 1f 00 07 	mcall	800033c4 <init_AT86RF212+0x124>
  * \param  delay:   (input) delay in CPU cycles before timeout.
  * \param  cpu_time: (output) internal information used by the timer API.
  */
 __always_inline static void cpu_set_timeout(unsigned long delay, t_cpu_time *cpu_time)
 {
   cpu_time->delay_start_cycle = Get_system_register(AVR32_COUNT);
-8000339e:	e1 b8 00 42 	mfsr	r8,0x108
+800033ae:	e1 b8 00 42 	mfsr	r8,0x108
   cpu_time->delay_end_cycle   = cpu_time->delay_start_cycle + delay;
-800033a2:	f0 ca ff f3 	sub	r10,r8,-13
-800033a6:	cd 1b       	rjmp	80003348 <init_AT86RF212+0xb8>
-800033a8:	80 00       	ld.sh	r0,r0[0x0]
-800033aa:	3e 10       	mov	r0,-31
-800033ac:	80 00       	ld.sh	r0,r0[0x0]
-800033ae:	32 0c       	mov	r12,32
-800033b0:	80 00       	ld.sh	r0,r0[0x0]
-800033b2:	30 68       	mov	r8,6
-800033b4:	80 00       	ld.sh	r0,r0[0x0]
-800033b6:	2c e4       	sub	r4,-50
+800033b2:	f0 ca ff f3 	sub	r10,r8,-13
+800033b6:	cd 1b       	rjmp	80003358 <init_AT86RF212+0xb8>
 800033b8:	80 00       	ld.sh	r0,r0[0x0]
-800033ba:	2f 54       	sub	r4,-11
+800033ba:	3e 10       	mov	r0,-31
 800033bc:	80 00       	ld.sh	r0,r0[0x0]
-800033be:	3e 30       	mov	r0,-29
+800033be:	32 1c       	mov	r12,33
 800033c0:	80 00       	ld.sh	r0,r0[0x0]
-800033c2:	2e 8c       	sub	r12,-24
+800033c2:	30 78       	mov	r8,7
+800033c4:	80 00       	ld.sh	r0,r0[0x0]
+800033c6:	2c e4       	sub	r4,-50
+800033c8:	80 00       	ld.sh	r0,r0[0x0]
+800033ca:	2f 64       	sub	r4,-10
+800033cc:	80 00       	ld.sh	r0,r0[0x0]
+800033ce:	3e 30       	mov	r0,-29
+800033d0:	80 00       	ld.sh	r0,r0[0x0]
+800033d2:	2e 9c       	sub	r12,-23
 
-800033c4 <estadoPorPc>:
+800033d4 <estadoPorPc>:
 	RST_LOW();
 	pal_trx_reg_write(RG_TRX_CTRL_0,0x08);
 	//pal_trx_reg_write(RG_TRX_STATE,CMD_FORCE_TRX_OFF);
 	
 }
 void estadoPorPc(){
-800033c4:	d4 01       	pushm	lr
+800033d4:	d4 01       	pushm	lr
  * \param  delay:   (input) delay in CPU cycles before timeout.
  * \param  cpu_time: (output) internal information used by the timer API.
  */
 __always_inline static void cpu_set_timeout(unsigned long delay, t_cpu_time *cpu_time)
 {
   cpu_time->delay_start_cycle = Get_system_register(AVR32_COUNT);
-800033c6:	e1 b8 00 42 	mfsr	r8,0x108
+800033d6:	e1 b8 00 42 	mfsr	r8,0x108
   cpu_time->delay_end_cycle   = cpu_time->delay_start_cycle + delay;
-800033ca:	f0 ca ff 8d 	sub	r10,r8,-115
+800033da:	f0 ca ff 8d 	sub	r10,r8,-115
  *
  * \return true if timeout occurred, otherwise false.
  */
 __always_inline static unsigned long cpu_is_timeout(t_cpu_time *cpu_time)
 {
   unsigned long current_cycle_count = Get_system_register(AVR32_COUNT);
-800033ce:	e1 b9 00 42 	mfsr	r9,0x108
+800033de:	e1 b9 00 42 	mfsr	r9,0x108
   // Test if the timeout as already occurred.
   else if (cpu_time->timer_state == CPU_TIMER_STATE_REACHED)
     return true;
 
   // If the ending cycle count of this timeout is wrapped, ...
   else if (cpu_time->delay_start_cycle > cpu_time->delay_end_cycle)
-800033d2:	14 38       	cp.w	r8,r10
-800033d4:	e0 88 00 08 	brls	800033e4 <estadoPorPc+0x20>
+800033e2:	14 38       	cp.w	r8,r10
+800033e4:	e0 88 00 08 	brls	800033f4 <estadoPorPc+0x20>
   {
     if (current_cycle_count < cpu_time->delay_start_cycle && current_cycle_count > cpu_time->delay_end_cycle)
-800033d8:	12 38       	cp.w	r8,r9
-800033da:	fe 98 ff fa 	brls	800033ce <estadoPorPc+0xa>
-800033de:	12 3a       	cp.w	r10,r9
-800033e0:	c5 13       	brcs	80003482 <estadoPorPc+0xbe>
-800033e2:	cf 6b       	rjmp	800033ce <estadoPorPc+0xa>
+800033e8:	12 38       	cp.w	r8,r9
+800033ea:	fe 98 ff fa 	brls	800033de <estadoPorPc+0xa>
+800033ee:	12 3a       	cp.w	r10,r9
+800033f0:	c5 13       	brcs	80003492 <estadoPorPc+0xbe>
+800033f2:	cf 6b       	rjmp	800033de <estadoPorPc+0xa>
     }
     return false;
   }
   else
   {
     if (current_cycle_count < cpu_time->delay_start_cycle || current_cycle_count > cpu_time->delay_end_cycle)
-800033e4:	12 38       	cp.w	r8,r9
-800033e6:	e0 8b 00 4e 	brhi	80003482 <estadoPorPc+0xbe>
-800033ea:	12 3a       	cp.w	r10,r9
-800033ec:	c4 b3       	brcs	80003482 <estadoPorPc+0xbe>
-800033ee:	cf 0b       	rjmp	800033ce <estadoPorPc+0xa>
+800033f4:	12 38       	cp.w	r8,r9
+800033f6:	e0 8b 00 4e 	brhi	80003492 <estadoPorPc+0xbe>
+800033fa:	12 3a       	cp.w	r10,r9
+800033fc:	c4 b3       	brcs	80003492 <estadoPorPc+0xbe>
+800033fe:	cf 0b       	rjmp	800033de <estadoPorPc+0xa>
 	delay_ms(1);
 	switch (getStateAT86RF212()){
 		case P_ON:
 		escribir_linea_pc("\r\n AT86RF212 en estado ON\n");
-800033f0:	4a 9c       	lddpc	r12,80003494 <estadoPorPc+0xd0>
-800033f2:	f0 1f 00 2a 	mcall	80003498 <estadoPorPc+0xd4>
+80003400:	4a 9c       	lddpc	r12,800034a4 <estadoPorPc+0xd0>
+80003402:	f0 1f 00 2a 	mcall	800034a8 <estadoPorPc+0xd4>
 		break;
-800033f6:	c3 18       	rjmp	80003458 <estadoPorPc+0x94>
+80003406:	c3 18       	rjmp	80003468 <estadoPorPc+0x94>
 		case BUSY_RX:
 		escribir_linea_pc("\r\n AT86RF212 en estado BUSY_RX\n");
-800033f8:	4a 9c       	lddpc	r12,8000349c <estadoPorPc+0xd8>
-800033fa:	f0 1f 00 28 	mcall	80003498 <estadoPorPc+0xd4>
+80003408:	4a 9c       	lddpc	r12,800034ac <estadoPorPc+0xd8>
+8000340a:	f0 1f 00 28 	mcall	800034a8 <estadoPorPc+0xd4>
 		break;
-800033fe:	c2 d8       	rjmp	80003458 <estadoPorPc+0x94>
+8000340e:	c2 d8       	rjmp	80003468 <estadoPorPc+0x94>
 		case RX_ON:
 		escribir_linea_pc("\r\n AT86RF212 en estado RX\n");
-80003400:	4a 8c       	lddpc	r12,800034a0 <estadoPorPc+0xdc>
-80003402:	f0 1f 00 26 	mcall	80003498 <estadoPorPc+0xd4>
+80003410:	4a 8c       	lddpc	r12,800034b0 <estadoPorPc+0xdc>
+80003412:	f0 1f 00 26 	mcall	800034a8 <estadoPorPc+0xd4>
 		break;
-80003406:	c2 98       	rjmp	80003458 <estadoPorPc+0x94>
+80003416:	c2 98       	rjmp	80003468 <estadoPorPc+0x94>
 		case TRX_OFF:
 		escribir_linea_pc("\r\n AT86RF212 en estado TRX_OFF \n");
-80003408:	4a 7c       	lddpc	r12,800034a4 <estadoPorPc+0xe0>
-8000340a:	f0 1f 00 24 	mcall	80003498 <estadoPorPc+0xd4>
+80003418:	4a 7c       	lddpc	r12,800034b4 <estadoPorPc+0xe0>
+8000341a:	f0 1f 00 24 	mcall	800034a8 <estadoPorPc+0xd4>
 		break;
-8000340e:	c2 58       	rjmp	80003458 <estadoPorPc+0x94>
+8000341e:	c2 58       	rjmp	80003468 <estadoPorPc+0x94>
 		case PLL_ON:
 		escribir_linea_pc("\r\n AT86RF212 en estado PLL_ON\n");
-80003410:	4a 6c       	lddpc	r12,800034a8 <estadoPorPc+0xe4>
-80003412:	f0 1f 00 22 	mcall	80003498 <estadoPorPc+0xd4>
+80003420:	4a 6c       	lddpc	r12,800034b8 <estadoPorPc+0xe4>
+80003422:	f0 1f 00 22 	mcall	800034a8 <estadoPorPc+0xd4>
 		break;
-80003416:	c2 18       	rjmp	80003458 <estadoPorPc+0x94>
+80003426:	c2 18       	rjmp	80003468 <estadoPorPc+0x94>
 		case TRX_SLEEP:
 		escribir_linea_pc("\r\n AT86RF212 en estado TRX_SLEEP \n");
-80003418:	4a 5c       	lddpc	r12,800034ac <estadoPorPc+0xe8>
-8000341a:	f0 1f 00 20 	mcall	80003498 <estadoPorPc+0xd4>
+80003428:	4a 5c       	lddpc	r12,800034bc <estadoPorPc+0xe8>
+8000342a:	f0 1f 00 20 	mcall	800034a8 <estadoPorPc+0xd4>
 		break;
-8000341e:	c1 d8       	rjmp	80003458 <estadoPorPc+0x94>
+8000342e:	c1 d8       	rjmp	80003468 <estadoPorPc+0x94>
 		case BUSY_RX_AACK:
 		escribir_linea_pc("\r\n AT86RF212 en estado BUSY_RX_AACK\n");
-80003420:	4a 4c       	lddpc	r12,800034b0 <estadoPorPc+0xec>
-80003422:	f0 1f 00 1e 	mcall	80003498 <estadoPorPc+0xd4>
+80003430:	4a 4c       	lddpc	r12,800034c0 <estadoPorPc+0xec>
+80003432:	f0 1f 00 1e 	mcall	800034a8 <estadoPorPc+0xd4>
 		break;
-80003426:	c1 98       	rjmp	80003458 <estadoPorPc+0x94>
+80003436:	c1 98       	rjmp	80003468 <estadoPorPc+0x94>
 		case BUSY_TX_ARET:
 		escribir_linea_pc("\r\n AT86RF212 en estado BUSY_TX_ARET \n");
-80003428:	4a 3c       	lddpc	r12,800034b4 <estadoPorPc+0xf0>
-8000342a:	f0 1f 00 1c 	mcall	80003498 <estadoPorPc+0xd4>
+80003438:	4a 3c       	lddpc	r12,800034c4 <estadoPorPc+0xf0>
+8000343a:	f0 1f 00 1c 	mcall	800034a8 <estadoPorPc+0xd4>
 		break;
-8000342e:	c1 58       	rjmp	80003458 <estadoPorPc+0x94>
+8000343e:	c1 58       	rjmp	80003468 <estadoPorPc+0x94>
 		case RX_AACK_ON:
 		escribir_linea_pc("\r\n AT86RF212 en estado RX_AACK_ON\n");
-80003430:	4a 2c       	lddpc	r12,800034b8 <estadoPorPc+0xf4>
-80003432:	f0 1f 00 1a 	mcall	80003498 <estadoPorPc+0xd4>
+80003440:	4a 2c       	lddpc	r12,800034c8 <estadoPorPc+0xf4>
+80003442:	f0 1f 00 1a 	mcall	800034a8 <estadoPorPc+0xd4>
 		break;
-80003436:	c1 18       	rjmp	80003458 <estadoPorPc+0x94>
+80003446:	c1 18       	rjmp	80003468 <estadoPorPc+0x94>
 		case CMD_TX_ARET_ON:
 		escribir_linea_pc("\r\n AT86RF212 en estado TX_ARET_ON\n");
-80003438:	4a 1c       	lddpc	r12,800034bc <estadoPorPc+0xf8>
-8000343a:	f0 1f 00 18 	mcall	80003498 <estadoPorPc+0xd4>
+80003448:	4a 1c       	lddpc	r12,800034cc <estadoPorPc+0xf8>
+8000344a:	f0 1f 00 18 	mcall	800034a8 <estadoPorPc+0xd4>
 		case RX_ON_NOCLK :
 		escribir_linea_pc("\r\n AT86RF212 en estado RX_ON_NOCLK \n");
-8000343e:	4a 1c       	lddpc	r12,800034c0 <estadoPorPc+0xfc>
-80003440:	f0 1f 00 16 	mcall	80003498 <estadoPorPc+0xd4>
+8000344e:	4a 1c       	lddpc	r12,800034d0 <estadoPorPc+0xfc>
+80003450:	f0 1f 00 16 	mcall	800034a8 <estadoPorPc+0xd4>
 		case RX_AACK_ON_NOCLK:
 		escribir_linea_pc("\r\n AT86RF212 en estado RX_AACK_ON_NOCLK \n");
-80003444:	4a 0c       	lddpc	r12,800034c4 <estadoPorPc+0x100>
-80003446:	f0 1f 00 15 	mcall	80003498 <estadoPorPc+0xd4>
+80003454:	4a 0c       	lddpc	r12,800034d4 <estadoPorPc+0x100>
+80003456:	f0 1f 00 15 	mcall	800034a8 <estadoPorPc+0xd4>
 		case STATE_TRANSITION_IN_PROGRESS:
 		escribir_linea_pc("\r\n :'(  STATE_TRANSITION_IN_PROGRESS ");
-8000344a:	4a 0c       	lddpc	r12,800034c8 <estadoPorPc+0x104>
-8000344c:	f0 1f 00 13 	mcall	80003498 <estadoPorPc+0xd4>
+8000345a:	4a 0c       	lddpc	r12,800034d8 <estadoPorPc+0x104>
+8000345c:	f0 1f 00 13 	mcall	800034a8 <estadoPorPc+0xd4>
 		break;
-80003450:	c0 48       	rjmp	80003458 <estadoPorPc+0x94>
+80003460:	c0 48       	rjmp	80003468 <estadoPorPc+0x94>
 		
 		default:
 		escribir_linea_pc("\r\n estado no contemplado");
-80003452:	49 fc       	lddpc	r12,800034cc <estadoPorPc+0x108>
-80003454:	f0 1f 00 11 	mcall	80003498 <estadoPorPc+0xd4>
+80003462:	49 fc       	lddpc	r12,800034dc <estadoPorPc+0x108>
+80003464:	f0 1f 00 11 	mcall	800034a8 <estadoPorPc+0xd4>
  * \param  delay:   (input) delay in CPU cycles before timeout.
  * \param  cpu_time: (output) internal information used by the timer API.
  */
 __always_inline static void cpu_set_timeout(unsigned long delay, t_cpu_time *cpu_time)
 {
   cpu_time->delay_start_cycle = Get_system_register(AVR32_COUNT);
-80003458:	e1 b8 00 42 	mfsr	r8,0x108
+80003468:	e1 b8 00 42 	mfsr	r8,0x108
   cpu_time->delay_end_cycle   = cpu_time->delay_start_cycle + delay;
-8000345c:	f0 ca ff 8d 	sub	r10,r8,-115
+8000346c:	f0 ca ff 8d 	sub	r10,r8,-115
  *
  * \return true if timeout occurred, otherwise false.
  */
 __always_inline static unsigned long cpu_is_timeout(t_cpu_time *cpu_time)
 {
   unsigned long current_cycle_count = Get_system_register(AVR32_COUNT);
-80003460:	e1 b9 00 42 	mfsr	r9,0x108
+80003470:	e1 b9 00 42 	mfsr	r9,0x108
   // Test if the timeout as already occurred.
   else if (cpu_time->timer_state == CPU_TIMER_STATE_REACHED)
     return true;
 
   // If the ending cycle count of this timeout is wrapped, ...
   else if (cpu_time->delay_start_cycle > cpu_time->delay_end_cycle)
-80003464:	14 38       	cp.w	r8,r10
-80003466:	e0 88 00 08 	brls	80003476 <estadoPorPc+0xb2>
+80003474:	14 38       	cp.w	r8,r10
+80003476:	e0 88 00 08 	brls	80003486 <estadoPorPc+0xb2>
   {
     if (current_cycle_count < cpu_time->delay_start_cycle && current_cycle_count > cpu_time->delay_end_cycle)
-8000346a:	12 38       	cp.w	r8,r9
-8000346c:	fe 98 ff fa 	brls	80003460 <estadoPorPc+0x9c>
-80003470:	12 3a       	cp.w	r10,r9
-80003472:	c1 03       	brcs	80003492 <estadoPorPc+0xce>
-80003474:	cf 6b       	rjmp	80003460 <estadoPorPc+0x9c>
+8000347a:	12 38       	cp.w	r8,r9
+8000347c:	fe 98 ff fa 	brls	80003470 <estadoPorPc+0x9c>
+80003480:	12 3a       	cp.w	r10,r9
+80003482:	c1 03       	brcs	800034a2 <estadoPorPc+0xce>
+80003484:	cf 6b       	rjmp	80003470 <estadoPorPc+0x9c>
     }
     return false;
   }
   else
   {
     if (current_cycle_count < cpu_time->delay_start_cycle || current_cycle_count > cpu_time->delay_end_cycle)
-80003476:	12 38       	cp.w	r8,r9
-80003478:	e0 8b 00 0d 	brhi	80003492 <estadoPorPc+0xce>
-8000347c:	12 3a       	cp.w	r10,r9
-8000347e:	c0 a3       	brcs	80003492 <estadoPorPc+0xce>
-80003480:	cf 0b       	rjmp	80003460 <estadoPorPc+0x9c>
+80003486:	12 38       	cp.w	r8,r9
+80003488:	e0 8b 00 0d 	brhi	800034a2 <estadoPorPc+0xce>
+8000348c:	12 3a       	cp.w	r10,r9
+8000348e:	c0 a3       	brcs	800034a2 <estadoPorPc+0xce>
+80003490:	cf 0b       	rjmp	80003470 <estadoPorPc+0x9c>
 	//pal_trx_reg_write(RG_TRX_STATE,CMD_FORCE_TRX_OFF);
 	
 }
 void estadoPorPc(){
 	delay_ms(1);
 	switch (getStateAT86RF212()){
-80003482:	f0 1f 00 14 	mcall	800034d0 <estadoPorPc+0x10c>
-80003486:	59 fc       	cp.w	r12,31
-80003488:	fe 9b ff e5 	brhi	80003452 <estadoPorPc+0x8e>
-8000348c:	49 28       	lddpc	r8,800034d4 <estadoPorPc+0x110>
-8000348e:	f0 0c 03 2f 	ld.w	pc,r8[r12<<0x2]
-80003492:	d8 02       	popm	pc
-80003494:	80 00       	ld.sh	r0,r0[0x0]
-80003496:	3e 58       	mov	r8,-27
-80003498:	80 00       	ld.sh	r0,r0[0x0]
-8000349a:	32 0c       	mov	r12,32
-8000349c:	80 00       	ld.sh	r0,r0[0x0]
-8000349e:	3e 74       	mov	r4,-25
-800034a0:	80 00       	ld.sh	r0,r0[0x0]
-800034a2:	3e 94       	mov	r4,-23
+80003492:	f0 1f 00 14 	mcall	800034e0 <estadoPorPc+0x10c>
+80003496:	59 fc       	cp.w	r12,31
+80003498:	fe 9b ff e5 	brhi	80003462 <estadoPorPc+0x8e>
+8000349c:	49 28       	lddpc	r8,800034e4 <estadoPorPc+0x110>
+8000349e:	f0 0c 03 2f 	ld.w	pc,r8[r12<<0x2]
+800034a2:	d8 02       	popm	pc
 800034a4:	80 00       	ld.sh	r0,r0[0x0]
-800034a6:	3e b0       	mov	r0,-21
+800034a6:	3e 58       	mov	r8,-27
 800034a8:	80 00       	ld.sh	r0,r0[0x0]
-800034aa:	3e d4       	mov	r4,-19
+800034aa:	32 1c       	mov	r12,33
 800034ac:	80 00       	ld.sh	r0,r0[0x0]
-800034ae:	3e f4       	mov	r4,-17
+800034ae:	3e 74       	mov	r4,-25
 800034b0:	80 00       	ld.sh	r0,r0[0x0]
-800034b2:	3f 18       	mov	r8,-15
+800034b2:	3e 94       	mov	r4,-23
 800034b4:	80 00       	ld.sh	r0,r0[0x0]
-800034b6:	3f 40       	mov	r0,-12
+800034b6:	3e b0       	mov	r0,-21
 800034b8:	80 00       	ld.sh	r0,r0[0x0]
-800034ba:	3f 68       	mov	r8,-10
+800034ba:	3e d4       	mov	r4,-19
 800034bc:	80 00       	ld.sh	r0,r0[0x0]
-800034be:	3f 8c       	mov	r12,-8
+800034be:	3e f4       	mov	r4,-17
 800034c0:	80 00       	ld.sh	r0,r0[0x0]
-800034c2:	3f b0       	mov	r0,-5
+800034c2:	3f 18       	mov	r8,-15
 800034c4:	80 00       	ld.sh	r0,r0[0x0]
-800034c6:	3f d8       	mov	r8,-3
+800034c6:	3f 40       	mov	r0,-12
 800034c8:	80 00       	ld.sh	r0,r0[0x0]
-800034ca:	40 04       	lddsp	r4,sp[0x0]
+800034ca:	3f 68       	mov	r8,-10
 800034cc:	80 00       	ld.sh	r0,r0[0x0]
-800034ce:	40 2c       	lddsp	r12,sp[0x8]
+800034ce:	3f 8c       	mov	r12,-8
 800034d0:	80 00       	ld.sh	r0,r0[0x0]
-800034d2:	2f 54       	sub	r4,-11
+800034d2:	3f b0       	mov	r0,-5
 800034d4:	80 00       	ld.sh	r0,r0[0x0]
-800034d6:	3d 18       	mov	r8,-47
+800034d6:	3f d8       	mov	r8,-3
+800034d8:	80 00       	ld.sh	r0,r0[0x0]
+800034da:	40 04       	lddsp	r4,sp[0x0]
+800034dc:	80 00       	ld.sh	r0,r0[0x0]
+800034de:	40 2c       	lddsp	r12,sp[0x8]
+800034e0:	80 00       	ld.sh	r0,r0[0x0]
+800034e2:	2f 64       	sub	r4,-10
+800034e4:	80 00       	ld.sh	r0,r0[0x0]
+800034e6:	3d 18       	mov	r8,-47
 
-800034d8 <txTramaManual>:
+800034e8 <txTramaManual>:
 {
 	return pal_trx_reg_read(RG_TRX_STATUS) & 0x1F;
 }
 
 uint8_t txTramaManual(uint8_t *data)
 {
-800034d8:	eb cd 40 c0 	pushm	r6-r7,lr
-800034dc:	18 96       	mov	r6,r12
+800034e8:	eb cd 40 c0 	pushm	r6-r7,lr
+800034ec:	20 4d       	sub	sp,16
+800034ee:	18 96       	mov	r6,r12
+	uint8_t colado[15]="hola soy colado";
+800034f0:	4b 19       	lddpc	r9,800035b4 <txTramaManual+0xcc>
+800034f2:	f2 ea 00 00 	ld.d	r10,r9[0]
+800034f6:	fa eb 00 00 	st.d	sp[0],r10
+800034fa:	72 2a       	ld.w	r10,r9[0x8]
+800034fc:	50 2a       	stdsp	sp[0x8],r10
+800034fe:	f3 3a 00 0c 	ld.ub	r10,r9[12]
+80003502:	fb 6a 00 0c 	st.b	sp[12],r10
+80003506:	f3 3a 00 0d 	ld.ub	r10,r9[13]
+8000350a:	fb 6a 00 0d 	st.b	sp[13],r10
+8000350e:	f3 39 00 0e 	ld.ub	r9,r9[14]
+80003512:	fb 69 00 0e 	st.b	sp[14],r9
 	uint8_t state = getStateAT86RF212();
-800034de:	f0 1f 00 25 	mcall	80003570 <txTramaManual+0x98>
+80003516:	f0 1f 00 29 	mcall	800035b8 <txTramaManual+0xd0>
 	//Set MAX_CSMA_RETRIES register 0x2C, XAH_CTRL_0
 	//Set CSMA_SEED registers 0x2D, 0x2E
 	//Set MAX_BE, MIN_BE register 0x2F, CSMA_BE
 	//Configure CCA see Section 8.6
 	
 	if (state==CMD_RX_ON) {
-800034e2:	30 68       	mov	r8,6
-800034e4:	f0 0c 18 00 	cp.b	r12,r8
-800034e8:	c3 41       	brne	80003550 <txTramaManual+0x78>
+8000351a:	30 68       	mov	r8,6
+8000351c:	f0 0c 18 00 	cp.b	r12,r8
+80003520:	c3 81       	brne	80003590 <txTramaManual+0xa8>
 		//DISABLE_TRX_IRQ();
 		
 		//variable1=getStateAT86RF212();
 		escribir_linea_pc("AT86RF por transmitir...\r\n");	
-800034ea:	4a 3c       	lddpc	r12,80003574 <txTramaManual+0x9c>
-800034ec:	f0 1f 00 23 	mcall	80003578 <txTramaManual+0xa0>
+80003522:	4a 7c       	lddpc	r12,800035bc <txTramaManual+0xd4>
+80003524:	f0 1f 00 27 	mcall	800035c0 <txTramaManual+0xd8>
 		//estadoPorPc();
 		pal_trx_reg_write(RG_TRX_STATE,CMD_FORCE_PLL_ON); //pongo en PLL ON
-800034f0:	30 4b       	mov	r11,4
-800034f2:	30 2c       	mov	r12,2
-800034f4:	f0 1f 00 22 	mcall	8000357c <txTramaManual+0xa4>
+80003528:	30 4b       	mov	r11,4
+8000352a:	30 2c       	mov	r12,2
+8000352c:	f0 1f 00 26 	mcall	800035c4 <txTramaManual+0xdc>
 		while(getStateAT86RF212()!=CMD_PLL_ON);  //espero q se ponga en PLL ON
-800034f8:	30 97       	mov	r7,9
-800034fa:	f0 1f 00 1e 	mcall	80003570 <txTramaManual+0x98>
-800034fe:	ee 0c 18 00 	cp.b	r12,r7
-80003502:	cf c1       	brne	800034fa <txTramaManual+0x22>
+80003530:	30 97       	mov	r7,9
+80003532:	f0 1f 00 22 	mcall	800035b8 <txTramaManual+0xd0>
+80003536:	ee 0c 18 00 	cp.b	r12,r7
+8000353a:	cf c1       	brne	80003532 <txTramaManual+0x4a>
 	//	estadoPorPc();
 		pal_trx_reg_write(RG_IRQ_MASK,0x0C);
-80003504:	30 cb       	mov	r11,12
-80003506:	30 ec       	mov	r12,14
-80003508:	f0 1f 00 1d 	mcall	8000357c <txTramaManual+0xa4>
+8000353c:	30 cb       	mov	r11,12
+8000353e:	30 ec       	mov	r12,14
+80003540:	f0 1f 00 21 	mcall	800035c4 <txTramaManual+0xdc>
 		variable1=pal_trx_reg_read(RG_IRQ_MASK);
-8000350c:	30 ec       	mov	r12,14
-8000350e:	f0 1f 00 1d 	mcall	80003580 <txTramaManual+0xa8>
-80003512:	49 d8       	lddpc	r8,80003584 <txTramaManual+0xac>
-80003514:	b0 8c       	st.b	r8[0x0],r12
-		pal_trx_frame_write(data,90);  // 200kbps
-80003516:	35 ab       	mov	r11,90
-80003518:	0c 9c       	mov	r12,r6
-8000351a:	f0 1f 00 1c 	mcall	80003588 <txTramaManual+0xb0>
+80003544:	30 ec       	mov	r12,14
+80003546:	f0 1f 00 21 	mcall	800035c8 <txTramaManual+0xe0>
+8000354a:	4a 18       	lddpc	r8,800035cc <txTramaManual+0xe4>
+8000354c:	b0 8c       	st.b	r8[0x0],r12
+		pal_trx_frame_write(data,120);  // 200kbps
+8000354e:	37 8b       	mov	r11,120
+80003550:	0c 9c       	mov	r12,r6
+80003552:	f0 1f 00 20 	mcall	800035d0 <txTramaManual+0xe8>
+		pal_trx_frame_write(colado,15);  // 200kbps
+80003556:	30 fb       	mov	r11,15
+80003558:	1a 9c       	mov	r12,sp
+8000355a:	f0 1f 00 1e 	mcall	800035d0 <txTramaManual+0xe8>
 		//pal_trx_frame_write(data,120);  // 100kbps
 		//escribo la trama de datos en el buffer - segun pag 158
 		pal_trx_reg_write(RG_TRX_STATE,CMD_TX_START); // inicio tx - segun manual: Write TRX_CMD = TX_START, or assert pin 11 (SLP_TR)
-8000351e:	30 2b       	mov	r11,2
-80003520:	16 9c       	mov	r12,r11
-80003522:	f0 1f 00 17 	mcall	8000357c <txTramaManual+0xa4>
+8000355e:	30 2b       	mov	r11,2
+80003560:	16 9c       	mov	r12,r11
+80003562:	f0 1f 00 19 	mcall	800035c4 <txTramaManual+0xdc>
  * \param  delay:   (input) delay in CPU cycles before timeout.
  * \param  cpu_time: (output) internal information used by the timer API.
  */
 __always_inline static void cpu_set_timeout(unsigned long delay, t_cpu_time *cpu_time)
 {
   cpu_time->delay_start_cycle = Get_system_register(AVR32_COUNT);
-80003526:	e1 b8 00 42 	mfsr	r8,0x108
+80003566:	e1 b8 00 42 	mfsr	r8,0x108
   cpu_time->delay_end_cycle   = cpu_time->delay_start_cycle + delay;
-8000352a:	f0 ca ff b8 	sub	r10,r8,-72
+8000356a:	f0 ca ff b8 	sub	r10,r8,-72
  *
  * \return true if timeout occurred, otherwise false.
  */
 __always_inline static unsigned long cpu_is_timeout(t_cpu_time *cpu_time)
 {
   unsigned long current_cycle_count = Get_system_register(AVR32_COUNT);
-8000352e:	e1 b9 00 42 	mfsr	r9,0x108
+8000356e:	e1 b9 00 42 	mfsr	r9,0x108
   // Test if the timeout as already occurred.
   else if (cpu_time->timer_state == CPU_TIMER_STATE_REACHED)
     return true;
 
   // If the ending cycle count of this timeout is wrapped, ...
   else if (cpu_time->delay_start_cycle > cpu_time->delay_end_cycle)
-80003532:	14 38       	cp.w	r8,r10
-80003534:	e0 88 00 08 	brls	80003544 <txTramaManual+0x6c>
+80003572:	14 38       	cp.w	r8,r10
+80003574:	e0 88 00 08 	brls	80003584 <txTramaManual+0x9c>
   {
     if (current_cycle_count < cpu_time->delay_start_cycle && current_cycle_count > cpu_time->delay_end_cycle)
-80003538:	12 38       	cp.w	r8,r9
-8000353a:	fe 98 ff fa 	brls	8000352e <txTramaManual+0x56>
-8000353e:	12 3a       	cp.w	r10,r9
-80003540:	c1 33       	brcs	80003566 <txTramaManual+0x8e>
-80003542:	cf 6b       	rjmp	8000352e <txTramaManual+0x56>
+80003578:	12 38       	cp.w	r8,r9
+8000357a:	fe 98 ff fa 	brls	8000356e <txTramaManual+0x86>
+8000357e:	12 3a       	cp.w	r10,r9
+80003580:	c1 43       	brcs	800035a8 <txTramaManual+0xc0>
+80003582:	cf 6b       	rjmp	8000356e <txTramaManual+0x86>
     }
     return false;
   }
   else
   {
     if (current_cycle_count < cpu_time->delay_start_cycle || current_cycle_count > cpu_time->delay_end_cycle)
-80003544:	12 38       	cp.w	r8,r9
-80003546:	e0 8b 00 10 	brhi	80003566 <txTramaManual+0x8e>
-8000354a:	12 3a       	cp.w	r10,r9
-8000354c:	c0 d3       	brcs	80003566 <txTramaManual+0x8e>
-8000354e:	cf 0b       	rjmp	8000352e <txTramaManual+0x56>
+80003584:	12 38       	cp.w	r8,r9
+80003586:	e0 8b 00 11 	brhi	800035a8 <txTramaManual+0xc0>
+8000358a:	12 3a       	cp.w	r10,r9
+8000358c:	c0 e3       	brcs	800035a8 <txTramaManual+0xc0>
+8000358e:	cf 0b       	rjmp	8000356e <txTramaManual+0x86>
 	//	estadoPorPc();
 		variable1=getStateAT86RF212();
 		
 		
 	} else {
 		escribir_linea_pc(" no se puede enviar la trama \n");
-80003550:	48 fc       	lddpc	r12,8000358c <txTramaManual+0xb4>
-80003552:	f0 1f 00 0a 	mcall	80003578 <txTramaManual+0xa0>
+80003590:	49 1c       	lddpc	r12,800035d4 <txTramaManual+0xec>
+80003592:	f0 1f 00 0c 	mcall	800035c0 <txTramaManual+0xd8>
 	}
 	pal_trx_reg_write(RG_TRX_STATE,CMD_RX_ON); //vuelvo a estador RX ON
-80003556:	30 6b       	mov	r11,6
-80003558:	30 2c       	mov	r12,2
-8000355a:	f0 1f 00 09 	mcall	8000357c <txTramaManual+0xa4>
+80003596:	30 6b       	mov	r11,6
+80003598:	30 2c       	mov	r12,2
+8000359a:	f0 1f 00 0b 	mcall	800035c4 <txTramaManual+0xdc>
 	estadoPorPc();
-8000355e:	f0 1f 00 0d 	mcall	80003590 <txTramaManual+0xb8>
+8000359e:	f0 1f 00 0f 	mcall	800035d8 <txTramaManual+0xf0>
 }
-80003562:	e3 cd 80 c0 	ldm	sp++,r6-r7,pc
+800035a2:	2f cd       	sub	sp,-16
+800035a4:	e3 cd 80 c0 	ldm	sp++,r6-r7,pc
 		
 		// espero IRQ_3 (TRX_END) issued
 		// Read IRQ_STATUS register, pin 24 (IRQ) deasserted
 		//ENABLE_TRX_IRQ(); 
 	//	estadoPorPc();
 		variable1=getStateAT86RF212();
-80003566:	f0 1f 00 03 	mcall	80003570 <txTramaManual+0x98>
-8000356a:	48 78       	lddpc	r8,80003584 <txTramaManual+0xac>
-8000356c:	b0 8c       	st.b	r8[0x0],r12
-8000356e:	cf 4b       	rjmp	80003556 <txTramaManual+0x7e>
-80003570:	80 00       	ld.sh	r0,r0[0x0]
-80003572:	2f 54       	sub	r4,-11
-80003574:	80 00       	ld.sh	r0,r0[0x0]
-80003576:	40 48       	lddsp	r8,sp[0x10]
-80003578:	80 00       	ld.sh	r0,r0[0x0]
-8000357a:	32 0c       	mov	r12,32
-8000357c:	80 00       	ld.sh	r0,r0[0x0]
-8000357e:	2c e4       	sub	r4,-50
-80003580:	80 00       	ld.sh	r0,r0[0x0]
-80003582:	2d 50       	sub	r0,-43
-80003584:	00 00       	add	r0,r0
-80003586:	01 92       	ld.ub	r2,r0[0x1]
-80003588:	80 00       	ld.sh	r0,r0[0x0]
-8000358a:	2c 80       	sub	r0,-56
-8000358c:	80 00       	ld.sh	r0,r0[0x0]
-8000358e:	40 64       	lddsp	r4,sp[0x18]
-80003590:	80 00       	ld.sh	r0,r0[0x0]
-80003592:	33 c4       	mov	r4,60
+800035a8:	f0 1f 00 04 	mcall	800035b8 <txTramaManual+0xd0>
+800035ac:	48 88       	lddpc	r8,800035cc <txTramaManual+0xe4>
+800035ae:	b0 8c       	st.b	r8[0x0],r12
+800035b0:	cf 3b       	rjmp	80003596 <txTramaManual+0xae>
+800035b2:	00 00       	add	r0,r0
+800035b4:	80 00       	ld.sh	r0,r0[0x0]
+800035b6:	2e 8c       	sub	r12,-24
+800035b8:	80 00       	ld.sh	r0,r0[0x0]
+800035ba:	2f 64       	sub	r4,-10
+800035bc:	80 00       	ld.sh	r0,r0[0x0]
+800035be:	40 48       	lddsp	r8,sp[0x10]
+800035c0:	80 00       	ld.sh	r0,r0[0x0]
+800035c2:	32 1c       	mov	r12,33
+800035c4:	80 00       	ld.sh	r0,r0[0x0]
+800035c6:	2c e4       	sub	r4,-50
+800035c8:	80 00       	ld.sh	r0,r0[0x0]
+800035ca:	2d 50       	sub	r0,-43
+800035cc:	00 00       	add	r0,r0
+800035ce:	01 aa       	ld.ub	r10,r0[0x2]
+800035d0:	80 00       	ld.sh	r0,r0[0x0]
+800035d2:	2c 80       	sub	r0,-56
+800035d4:	80 00       	ld.sh	r0,r0[0x0]
+800035d6:	40 64       	lddsp	r4,sp[0x18]
+800035d8:	80 00       	ld.sh	r0,r0[0x0]
+800035da:	33 d4       	mov	r4,61
 
-80003594 <init_i2c_module>:
+800035dc <init_i2c_module>:
 	gpio_enable_module (TWI_GPIO_MAP,
 			sizeof (TWI_GPIO_MAP) / sizeof (TWI_GPIO_MAP[0]));
 			
 }
 void init_i2c_module(void)
 {
-80003594:	d4 01       	pushm	lr
-80003596:	20 4d       	sub	sp,16
+800035dc:	d4 01       	pushm	lr
+800035de:	20 4d       	sub	sp,16
  * \brief Enable a module clock derived from the PBA clock
  * \param index Index of the module clock in the PBAMASK register
  */
 static inline void sysclk_enable_pba_module(unsigned int index)
 {
 	sysclk_priv_enable_module(AVR32_PM_CLK_GRP_PBA, index);
-80003598:	30 eb       	mov	r11,14
-8000359a:	30 2c       	mov	r12,2
-8000359c:	f0 1f 00 0e 	mcall	800035d4 <init_i2c_module+0x40>
+800035e0:	30 eb       	mov	r11,14
+800035e2:	30 2c       	mov	r12,2
+800035e4:	f0 1f 00 0e 	mcall	8000361c <init_i2c_module+0x40>
 	{
 		.pba_hz = sysclk_get_cpu_hz(),
 		.speed = 10000,
 		.chip = TARGET_ADDRESS,
 		.smbus = 0,
 	};
-800035a0:	e0 78 c1 38 	mov	r8,115000
-800035a4:	50 08       	stdsp	sp[0x0],r8
-800035a6:	e0 68 27 10 	mov	r8,10000
-800035aa:	50 18       	stdsp	sp[0x4],r8
-800035ac:	34 88       	mov	r8,72
-800035ae:	50 28       	stdsp	sp[0x8],r8
-800035b0:	30 08       	mov	r8,0
-800035b2:	fb 68 00 0c 	st.b	sp[12],r8
+800035e8:	e0 78 c1 38 	mov	r8,115000
+800035ec:	50 08       	stdsp	sp[0x0],r8
+800035ee:	e0 68 27 10 	mov	r8,10000
+800035f2:	50 18       	stdsp	sp[0x4],r8
+800035f4:	34 88       	mov	r8,72
+800035f6:	50 28       	stdsp	sp[0x8],r8
+800035f8:	30 08       	mov	r8,0
+800035fa:	fb 68 00 0c 	st.b	sp[12],r8
 	
 	// Initialize as master.
 	int status = twim_master_init (&AVR32_TWIM0, &TWIM_OPTIONS);
-800035b6:	1a 9b       	mov	r11,sp
-800035b8:	fe 7c 44 00 	mov	r12,-48128
-800035bc:	f0 1f 00 07 	mcall	800035d8 <init_i2c_module+0x44>
+800035fe:	1a 9b       	mov	r11,sp
+80003600:	fe 7c 44 00 	mov	r12,-48128
+80003604:	f0 1f 00 07 	mcall	80003620 <init_i2c_module+0x44>
 	
 	// Check whether TARGET device is connected
 	
 	if (status == STATUS_OK) {
-800035c0:	c0 51       	brne	800035ca <init_i2c_module+0x36>
+80003608:	c0 51       	brne	80003612 <init_i2c_module+0x36>
 		// display test result to user
 		escribir_linea_pc("Sensor Temp:\tPASS\r\n");
-800035c2:	48 7c       	lddpc	r12,800035dc <init_i2c_module+0x48>
-800035c4:	f0 1f 00 07 	mcall	800035e0 <init_i2c_module+0x4c>
-800035c8:	c0 48       	rjmp	800035d0 <init_i2c_module+0x3c>
+8000360a:	48 7c       	lddpc	r12,80003624 <init_i2c_module+0x48>
+8000360c:	f0 1f 00 07 	mcall	80003628 <init_i2c_module+0x4c>
+80003610:	c0 48       	rjmp	80003618 <init_i2c_module+0x3c>
 	} else {
 		// display test result to user
 		escribir_linea_pc("Sensor Temp:\tFAILED\r\n");
-800035ca:	48 7c       	lddpc	r12,800035e4 <init_i2c_module+0x50>
-800035cc:	f0 1f 00 05 	mcall	800035e0 <init_i2c_module+0x4c>
+80003612:	48 7c       	lddpc	r12,8000362c <init_i2c_module+0x50>
+80003614:	f0 1f 00 05 	mcall	80003628 <init_i2c_module+0x4c>
 	}
 } 
-800035d0:	2f cd       	sub	sp,-16
-800035d2:	d8 02       	popm	pc
-800035d4:	80 00       	ld.sh	r0,r0[0x0]
-800035d6:	2d d4       	sub	r4,-35
-800035d8:	80 00       	ld.sh	r0,r0[0x0]
-800035da:	22 30       	sub	r0,35
-800035dc:	80 00       	ld.sh	r0,r0[0x0]
-800035de:	40 84       	lddsp	r4,sp[0x20]
-800035e0:	80 00       	ld.sh	r0,r0[0x0]
-800035e2:	32 0c       	mov	r12,32
-800035e4:	80 00       	ld.sh	r0,r0[0x0]
-800035e6:	40 98       	lddsp	r8,sp[0x24]
+80003618:	2f cd       	sub	sp,-16
+8000361a:	d8 02       	popm	pc
+8000361c:	80 00       	ld.sh	r0,r0[0x0]
+8000361e:	2d d4       	sub	r4,-35
+80003620:	80 00       	ld.sh	r0,r0[0x0]
+80003622:	22 30       	sub	r0,35
+80003624:	80 00       	ld.sh	r0,r0[0x0]
+80003626:	40 84       	lddsp	r4,sp[0x20]
+80003628:	80 00       	ld.sh	r0,r0[0x0]
+8000362a:	32 1c       	mov	r12,33
+8000362c:	80 00       	ld.sh	r0,r0[0x0]
+8000362e:	40 98       	lddsp	r8,sp[0x24]
 
-800035e8 <spi_init_module>:
+80003630 <spi_init_module>:
 	};
 
 	gpio_enable_module( SPI_GPIO_MAP,sizeof (SPI_GPIO_MAP) / sizeof (SPI_GPIO_MAP[0]));
 }
 void spi_init_module(void)
 {
-800035e8:	eb cd 40 e0 	pushm	r5-r7,lr
-800035ec:	20 4d       	sub	sp,16
+80003630:	eb cd 40 e0 	pushm	r5-r7,lr
+80003634:	20 4d       	sub	sp,16
 		.spck_delay   = 0,
 		.trans_delay  = 0,
 		.stay_act     = 1,
 		.spi_mode     = 0,
 		.modfdis      = 0
 	};
-800035ee:	4a 48       	lddpc	r8,8000367c <spi_init_module+0x94>
-800035f0:	1a 95       	mov	r5,sp
-800035f2:	70 09       	ld.w	r9,r8[0x0]
-800035f4:	50 09       	stdsp	sp[0x0],r9
-800035f6:	70 19       	ld.w	r9,r8[0x4]
-800035f8:	50 19       	stdsp	sp[0x4],r9
-800035fa:	70 29       	ld.w	r9,r8[0x8]
-800035fc:	50 29       	stdsp	sp[0x8],r9
-800035fe:	70 38       	ld.w	r8,r8[0xc]
-80003600:	50 38       	stdsp	sp[0xc],r8
-80003602:	30 db       	mov	r11,13
-80003604:	30 2c       	mov	r12,2
-80003606:	f0 1f 00 1f 	mcall	80003680 <spi_init_module+0x98>
+80003636:	4a 48       	lddpc	r8,800036c4 <spi_init_module+0x94>
+80003638:	1a 95       	mov	r5,sp
+8000363a:	70 09       	ld.w	r9,r8[0x0]
+8000363c:	50 09       	stdsp	sp[0x0],r9
+8000363e:	70 19       	ld.w	r9,r8[0x4]
+80003640:	50 19       	stdsp	sp[0x4],r9
+80003642:	70 29       	ld.w	r9,r8[0x8]
+80003644:	50 29       	stdsp	sp[0x8],r9
+80003646:	70 38       	ld.w	r8,r8[0xc]
+80003648:	50 38       	stdsp	sp[0xc],r8
+8000364a:	30 db       	mov	r11,13
+8000364c:	30 2c       	mov	r12,2
+8000364e:	f0 1f 00 1f 	mcall	800036c8 <spi_init_module+0x98>
  * \param spi       Base address of the SPI instance.
  *
  */
 static inline void spi_reset(volatile avr32_spi_t *spi)
 {
 	spi->cr = AVR32_SPI_CR_SWRST_MASK;
-8000360a:	fe 77 40 00 	mov	r7,-49152
-8000360e:	e0 68 00 80 	mov	r8,128
-80003612:	8f 08       	st.w	r7[0x0],r8
+80003652:	fe 77 40 00 	mov	r7,-49152
+80003656:	e0 68 00 80 	mov	r8,128
+8000365a:	8f 08       	st.w	r7[0x0],r8
  *
  * \param spi         Base address of the SPI instance.
  */
 static inline void spi_set_master_mode(volatile avr32_spi_t *spi)
 {
 	spi->MR.mstr = 1;
-80003614:	6e 18       	ld.w	r8,r7[0x4]
-80003616:	30 19       	mov	r9,1
-80003618:	f1 d9 d0 01 	bfins	r8,r9,0x0,0x1
-8000361c:	8f 18       	st.w	r7[0x4],r8
+8000365c:	6e 18       	ld.w	r8,r7[0x4]
+8000365e:	30 19       	mov	r9,1
+80003660:	f1 d9 d0 01 	bfins	r8,r9,0x0,0x1
+80003664:	8f 18       	st.w	r7[0x4],r8
  *
  * \param spi Base address of the SPI instance.
  */
 static inline void spi_disable_modfault(volatile avr32_spi_t *spi)
 {
 	spi->MR.modfdis = 1;
-8000361e:	6e 18       	ld.w	r8,r7[0x4]
-80003620:	f1 d9 d0 81 	bfins	r8,r9,0x4,0x1
-80003624:	8f 18       	st.w	r7[0x4],r8
+80003666:	6e 18       	ld.w	r8,r7[0x4]
+80003668:	f1 d9 d0 81 	bfins	r8,r9,0x4,0x1
+8000366c:	8f 18       	st.w	r7[0x4],r8
  *
  * \param spi Base address of the SPI instance.
  */
 static inline void spi_disable_loopback(volatile avr32_spi_t *spi)
 {
 	spi->MR.llb = 0;
-80003626:	6e 18       	ld.w	r8,r7[0x4]
-80003628:	30 06       	mov	r6,0
-8000362a:	f1 d6 d0 e1 	bfins	r8,r6,0x7,0x1
-8000362e:	8f 18       	st.w	r7[0x4],r8
+8000366e:	6e 18       	ld.w	r8,r7[0x4]
+80003670:	30 06       	mov	r6,0
+80003672:	f1 d6 d0 e1 	bfins	r8,r6,0x7,0x1
+80003676:	8f 18       	st.w	r7[0x4],r8
  * \param chip_select Chip Select.
  */
 static inline void spi_set_chipselect(volatile avr32_spi_t *spi,
 		uint8_t chip_select)
 {
 	spi->MR.pcs = chip_select;
-80003630:	6e 18       	ld.w	r8,r7[0x4]
-80003632:	30 f9       	mov	r9,15
-80003634:	f1 d9 d2 04 	bfins	r8,r9,0x10,0x4
-80003638:	8f 18       	st.w	r7[0x4],r8
+80003678:	6e 18       	ld.w	r8,r7[0x4]
+8000367a:	30 f9       	mov	r9,15
+8000367c:	f1 d9 d2 04 	bfins	r8,r9,0x10,0x4
+80003680:	8f 18       	st.w	r7[0x4],r8
  *
  * \param spi         Base address of the SPI instance.
  */
 static inline void spi_disable_variable_chipselect(volatile avr32_spi_t *spi)
 {
 	spi->MR.ps = 0;
-8000363a:	6e 18       	ld.w	r8,r7[0x4]
-8000363c:	f1 d6 d0 21 	bfins	r8,r6,0x1,0x1
-80003640:	8f 18       	st.w	r7[0x4],r8
+80003682:	6e 18       	ld.w	r8,r7[0x4]
+80003684:	f1 d6 d0 21 	bfins	r8,r6,0x1,0x1
+80003688:	8f 18       	st.w	r7[0x4],r8
  *
  * \param spi Base address of the SPI instance.
  */
 static inline void spi_disable_chipselect_decoding(volatile avr32_spi_t *spi)
 {
 	spi->MR.pcsdec = 0;
-80003642:	6e 18       	ld.w	r8,r7[0x4]
-80003644:	f1 d6 d0 41 	bfins	r8,r6,0x2,0x1
-80003648:	8f 18       	st.w	r7[0x4],r8
+8000368a:	6e 18       	ld.w	r8,r7[0x4]
+8000368c:	f1 d6 d0 41 	bfins	r8,r6,0x2,0x1
+80003690:	8f 18       	st.w	r7[0x4],r8
  * \param spi         Base address of the SPI instance.
  * \param delay       Delay.
  */
 static inline void spi_set_delay(volatile avr32_spi_t *spi, uint8_t delay)
 {
 	spi->MR.dlybcs = delay;
-8000364a:	6e 18       	ld.w	r8,r7[0x4]
-8000364c:	f1 d6 d3 08 	bfins	r8,r6,0x18,0x8
-80003650:	8f 18       	st.w	r7[0x4],r8
+80003692:	6e 18       	ld.w	r8,r7[0x4]
+80003694:	f1 d6 d3 08 	bfins	r8,r6,0x18,0x8
+80003698:	8f 18       	st.w	r7[0x4],r8
 
 	spi_master_init(AT86RFX_SPI);
 	
 	spiOptions.reg= SPI_CS;
-80003652:	30 38       	mov	r8,3
-80003654:	ba 88       	st.b	sp[0x0],r8
+8000369a:	30 38       	mov	r8,3
+8000369c:	ba 88       	st.b	sp[0x0],r8
 	spi_setupChipReg(AT86RFX_SPI, &spiOptions, sysclk_get_peripheral_bus_hz(&AVR32_SPI));
-80003656:	e0 7a c1 38 	mov	r10,115000
-8000365a:	1a 9b       	mov	r11,sp
-8000365c:	0e 9c       	mov	r12,r7
-8000365e:	f0 1f 00 0a 	mcall	80003684 <spi_init_module+0x9c>
+8000369e:	e0 7a c1 38 	mov	r10,115000
+800036a2:	1a 9b       	mov	r11,sp
+800036a4:	0e 9c       	mov	r12,r7
+800036a6:	f0 1f 00 0a 	mcall	800036cc <spi_init_module+0x9c>
 	spi_selectionMode(AT86RFX_SPI, 0, 0, 0);
-80003662:	0c 99       	mov	r9,r6
-80003664:	0c 9a       	mov	r10,r6
-80003666:	0c 9b       	mov	r11,r6
-80003668:	0e 9c       	mov	r12,r7
-8000366a:	f0 1f 00 08 	mcall	80003688 <spi_init_module+0xa0>
+800036aa:	0c 99       	mov	r9,r6
+800036ac:	0c 9a       	mov	r10,r6
+800036ae:	0c 9b       	mov	r11,r6
+800036b0:	0e 9c       	mov	r12,r7
+800036b2:	f0 1f 00 08 	mcall	800036d0 <spi_init_module+0xa0>
 	spi_enable(AT86RFX_SPI);
-8000366e:	0e 9c       	mov	r12,r7
-80003670:	f0 1f 00 07 	mcall	8000368c <spi_init_module+0xa4>
+800036b6:	0e 9c       	mov	r12,r7
+800036b8:	f0 1f 00 07 	mcall	800036d4 <spi_init_module+0xa4>
 }
-80003674:	2f cd       	sub	sp,-16
-80003676:	e3 cd 80 e0 	ldm	sp++,r5-r7,pc
-8000367a:	00 00       	add	r0,r0
-8000367c:	80 00       	ld.sh	r0,r0[0x0]
-8000367e:	41 20       	lddsp	r0,sp[0x48]
-80003680:	80 00       	ld.sh	r0,r0[0x0]
-80003682:	2d d4       	sub	r4,-35
-80003684:	80 00       	ld.sh	r0,r0[0x0]
-80003686:	27 98       	sub	r8,121
-80003688:	80 00       	ld.sh	r0,r0[0x0]
-8000368a:	26 f8       	sub	r8,111
-8000368c:	80 00       	ld.sh	r0,r0[0x0]
-8000368e:	28 50       	sub	r0,-123
+800036bc:	2f cd       	sub	sp,-16
+800036be:	e3 cd 80 e0 	ldm	sp++,r5-r7,pc
+800036c2:	00 00       	add	r0,r0
+800036c4:	80 00       	ld.sh	r0,r0[0x0]
+800036c6:	41 20       	lddsp	r0,sp[0x48]
+800036c8:	80 00       	ld.sh	r0,r0[0x0]
+800036ca:	2d d4       	sub	r4,-35
+800036cc:	80 00       	ld.sh	r0,r0[0x0]
+800036ce:	27 98       	sub	r8,121
+800036d0:	80 00       	ld.sh	r0,r0[0x0]
+800036d2:	26 f8       	sub	r8,111
+800036d4:	80 00       	ld.sh	r0,r0[0x0]
+800036d6:	28 50       	sub	r0,-123
 
-80003690 <init_dispositivos>:
+800036d8 <init_dispositivos>:
 		
 	}
 	return;
 }
 void init_dispositivos()
 {
-80003690:	eb cd 40 80 	pushm	r7,lr
+800036d8:	eb cd 40 80 	pushm	r7,lr
 	// configuracion del clock del sistema ver archivo "conf_clock.h"
 	sysclk_init();
-80003694:	f0 1f 00 35 	mcall	80003768 <init_dispositivos+0xd8>
+800036dc:	f0 1f 00 35 	mcall	800037b0 <init_dispositivos+0xd8>
 
 	//Configuracion de los pines para los LEDS
 	led_init_pins();
-80003698:	f0 1f 00 35 	mcall	8000376c <init_dispositivos+0xdc>
+800036e0:	f0 1f 00 35 	mcall	800037b4 <init_dispositivos+0xdc>
 
 	//Configuracion de los pines para el RS-232
 	rs_232_init_pins();
-8000369c:	f0 1f 00 35 	mcall	80003770 <init_dispositivos+0xe0>
+800036e4:	f0 1f 00 35 	mcall	800037b8 <init_dispositivos+0xe0>
 
 	//Configuracion pins para RF
 	init_rf_pins();
-800036a0:	f0 1f 00 35 	mcall	80003774 <init_dispositivos+0xe4>
+800036e8:	f0 1f 00 35 	mcall	800037bc <init_dispositivos+0xe4>
 
 	//Inicializacion del SPI
 	spi_init_module();
-800036a4:	f0 1f 00 35 	mcall	80003778 <init_dispositivos+0xe8>
+800036ec:	f0 1f 00 35 	mcall	800037c0 <init_dispositivos+0xe8>
 
 	//Inicializacion de la USART
 	int estado_rs_232 = rs_232_init_usart();
-800036a8:	f0 1f 00 35 	mcall	8000377c <init_dispositivos+0xec>
+800036f0:	f0 1f 00 35 	mcall	800037c4 <init_dispositivos+0xec>
 
 
 static void inicializar_interrupciones()
 {
 	// Disable all interrupts.
 	Disable_global_interrupt();
-800036ac:	d3 03       	ssrf	0x10
+800036f4:	d3 03       	ssrf	0x10
 	// Initialize interrupt vectors.
 	INTC_init_interrupts();
-800036ae:	f0 1f 00 35 	mcall	80003780 <init_dispositivos+0xf0>
+800036f6:	f0 1f 00 35 	mcall	800037c8 <init_dispositivos+0xf0>
 	 * EXAMPLE_USART_IRQ is the IRQ of the interrupt handler to register.
 	 * AVR32_INTC_INT0 is the interrupt priority level to assign to the
 	 * group of this IRQ.
 	 */
 	
 	INTC_register_interrupt(&usart_int_handler_RS232, AVR32_USART2_IRQ, AVR32_INTC_INT0);
-800036b2:	30 0a       	mov	r10,0
-800036b4:	e0 6b 02 20 	mov	r11,544
-800036b8:	4b 3c       	lddpc	r12,80003784 <init_dispositivos+0xf4>
-800036ba:	f0 1f 00 34 	mcall	80003788 <init_dispositivos+0xf8>
+800036fa:	30 0a       	mov	r10,0
+800036fc:	e0 6b 02 20 	mov	r11,544
+80003700:	4b 3c       	lddpc	r12,800037cc <init_dispositivos+0xf4>
+80003702:	f0 1f 00 34 	mcall	800037d0 <init_dispositivos+0xf8>
 
 	INTC_register_interrupt(&eic_int_handler2, AVR32_EIC_IRQ_2, AVR32_INTC_INT2);
-800036be:	30 2a       	mov	r10,2
-800036c0:	e0 6b 01 61 	mov	r11,353
-800036c4:	4b 2c       	lddpc	r12,8000378c <init_dispositivos+0xfc>
-800036c6:	f0 1f 00 31 	mcall	80003788 <init_dispositivos+0xf8>
+80003706:	30 2a       	mov	r10,2
+80003708:	e0 6b 01 61 	mov	r11,353
+8000370c:	4b 2c       	lddpc	r12,800037d4 <init_dispositivos+0xfc>
+8000370e:	f0 1f 00 31 	mcall	800037d0 <init_dispositivos+0xf8>
 	
 	// Register the TC interrupt handler to the interrupt controller.
 	INTC_register_interrupt(&tc_irq, EXAMPLE_TC_IRQ, EXAMPLE_TC_IRQ_PRIORITY);
-800036ca:	30 3a       	mov	r10,3
-800036cc:	e0 6b 03 40 	mov	r11,832
-800036d0:	4b 0c       	lddpc	r12,80003790 <init_dispositivos+0x100>
-800036d2:	f0 1f 00 2e 	mcall	80003788 <init_dispositivos+0xf8>
+80003712:	30 3a       	mov	r10,3
+80003714:	e0 6b 03 40 	mov	r11,832
+80003718:	4b 0c       	lddpc	r12,800037d8 <init_dispositivos+0x100>
+8000371a:	f0 1f 00 2e 	mcall	800037d0 <init_dispositivos+0xf8>
 	
 	// INTERRUPCIONES EXTERNAS (#2)
 	eic_init(&AVR32_EIC, &eic_options2,1);
-800036d6:	30 1a       	mov	r10,1
-800036d8:	4a fb       	lddpc	r11,80003794 <init_dispositivos+0x104>
-800036da:	fe 7c 24 00 	mov	r12,-56320
-800036de:	f0 1f 00 2f 	mcall	80003798 <init_dispositivos+0x108>
+8000371e:	30 1a       	mov	r10,1
+80003720:	4a fb       	lddpc	r11,800037dc <init_dispositivos+0x104>
+80003722:	fe 7c 24 00 	mov	r12,-56320
+80003726:	f0 1f 00 2f 	mcall	800037e0 <init_dispositivos+0x108>
 
 	// Enable External Interrupt Controller Line
 	eic_enable_line(&AVR32_EIC, AVR32_EIC_INT2);
-800036e2:	30 2b       	mov	r11,2
-800036e4:	fe 7c 24 00 	mov	r12,-56320
-800036e8:	f0 1f 00 2d 	mcall	8000379c <init_dispositivos+0x10c>
+8000372a:	30 2b       	mov	r11,2
+8000372c:	fe 7c 24 00 	mov	r12,-56320
+80003730:	f0 1f 00 2d 	mcall	800037e4 <init_dispositivos+0x10c>
 	eic_enable_interrupt_line(&AVR32_EIC, AVR32_EIC_INT2);	
-800036ec:	30 2b       	mov	r11,2
-800036ee:	fe 7c 24 00 	mov	r12,-56320
-800036f2:	f0 1f 00 2c 	mcall	800037a0 <init_dispositivos+0x110>
+80003734:	30 2b       	mov	r11,2
+80003736:	fe 7c 24 00 	mov	r12,-56320
+8000373a:	f0 1f 00 2c 	mcall	800037e8 <init_dispositivos+0x110>
 	
 	// Enable USART Rx interrupt.
 	(&AVR32_USART2)->ier = AVR32_USART_IER_RXRDY_MASK;
-800036f6:	30 19       	mov	r9,1
-800036f8:	fe 78 38 00 	mov	r8,-51200
-800036fc:	91 29       	st.w	r8[0x8],r9
+8000373e:	30 19       	mov	r9,1
+80003740:	fe 78 38 00 	mov	r8,-51200
+80003744:	91 29       	st.w	r8[0x8],r9
 	
 	// Enable all interrupts.
 	Enable_global_interrupt();
-800036fe:	d5 03       	csrf	0x10
+80003746:	d5 03       	csrf	0x10
 
 	//Inicializacion de las interrupciones
 	inicializar_interrupciones();
 
 	// Inicializacion del timer
 	tc_init(tc);
-80003700:	4a 98       	lddpc	r8,800037a4 <init_dispositivos+0x114>
-80003702:	70 07       	ld.w	r7,r8[0x0]
+80003748:	4a 98       	lddpc	r8,800037ec <init_dispositivos+0x114>
+8000374a:	70 07       	ld.w	r7,r8[0x0]
 		.lovrs = 0,
 		.covfs = 0
 	};
 	
 	// Initialize the timer/counter.
 	tc_init_waveform(tc, &waveform_opt);
-80003704:	4a 9b       	lddpc	r11,800037a8 <init_dispositivos+0x118>
-80003706:	0e 9c       	mov	r12,r7
-80003708:	f0 1f 00 29 	mcall	800037ac <init_dispositivos+0x11c>
+8000374c:	4a 9b       	lddpc	r11,800037f0 <init_dispositivos+0x118>
+8000374e:	0e 9c       	mov	r12,r7
+80003750:	f0 1f 00 29 	mcall	800037f4 <init_dispositivos+0x11c>
 	 * We want: (1 / (fPBA / 128)) * RC = 200 ms, hence RC = (fPBA / 128) / 5
 	 * to get an interrupt every 10 ms.
 	 */
 	
 		
 	tc_write_rc(tc, EXAMPLE_TC_CHANNEL,((sysclk_get_pba_hz() / 128) /5));
-8000370c:	e0 6a 00 b3 	mov	r10,179
-80003710:	30 0b       	mov	r11,0
-80003712:	0e 9c       	mov	r12,r7
-80003714:	f0 1f 00 27 	mcall	800037b0 <init_dispositivos+0x120>
+80003754:	e0 6a 00 b3 	mov	r10,179
+80003758:	30 0b       	mov	r11,0
+8000375a:	0e 9c       	mov	r12,r7
+8000375c:	f0 1f 00 27 	mcall	800037f8 <init_dispositivos+0x120>
 	// configure the timer interrupt
 	tc_configure_interrupts(tc, EXAMPLE_TC_CHANNEL, &tc_interrupt);
-80003718:	4a 7a       	lddpc	r10,800037b4 <init_dispositivos+0x124>
-8000371a:	30 0b       	mov	r11,0
-8000371c:	0e 9c       	mov	r12,r7
-8000371e:	f0 1f 00 27 	mcall	800037b8 <init_dispositivos+0x128>
+80003760:	4a 7a       	lddpc	r10,800037fc <init_dispositivos+0x124>
+80003762:	30 0b       	mov	r11,0
+80003764:	0e 9c       	mov	r12,r7
+80003766:	f0 1f 00 27 	mcall	80003800 <init_dispositivos+0x128>
 	// Start the timer/counter.
 	tc_start(tc, EXAMPLE_TC_CHANNEL);
-80003722:	30 0b       	mov	r11,0
-80003724:	0e 9c       	mov	r12,r7
-80003726:	f0 1f 00 26 	mcall	800037bc <init_dispositivos+0x12c>
+8000376a:	30 0b       	mov	r11,0
+8000376c:	0e 9c       	mov	r12,r7
+8000376e:	f0 1f 00 26 	mcall	80003804 <init_dispositivos+0x12c>
 	// 	while (at86rfx_init() != AT86RFX_SUCCESS) {
 	//  	 		escribir_linea_pc("Modulo RF:\tFAILED\r\n");
 	//  	 	}
 	//  		escribir_linea_pc("Modulo RF:\tPASS\r\n");
 
 	register_value = pal_trx_reg_read(RG_PART_NUM);//pedido de identificacion del modulo. Debe devolver 0x07
-8000372a:	31 cc       	mov	r12,28
-8000372c:	f0 1f 00 25 	mcall	800037c0 <init_dispositivos+0x130>
-80003730:	4a 58       	lddpc	r8,800037c4 <init_dispositivos+0x134>
-80003732:	b0 8c       	st.b	r8[0x0],r12
+80003772:	31 cc       	mov	r12,28
+80003774:	f0 1f 00 25 	mcall	80003808 <init_dispositivos+0x130>
+80003778:	4a 58       	lddpc	r8,8000380c <init_dispositivos+0x134>
+8000377a:	b0 8c       	st.b	r8[0x0],r12
 
 	if (register_value == PART_NUM_AT86RF212)
-80003734:	30 78       	mov	r8,7
-80003736:	f0 0c 18 00 	cp.b	r12,r8
-8000373a:	c0 51       	brne	80003744 <init_dispositivos+0xb4>
+8000377c:	30 78       	mov	r8,7
+8000377e:	f0 0c 18 00 	cp.b	r12,r8
+80003782:	c0 51       	brne	8000378c <init_dispositivos+0xb4>
 	escribir_linea_pc("Modulo RF:\tPASS\r\n");
-8000373c:	4a 3c       	lddpc	r12,800037c8 <init_dispositivos+0x138>
-8000373e:	f0 1f 00 24 	mcall	800037cc <init_dispositivos+0x13c>
-80003742:	c0 48       	rjmp	8000374a <init_dispositivos+0xba>
+80003784:	4a 3c       	lddpc	r12,80003810 <init_dispositivos+0x138>
+80003786:	f0 1f 00 24 	mcall	80003814 <init_dispositivos+0x13c>
+8000378a:	c0 48       	rjmp	80003792 <init_dispositivos+0xba>
 	else
 	escribir_linea_pc("Modulo RF:\tFAILED\r\n");
-80003744:	4a 3c       	lddpc	r12,800037d0 <init_dispositivos+0x140>
-80003746:	f0 1f 00 22 	mcall	800037cc <init_dispositivos+0x13c>
+8000378c:	4a 3c       	lddpc	r12,80003818 <init_dispositivos+0x140>
+8000378e:	f0 1f 00 22 	mcall	80003814 <init_dispositivos+0x13c>
 	escribir_linea_pc(register_value);
-8000374a:	49 f8       	lddpc	r8,800037c4 <init_dispositivos+0x134>
-8000374c:	11 8c       	ld.ub	r12,r8[0x0]
-8000374e:	f0 1f 00 20 	mcall	800037cc <init_dispositivos+0x13c>
+80003792:	49 f8       	lddpc	r8,8000380c <init_dispositivos+0x134>
+80003794:	11 8c       	ld.ub	r12,r8[0x0]
+80003796:	f0 1f 00 20 	mcall	80003814 <init_dispositivos+0x13c>
 
 	//Inicializacion del sensor de temp
 
 	init_i2c_pins();
-80003752:	f0 1f 00 21 	mcall	800037d4 <init_dispositivos+0x144>
+8000379a:	f0 1f 00 21 	mcall	8000381c <init_dispositivos+0x144>
 	init_i2c_module();
-80003756:	f0 1f 00 21 	mcall	800037d8 <init_dispositivos+0x148>
+8000379e:	f0 1f 00 21 	mcall	80003820 <init_dispositivos+0x148>
 	// inicializacion del tran
 	//pal_trx_reg_write(RG_TRX_STATE,CMD_FORCE_PLL_ON);
 
 
 
 	init_AT86RF212();
-8000375a:	f0 1f 00 21 	mcall	800037dc <init_dispositivos+0x14c>
+800037a2:	f0 1f 00 21 	mcall	80003824 <init_dispositivos+0x14c>
 	//------------------Fin de conguracion
 
 	escribir_linea_pc("TESIS TUCUMAN 2015\n\r\n");
-8000375e:	4a 1c       	lddpc	r12,800037e0 <init_dispositivos+0x150>
-80003760:	f0 1f 00 1b 	mcall	800037cc <init_dispositivos+0x13c>
+800037a6:	4a 1c       	lddpc	r12,80003828 <init_dispositivos+0x150>
+800037a8:	f0 1f 00 1b 	mcall	80003814 <init_dispositivos+0x13c>
 }
-80003764:	e3 cd 80 80 	ldm	sp++,r7,pc
-80003768:	80 00       	ld.sh	r0,r0[0x0]
-8000376a:	2d c4       	sub	r4,-36
-8000376c:	80 00       	ld.sh	r0,r0[0x0]
-8000376e:	31 bc       	mov	r12,27
-80003770:	80 00       	ld.sh	r0,r0[0x0]
-80003772:	31 24       	mov	r4,18
-80003774:	80 00       	ld.sh	r0,r0[0x0]
-80003776:	31 dc       	mov	r12,29
-80003778:	80 00       	ld.sh	r0,r0[0x0]
-8000377a:	35 e8       	mov	r8,94
-8000377c:	80 00       	ld.sh	r0,r0[0x0]
-8000377e:	31 00       	mov	r0,16
-80003780:	80 00       	ld.sh	r0,r0[0x0]
-80003782:	26 4c       	sub	r12,100
-80003784:	80 00       	ld.sh	r0,r0[0x0]
-80003786:	2f d8       	sub	r8,-3
-80003788:	80 00       	ld.sh	r0,r0[0x0]
-8000378a:	25 cc       	sub	r12,92
-8000378c:	80 00       	ld.sh	r0,r0[0x0]
-8000378e:	32 20       	mov	r0,34
-80003790:	80 00       	ld.sh	r0,r0[0x0]
-80003792:	2f 68       	sub	r8,-10
-80003794:	00 00       	add	r0,r0
-80003796:	00 20       	rsub	r0,r0
-80003798:	80 00       	ld.sh	r0,r0[0x0]
-8000379a:	22 e8       	sub	r8,46
-8000379c:	80 00       	ld.sh	r0,r0[0x0]
-8000379e:	23 b8       	sub	r8,59
-800037a0:	80 00       	ld.sh	r0,r0[0x0]
-800037a2:	23 c2       	sub	r2,60
-800037a4:	00 00       	add	r0,r0
-800037a6:	00 18       	sub	r8,r0
-800037a8:	80 00       	ld.sh	r0,r0[0x0]
-800037aa:	41 30       	lddsp	r0,sp[0x4c]
-800037ac:	80 00       	ld.sh	r0,r0[0x0]
-800037ae:	28 56       	sub	r6,-123
+800037ac:	e3 cd 80 80 	ldm	sp++,r7,pc
 800037b0:	80 00       	ld.sh	r0,r0[0x0]
-800037b2:	29 28       	sub	r8,-110
+800037b2:	2d c4       	sub	r4,-36
 800037b4:	80 00       	ld.sh	r0,r0[0x0]
-800037b6:	3d a8       	mov	r8,-38
+800037b6:	31 cc       	mov	r12,28
 800037b8:	80 00       	ld.sh	r0,r0[0x0]
-800037ba:	29 5c       	sub	r12,-107
+800037ba:	31 34       	mov	r4,19
 800037bc:	80 00       	ld.sh	r0,r0[0x0]
-800037be:	28 f2       	sub	r2,-113
+800037be:	31 ec       	mov	r12,30
 800037c0:	80 00       	ld.sh	r0,r0[0x0]
-800037c2:	2d 50       	sub	r0,-43
-800037c4:	00 00       	add	r0,r0
-800037c6:	01 8d       	ld.ub	sp,r0[0x0]
+800037c2:	36 30       	mov	r0,99
+800037c4:	80 00       	ld.sh	r0,r0[0x0]
+800037c6:	31 10       	mov	r0,17
 800037c8:	80 00       	ld.sh	r0,r0[0x0]
-800037ca:	40 b0       	lddsp	r0,sp[0x2c]
+800037ca:	26 4c       	sub	r12,100
 800037cc:	80 00       	ld.sh	r0,r0[0x0]
-800037ce:	32 0c       	mov	r12,32
+800037ce:	2f e8       	sub	r8,-2
 800037d0:	80 00       	ld.sh	r0,r0[0x0]
-800037d2:	40 c4       	lddsp	r4,sp[0x30]
+800037d2:	25 cc       	sub	r12,92
 800037d4:	80 00       	ld.sh	r0,r0[0x0]
-800037d6:	31 50       	mov	r0,21
+800037d6:	32 30       	mov	r0,35
 800037d8:	80 00       	ld.sh	r0,r0[0x0]
-800037da:	35 94       	mov	r4,89
-800037dc:	80 00       	ld.sh	r0,r0[0x0]
-800037de:	32 90       	mov	r0,41
+800037da:	2f 78       	sub	r8,-9
+800037dc:	00 00       	add	r0,r0
+800037de:	00 98       	mov	r8,r0
 800037e0:	80 00       	ld.sh	r0,r0[0x0]
-800037e2:	40 d8       	lddsp	r8,sp[0x34]
+800037e2:	22 e8       	sub	r8,46
+800037e4:	80 00       	ld.sh	r0,r0[0x0]
+800037e6:	23 b8       	sub	r8,59
+800037e8:	80 00       	ld.sh	r0,r0[0x0]
+800037ea:	23 c2       	sub	r2,60
+800037ec:	00 00       	add	r0,r0
+800037ee:	00 18       	sub	r8,r0
+800037f0:	80 00       	ld.sh	r0,r0[0x0]
+800037f2:	41 30       	lddsp	r0,sp[0x4c]
+800037f4:	80 00       	ld.sh	r0,r0[0x0]
+800037f6:	28 56       	sub	r6,-123
+800037f8:	80 00       	ld.sh	r0,r0[0x0]
+800037fa:	29 28       	sub	r8,-110
+800037fc:	80 00       	ld.sh	r0,r0[0x0]
+800037fe:	3d a8       	mov	r8,-38
+80003800:	80 00       	ld.sh	r0,r0[0x0]
+80003802:	29 5c       	sub	r12,-107
+80003804:	80 00       	ld.sh	r0,r0[0x0]
+80003806:	28 f2       	sub	r2,-113
+80003808:	80 00       	ld.sh	r0,r0[0x0]
+8000380a:	2d 50       	sub	r0,-43
+8000380c:	00 00       	add	r0,r0
+8000380e:	01 a5       	ld.ub	r5,r0[0x2]
+80003810:	80 00       	ld.sh	r0,r0[0x0]
+80003812:	40 b0       	lddsp	r0,sp[0x2c]
+80003814:	80 00       	ld.sh	r0,r0[0x0]
+80003816:	32 1c       	mov	r12,33
+80003818:	80 00       	ld.sh	r0,r0[0x0]
+8000381a:	40 c4       	lddsp	r4,sp[0x30]
+8000381c:	80 00       	ld.sh	r0,r0[0x0]
+8000381e:	31 60       	mov	r0,22
+80003820:	80 00       	ld.sh	r0,r0[0x0]
+80003822:	35 dc       	mov	r12,93
+80003824:	80 00       	ld.sh	r0,r0[0x0]
+80003826:	32 a0       	mov	r0,42
+80003828:	80 00       	ld.sh	r0,r0[0x0]
+8000382a:	40 d8       	lddsp	r8,sp[0x34]
 
-800037e4 <main>:
+8000382c <main>:
 int main (void)
 {
-800037e4:	eb cd 40 80 	pushm	r7,lr
+8000382c:	eb cd 40 80 	pushm	r7,lr
 // NODO I TX	
 
 	char temps[10] = "\0";
 	int i=0;
 	
 	init_dispositivos();
-800037e8:	f0 1f 00 11 	mcall	8000382c <main+0x48>
+80003830:	f0 1f 00 11 	mcall	80003874 <main+0x48>
 	
 	pal_trx_reg_write(RG_TRX_STATE, CMD_RX_ON);// seteo el tran en RX
-800037ec:	30 6b       	mov	r11,6
-800037ee:	30 2c       	mov	r12,2
-800037f0:	f0 1f 00 10 	mcall	80003830 <main+0x4c>
+80003834:	30 6b       	mov	r11,6
+80003836:	30 2c       	mov	r12,2
+80003838:	f0 1f 00 10 	mcall	80003878 <main+0x4c>
 // 				}
 // 				configuracion = false;
 // 			}
 // 		}
 		
-		txTramaManual(tx_buffer90); // 90 bytes 200kbps
-800037f4:	49 07       	lddpc	r7,80003834 <main+0x50>
-800037f6:	0e 9c       	mov	r12,r7
-800037f8:	f0 1f 00 10 	mcall	80003838 <main+0x54>
+		txTramaManual(tx_buffer120); // 90 bytes 200kbps
+8000383c:	49 07       	lddpc	r7,8000387c <main+0x50>
+8000383e:	0e 9c       	mov	r12,r7
+80003840:	f0 1f 00 10 	mcall	80003880 <main+0x54>
  * \param  delay:   (input) delay in CPU cycles before timeout.
  * \param  cpu_time: (output) internal information used by the timer API.
  */
 __always_inline static void cpu_set_timeout(unsigned long delay, t_cpu_time *cpu_time)
 {
   cpu_time->delay_start_cycle = Get_system_register(AVR32_COUNT);
-800037fc:	e1 b8 00 42 	mfsr	r8,0x108
+80003844:	e1 b8 00 42 	mfsr	r8,0x108
   cpu_time->delay_end_cycle   = cpu_time->delay_start_cycle + delay;
-80003800:	e0 79 c1 38 	mov	r9,115000
-80003804:	f0 09 00 0a 	add	r10,r8,r9
+80003848:	e0 79 c1 38 	mov	r9,115000
+8000384c:	f0 09 00 0a 	add	r10,r8,r9
  *
  * \return true if timeout occurred, otherwise false.
  */
 __always_inline static unsigned long cpu_is_timeout(t_cpu_time *cpu_time)
 {
   unsigned long current_cycle_count = Get_system_register(AVR32_COUNT);
-80003808:	e1 b9 00 42 	mfsr	r9,0x108
+80003850:	e1 b9 00 42 	mfsr	r9,0x108
   // Test if the timeout as already occurred.
   else if (cpu_time->timer_state == CPU_TIMER_STATE_REACHED)
     return true;
 
   // If the ending cycle count of this timeout is wrapped, ...
   else if (cpu_time->delay_start_cycle > cpu_time->delay_end_cycle)
-8000380c:	14 38       	cp.w	r8,r10
-8000380e:	e0 88 00 08 	brls	8000381e <main+0x3a>
+80003854:	14 38       	cp.w	r8,r10
+80003856:	e0 88 00 08 	brls	80003866 <main+0x3a>
   {
     if (current_cycle_count < cpu_time->delay_start_cycle && current_cycle_count > cpu_time->delay_end_cycle)
-80003812:	12 38       	cp.w	r8,r9
-80003814:	fe 98 ff fa 	brls	80003808 <main+0x24>
-80003818:	12 3a       	cp.w	r10,r9
-8000381a:	ce e3       	brcs	800037f6 <main+0x12>
-8000381c:	cf 6b       	rjmp	80003808 <main+0x24>
+8000385a:	12 38       	cp.w	r8,r9
+8000385c:	fe 98 ff fa 	brls	80003850 <main+0x24>
+80003860:	12 3a       	cp.w	r10,r9
+80003862:	ce e3       	brcs	8000383e <main+0x12>
+80003864:	cf 6b       	rjmp	80003850 <main+0x24>
     }
     return false;
   }
   else
   {
     if (current_cycle_count < cpu_time->delay_start_cycle || current_cycle_count > cpu_time->delay_end_cycle)
-8000381e:	12 38       	cp.w	r8,r9
-80003820:	fe 9b ff eb 	brhi	800037f6 <main+0x12>
-80003824:	12 3a       	cp.w	r10,r9
-80003826:	ce 83       	brcs	800037f6 <main+0x12>
-80003828:	cf 0b       	rjmp	80003808 <main+0x24>
-8000382a:	00 00       	add	r0,r0
-8000382c:	80 00       	ld.sh	r0,r0[0x0]
-8000382e:	36 90       	mov	r0,105
-80003830:	80 00       	ld.sh	r0,r0[0x0]
-80003832:	2c e4       	sub	r4,-50
-80003834:	00 00       	add	r0,r0
-80003836:	00 28       	rsub	r8,r0
-80003838:	80 00       	ld.sh	r0,r0[0x0]
-8000383a:	34 d8       	mov	r8,77
+80003866:	12 38       	cp.w	r8,r9
+80003868:	fe 9b ff eb 	brhi	8000383e <main+0x12>
+8000386c:	12 3a       	cp.w	r10,r9
+8000386e:	ce 83       	brcs	8000383e <main+0x12>
+80003870:	cf 0b       	rjmp	80003850 <main+0x24>
+80003872:	00 00       	add	r0,r0
+80003874:	80 00       	ld.sh	r0,r0[0x0]
+80003876:	36 d8       	mov	r8,109
+80003878:	80 00       	ld.sh	r0,r0[0x0]
+8000387a:	2c e4       	sub	r4,-50
+8000387c:	00 00       	add	r0,r0
+8000387e:	00 20       	rsub	r0,r0
+80003880:	80 00       	ld.sh	r0,r0[0x0]
+80003882:	34 e8       	mov	r8,78
 
 Disassembly of section .exception:
 
