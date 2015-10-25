@@ -147,11 +147,7 @@ static void eic_int_handler2(void)
 		//IRQ_STATUS = pal_trx_reg_read(RG_IRQ_STATUS);
 		//variable1=pal_trx_reg_read(RG_IRQ_STATUS);
 		//variable2=pal_trx_reg_read(RG_IRQ_MASK);
-		if (contadorRX>90){
-			escribir_linea_pc("\n\n - = T r a m a   r e c i b i d a  = -\n\n");
-			escribir_linea_pc(colaRX);
- 			 contadorRX=0;
-		}
+		
 		switch (IRQ_STATUS){
 // 			case TRX_IRQ_TRX_END:
 // 				escribir_linea_pc("\n\n --> Trama enviada :) :) \r\n");
@@ -162,8 +158,11 @@ static void eic_int_handler2(void)
 // 			break;
 			case TRX_IRQ_RX_START:
 			
-				pal_trx_frame_read(&colaRX[contadorRX],90); // para 200kbps
-				contadorRX=contadorRX+90;
+				pal_trx_frame_read(&colaRX[contadorRX],120); // para 200kbps
+				escribir_linea_pc("\n\n - = T r a m a   r e c i b i d a  = -\n\n");
+				escribir_linea_pc(colaRX);
+				contadorRX = 0;
+				
 			break;
 		}
 }
