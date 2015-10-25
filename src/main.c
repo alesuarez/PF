@@ -680,9 +680,10 @@ uint8_t init_AT86RF212(void)
 	pal_trx_reg_write(RG_TRX_CTRL_1, 0x2E); // 1 -> TX AUTO_CRC && SPI_CMD_MODE -> 3 && 1-> IRQ_MASK_MODE
 	//PAL_WAIT_1_US();
 	pal_trx_reg_write(RG_IRQ_MASK, 0x0C);
-	//pal_trx_reg_write(RG_TRX_CTRL_2, 0x28); // O-QPSK 100kb/s
-	pal_trx_reg_write(RG_TRX_CTRL_2, 0x29); // O-QPSK 200kb/s
-	//PAL_WAIT_1_US();
+	PAL_WAIT_1_US();
+	pal_trx_reg_write(RG_TRX_CTRL_2, 0x28); // O-QPSK 100kb/s
+	//pal_trx_reg_write(RG_TRX_CTRL_2, 0x29); // O-QPSK 200kb/s
+	PAL_WAIT_1_US();
 	//pal_trx_reg_write(RG_XOSC_CTRL, 0x40); // manejo del cristal externo y capacitores
 	//PAL_WAIT_1_US();
 	promiscuous_mode();
@@ -786,7 +787,7 @@ int main (void)
 	char temps[10] = "\0";
 	int i=0;
 	
-	init_dispositivos()
+	init_dispositivos();
 	
 	pal_trx_reg_write(RG_TRX_STATE, CMD_RX_ON);// seteo el tran en RX
 	while(true)
