@@ -147,10 +147,9 @@ static void eic_int_handler2(void)
 		//IRQ_STATUS = pal_trx_reg_read(RG_IRQ_STATUS);
 		//variable1=pal_trx_reg_read(RG_IRQ_STATUS);
 		//variable2=pal_trx_reg_read(RG_IRQ_MASK);
-		if (contadorRX>120){
-			escribir_linea_pc("\n\n a \n\n");
+		if (contadorRX>90){
+			escribir_linea_pc("\n\n - = T r a m a   r e c i b i d a  = -\n\n");
 			escribir_linea_pc(colaRX);
-			escribir_linea_pc("\n\n a \n\n");
  			 contadorRX=0;
 		}
 		switch (IRQ_STATUS){
@@ -163,8 +162,8 @@ static void eic_int_handler2(void)
 // 			break;
 			case TRX_IRQ_RX_START:
 			
-				pal_trx_frame_read(&colaRX[contadorRX],120);
-				contadorRX=contadorRX+120;
+				pal_trx_frame_read(&colaRX[contadorRX],90); // para 200kbps
+				contadorRX=contadorRX+90;
 			break;
 		}
 }
@@ -772,7 +771,8 @@ uint8_t init_AT86RF212(void)
 	PAL_WAIT_1_US();
 	//pal_trx_reg_write(RG_RX_CTRL, 0x20);
 	pal_trx_reg_write(RG_IRQ_MASK, 0x0C);
-//	pal_trx_reg_write(RG_TRX_CTRL_2, 0x00); // configuracion de velocidad y frec
+	//pal_trx_reg_write(RG_TRX_CTRL_2, 0x28); // O-QPSK 100kb/s
+	pal_trx_reg_write(RG_TRX_CTRL_2, 0x29); // O-QPSK 200kb/s
 	PAL_WAIT_1_US();
 	//pal_trx_reg_write(RG_XOSC_CTRL, 0x40); // manejo del cristal externo y capacitores se muere cuando se activa
 	PAL_WAIT_1_US();
