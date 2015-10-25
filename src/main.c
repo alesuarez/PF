@@ -1,3 +1,5 @@
+// NODO I tx
+
 //Inicializa modulos RF, TEMPERATURA Y RS232
 
 //EN CASO DE RECIBIR EL CARACTER 't' ENVIA LA TEMPERATURA MEDIDA
@@ -33,7 +35,8 @@ volatile avr32_tc_t *tc = EXAMPLE_TC;
 
 volatile uint8_t resolution = AT30TSE_CONFIG_RES_12_bit;
 
-uint8_t tx_buffer[200]="Esto es un mensaje de 120 bytes que se envia de un punto A hacia un punto B con el fin de hacer distintas mediciones :)";
+uint8_t tx_buffer120[120]="Esto es un mensaje de 120 bytes que se envia de un punto A hacia un punto B con el fin de hacer distintas mediciones :)";
+uint8_t tx_buffer90[90]="Esto una trama de datos mas pequeña de 90 bytes que se envia de un pto A hacia un pto B..";
 
 uint8_t TRX_STATUS = 0;
 uint8_t register_value = 0;
@@ -529,43 +532,6 @@ uint8_t getStateAT86RF212(void)
 	return pal_trx_reg_read(RG_TRX_STATUS) & 0x1F;
 }
 
-uint8_t txTrama(uint8_t *data)
-{
-	uint8_t state = getStateAT86RF212();
-	//pcb_t *pcb = chb_get_pcb();
-	
-	
-	if ((state == BUSY_TX) || (state == BUSY_TX_ARET))
-	{
-		return RADIO_WRONG_STATE;
-	}
-	DISABLE_TRX_IRQ();
-	
-	//SLP_TR_LOW();
-	pal_trx_reg_write(RG_TRX_STATE,CMD_FORCE_TRX_OFF); // 
-	
-	while (getStateAT86RF212()!= CMD_TRX_OFF);
-
-	pal_trx_reg_write(RG_TRX_STATE,CMD_TX_ARET_ON); // 
-	DELAY_US(TRX_OFF_TO_PLL_ON_TIME_US);
-	
-	while (getStateAT86RF212()!=CMD_TX_ARET_ON)// 
-	{
-		DELAY_US(300);
-		pal_trx_reg_write(RG_TRX_STATE,CMD_TX_ARET_ON);
-	}
-	
-	// write frame to buffer. first write header into buffer (add 1 for len byte), then data.
-	pal_trx_frame_write(data,data[0] - LENGTH_FIELD_LEN);
-	
-	pal_trx_reg_write(RG_TRX_STATE,CMD_TX_START);
-
-	ENABLE_TRX_IRQ();
-	
-	variable1=getStateAT86RF212();
-	return variable1;
-}
-
 uint8_t txTramaManual(uint8_t *data)
 {
 	uint8_t state = getStateAT86RF212();
@@ -587,7 +553,8 @@ uint8_t txTramaManual(uint8_t *data)
 	//	estadoPorPc();
 		pal_trx_reg_write(RG_IRQ_MASK,0x0C);
 		variable1=pal_trx_reg_read(RG_IRQ_MASK);
-		pal_trx_frame_write(data,200);  //esto para mi hay q ponerlo arriba donde dije escribir trama
+		pal_trx_frame_write(data,90);  // 200kbps
+		//pal_trx_frame_write(data,120);  // 100kbps
 		//escribo la trama de datos en el buffer - segun pag 158
 		pal_trx_reg_write(RG_TRX_STATE,CMD_TX_START); // inicio tx - segun manual: Write TRX_CMD = TX_START, or assert pin 11 (SLP_TR)
 		DELAY_US(RST_PULSE_WIDTH_NS); // hacia el estado busy_tx
@@ -605,31 +572,7 @@ uint8_t txTramaManual(uint8_t *data)
 	pal_trx_reg_write(RG_TRX_STATE,CMD_RX_ON); //vuelvo a estador RX ON
 	estadoPorPc();
 }
-uint8_t txTramachibi(uint8_t *data)
-{
-	
-	
-	variable1=getStateAT86RF212();
-	if (getStateAT86RF212()==CMD_RX_ON)
-	{
-		escribir_linea_pc("\n\n\n\nAT86RF por transmitir... en modo manual con altos de pin\r\n");
-		estadoPorPc();
-		pal_trx_reg_write(RG_TRX_STATE,CMD_FORCE_PLL_ON);
-		while(getStateAT86RF212()!=CMD_PLL_ON);
-		pal_trx_frame_write(RG_TRX_STATE,CMD_TX_START);
-		DELAY_US(RST_PULSE_WIDTH_NS);
-		
-		pal_trx_frame_write(data,data[0] - LENGTH_FIELD_LEN);
-		escribir_linea_pc("\n\n\n FINNNNNN \n\n\n\n");
-	}
-	else
-	{
-		
-		escribir_linea_pc("\nno se puede tx\r\n");
-		pal_trx_frame_write(RG_TRX_STATE,CMD_RX_ON);
-	}
-	
-}
+
 void promiscuous_mode()
 {
 	for (address=0x20; address<0x2C; address++)
@@ -737,7 +680,8 @@ uint8_t init_AT86RF212(void)
 	pal_trx_reg_write(RG_TRX_CTRL_1, 0x2E); // 1 -> TX AUTO_CRC && SPI_CMD_MODE -> 3 && 1-> IRQ_MASK_MODE
 	//PAL_WAIT_1_US();
 	pal_trx_reg_write(RG_IRQ_MASK, 0x0C);
-	//pal_trx_reg_write(RG_TRX_CTRL_2, 0x00);
+	//pal_trx_reg_write(RG_TRX_CTRL_2, 0x28); // O-QPSK 100kb/s
+	pal_trx_reg_write(RG_TRX_CTRL_2, 0x29); // O-QPSK 200kb/s
 	//PAL_WAIT_1_US();
 	//pal_trx_reg_write(RG_XOSC_CTRL, 0x40); // manejo del cristal externo y capacitores
 	//PAL_WAIT_1_US();
@@ -778,111 +722,106 @@ void modeConfig()
 	}
 	return;
 }
-
-int main (void)
+void init_dispositivos()
 {
-	char temps[10] = "\0";
-	int i=0;
-	
-	//board_init();
-	// configuracion del clock del sistema ver archivo "conf_clock.h"	
-	sysclk_init();	
-	
-	//Configuracion de los pines para los LEDS 
+	// configuracion del clock del sistema ver archivo "conf_clock.h"
+	sysclk_init();
+
+	//Configuracion de los pines para los LEDS
 	led_init_pins();
 
 	//Configuracion de los pines para el RS-232
 	rs_232_init_pins();
-	
+
 	//Configuracion pins para RF
 	init_rf_pins();
-	
+
 	//Inicializacion del SPI
 	spi_init_module();
-	
-	//Inicializacion de la USART	
+
+	//Inicializacion de la USART
 	int estado_rs_232 = rs_232_init_usart();
 
-		
+
 	//Inicializacion de las interrupciones
 	inicializar_interrupciones();
-	
+
 	// Inicializacion del timer
 	tc_init(tc);
 	// inicializacion de AT86RF212
 	//while (trx_init()!=TRX_SUCCESS);
 	//at86rfx_init();
 	//Inicializacion Modulo RF (Depurar!)
-// 	while (at86rfx_init() != AT86RFX_SUCCESS) {
-//  	 		escribir_linea_pc("Modulo RF:\tFAILED\r\n");
-//  	 	}
-//  		escribir_linea_pc("Modulo RF:\tPASS\r\n");
- 
+	// 	while (at86rfx_init() != AT86RFX_SUCCESS) {
+	//  	 		escribir_linea_pc("Modulo RF:\tFAILED\r\n");
+	//  	 	}
+	//  		escribir_linea_pc("Modulo RF:\tPASS\r\n");
+
 	register_value = pal_trx_reg_read(RG_PART_NUM);//pedido de identificacion del modulo. Debe devolver 0x07
-	
-	if (register_value == PART_NUM_AT86RF212) 
- 		escribir_linea_pc("Modulo RF:\tPASS\r\n");
+
+	if (register_value == PART_NUM_AT86RF212)
+	escribir_linea_pc("Modulo RF:\tPASS\r\n");
 	else
-		escribir_linea_pc("Modulo RF:\tFAILED\r\n"); 			
+	escribir_linea_pc("Modulo RF:\tFAILED\r\n");
 	escribir_linea_pc(register_value);
-	
+
 	//Inicializacion del sensor de temp
-	
+
 	init_i2c_pins();
 	init_i2c_module();
 	// inicializacion del tran
 	//pal_trx_reg_write(RG_TRX_STATE,CMD_FORCE_PLL_ON);
 
-	
+
 
 	init_AT86RF212();
 	//------------------Fin de conguracion
-	
+
 	escribir_linea_pc("TESIS TUCUMAN 2015\n\r\n");
+}
+int main (void)
+{
+// NODO I TX	
+
+	char temps[10] = "\0";
+	int i=0;
+	
+	init_dispositivos()
 	
 	pal_trx_reg_write(RG_TRX_STATE, CMD_RX_ON);// seteo el tran en RX
 	while(true)
 	{
-		if (cola_PC_nr != cola_PC_nw )
-		{
-			if (cola_PC[cola_PC_nr] == 't')
-			{
-				leer_temp(temps);
-				escribir_linea_pc("Temp: ");
-				escribir_linea_pc(temps);
-				escribir_linea_pc("*C\r\n");
-			}
-			cola_PC_nr++;
-			
-			if (cola_PC_nr >= tamano_cola)
-				cola_PC_nr = 0;
-				
-			if (configuracion && (cola_PC_nr >= pConfiguracion + 4))
-			{
-				if ((cola_PC[pConfiguracion] & cola_PC[pConfiguracion+1] & cola_PC[pConfiguracion+2]) == 0x01)
-				{
-					if (cola_PC[pConfiguracion+3] == ADDRESS)
-					{
-						modeConfig();
-					}
-					
-				}
-				configuracion = false;
-			}
-		}
-		//at86rfx_tx_frame(tx_buffer);
+// 		if (cola_PC_nr != cola_PC_nw )
+// 		{
+// 			if (cola_PC[cola_PC_nr] == 't')
+// 			{
+// 				leer_temp(temps);
+// 				escribir_linea_pc("Temp: ");
+// 				escribir_linea_pc(temps);
+// 				escribir_linea_pc("*C\r\n");
+// 			}
+// 			cola_PC_nr++;
+// 			
+// 			if (cola_PC_nr >= tamano_cola)
+// 				cola_PC_nr = 0;
+// 				
+// 			if (configuracion && (cola_PC_nr >= pConfiguracion + 4))
+// 			{
+// 				if ((cola_PC[pConfiguracion] & cola_PC[pConfiguracion+1] & cola_PC[pConfiguracion+2]) == 0x01)
+// 				{
+// 					if (cola_PC[pConfiguracion+3] == ADDRESS)
+// 					{
+// 						modeConfig();
+// 					}
+// 					
+// 				}
+// 				configuracion = false;
+// 			}
+// 		}
 		
-			txTramaManual(tx_buffer);
+		txTramaManual(tx_buffer90); // 90 bytes 200kbps
+		delay_ms(1000); // espero 1s 
 		
-		
-		//txTramachibi(tx_buffer);
-		//txTramachibi(tx_buffer);
-		//estadoPorPc();
-		delay_ms(500);
-		//txTramachibi(tx_buffer); // funcion creada segun el manual
-	//	txTrama(tx_buffer); // funcion creada segun un ejemplo LwMesh
-		// para Rx lo hace cuando hay interrupcion y muestra por pantalla
-
  	}
 }
 
