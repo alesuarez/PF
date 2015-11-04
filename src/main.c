@@ -102,7 +102,6 @@ static void tc_irq(void)
 	tc_read_sr(EXAMPLE_TC, EXAMPLE_TC_CHANNEL);
 
 	tc_tick++;	// contador para controlar el tiempo de las interrupciones
-	
 	if (tc_tick < 20)
 	{
 		// la funcion toggle pin (parece) que pone el pin en 1
@@ -122,6 +121,12 @@ static void tc_irq(void)
 	{
 		gpio_toggle_pin(AVR32_PIN_PA11);	
 		tc_tick = 1;
+	}
+	if (cola_PC_nw>0){
+		if (cola_PC_nw!=tamano_cola)
+			cola_PC[cola_PC_nw+1]='\0';
+		escribir_linea_pc(cola_PC);
+		cola_PC_nw = 0;
 	}
 }
 
@@ -160,34 +165,29 @@ __interrupt
 static void usart_int_handler_RS232(void)
 {
 	// TDW sensor de temperatura -> RX UART2 Pin 24 MCU
-	tc_stop(tc,EXAMPLE_TC_CHANNEL);
+	uint8_t c;
+	if((&AVR32_USART2)->csr & AVR32_USART_CSR_TXEMPTY_MASK){
+		c = (&AVR32_USART2)->rhr;
 	
-	uint8_t c=0;
+		cola_PC[cola_PC_nw] = c;
 	
-	if (usart_read_char(&AVR32_USART2, &c) != USART_SUCCESS) //aqui lee el caracter por el puerto uart2
-		return;
+		if (c == 0x01){		
+			++pSOH;
+		}
 	
-	cola_PC[cola_PC_nw] = c;
+		if(pSOH == 0x03) {
+				pSOH = cola_PC_nw;
+		}
 	
-	if (c == 0x01){		
-		++pSOH;
+		if (c == 0x04) {
+			pEOT = cola_PC_nw;
+			configuracion = true;
+		}
+	
+		cola_PC_nw++;
 	}
-	
-	if(pSOH == 0x03) {
-			pSOH = cola_PC_nw;
-	}
-	
-	if (c == 0x04) {
-		pEOT = cola_PC_nw;
-		configuracion = true;
-	}
-	
-	cola_PC_nw++;
-	
 	if (cola_PC_nw >= tamano_cola)
 		cola_PC_nw = 0;
-	
-	tc_start(tc,EXAMPLE_TC_CHANNEL);
 	
 	return;
 }
@@ -412,7 +412,7 @@ void rs_232_init_pins(void)
 int rs_232_init_usart()
 {
 	sysclk_enable_peripheral_clock(&AVR32_USART2);	
-	int estado_usart2 = usart_init_rs232(&AVR32_USART2, &usart9600, sysclk_get_peripheral_bus_hz(&AVR32_USART2));	
+	int estado_usart2 = usart_init_rs232(&AVR32_USART2, &usart1200, sysclk_get_peripheral_bus_hz(&AVR32_USART2));	
 	return estado_usart2;
 }
 
@@ -732,6 +732,9 @@ void modeConfig()
 		case CONFIG_TEMPERATURA:
 			getTemperature();
 		break;
+		case HIDDEN_SETTINGS:
+			escribir_linea_pc("\n Tesis \n\n\n\n SAS \n\n\n\n\n A life is like a garden. Perfect moments can be had, but not preserved, except in memory... \n\n\n\n\n\t\t\t\t\t\t\t\t\t\t\t\t\t \\m/");
+		break;
 	}
 	return;
 }
@@ -796,8 +799,8 @@ int main (void)
 				pEOT = 0;
 			}
 		}
-		estadoPorPc();
-		delay_ms(500);
+		//estadoPorPc();
+		delay_ms(20);
 	}
 }
 
