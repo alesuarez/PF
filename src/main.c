@@ -16,12 +16,12 @@
 
 #define BUFFER_SIZE       (15)
 #define ADDRESS 0x31
-#define BUFFER_TRAMA 20
-
+#define SOH 0x01
+#define EOT 0x04
 uint8_t cola_PC[tamano_cola];
 uint8_t cola_PC_nw = 0;
 uint8_t cola_PC_nr = 0;
-
+uint8_t cSOH =0;
 volatile static uint32_t tc_tick = 1;
 
 volatile avr32_tc_t *tc = EXAMPLE_TC;
@@ -170,18 +170,17 @@ static void usart_int_handler_RS232(void)
 		c = (&AVR32_USART2)->rhr;
 	
 		cola_PC[cola_PC_nw] = c;
-	
-		if (c == 0x01) {		
-			++pSOH;
+		if ( cSOH < 3) {
+			if (c == SOH ) {
+				pSOH=cola_PC_nw;
+				cSOH++;
+			}
 		}
 	
-		if(pSOH == 0x03) {
-				pSOH = cola_PC_nw;
-		}
-	
-		if (c == 0x04) {
+		if (c == EOT) {
 			pEOT = cola_PC_nw;
 			configuracion = true;
+			cSOH=0;
 		}
 	
 		cola_PC_nw++;
@@ -655,7 +654,7 @@ void getTemperature()
 
 void setUART()
 {
-	int i=2;
+	int i=3;
 	int mult = 1;
 	unsigned long baudRate = 0;
 	Disable_global_interrupt();
@@ -665,7 +664,7 @@ void setUART()
 	{
 		tConfiguracion.payload[i++]-=0x30;
 	}
-	for(int i=2; i < tConfiguracion.tamPayload; i++)
+	for(int i=3; i < tConfiguracion.tamPayload; i++)
 	{
 		baudRate = baudRate * mult + tConfiguracion.payload[i];
 		mult = mult*10;
@@ -706,16 +705,15 @@ uint8_t checkPack(config_package packet)
 void unpack()
 {
 	uint8_t i = 0;
-	uint8_t p = pSOH+1;
 	
-	tConfiguracion.tamPayload = cola_PC[p];
-	tConfiguracion.addr = cola_PC[p+1];
-	tConfiguracion.cmd = cola_PC[p+2];
-			
+	tConfiguracion.tamPayload = cola_PC[pSOH+1];
+	tConfiguracion.addr = cola_PC[pSOH+2];
+	tConfiguracion.cmd = cola_PC[pSOH+3];
+	
 	while( i <= tConfiguracion.tamPayload)
-		tConfiguracion.payload[i++] = cola_PC[p++];
+		tConfiguracion.payload[i++] = cola_PC[++pSOH];
 
-	tConfiguracion.lrc=cola_PC[p];
+	tConfiguracion.lrc=cola_PC[++pSOH];
 }
 
 void modeConfig()
@@ -726,13 +724,14 @@ void modeConfig()
 	switch (tConfiguracion.cmd){
 		case CONFIG_BAUDRATE:
 			setUART();
+			
 		break;
 		
 		case CONFIG_TEMPERATURA:
 			getTemperature();
 		break;
 		case HIDDEN_SETTINGS:
-			escribir_linea_pc("\n Tesis \n\n\n\n SAS \n\n\n\n\n A life is like a garden. Perfect moments can be had, but not preserved, except in memory... \n\n\n\n\n\t\t\t\t\t\t\t\t\t\t\t\t\t \\m/");
+			escribir_linea_pc("\nA life is like a garden. Perfect moments can be had, but not preserved, except in memory... \n");
 		break;
 	}
 	return;
@@ -777,7 +776,7 @@ void inciarDispositivos()
 	init_i2c_module();
 	
 	// inicializacion del transceiver
-	init_AT86RF212();
+	//init_AT86RF212();
 	
 }
 
@@ -787,12 +786,6 @@ int main (void)
 	
 	while(true)
 	{
-		if (cola_PC_nr != cola_PC_nw )
-		{
-			cola_PC_nr++;
-			
-			if (cola_PC_nr >= tamano_cola) cola_PC_nr = 0;
-				
 			if (configuracion)
 			{
 				unpack();
@@ -802,9 +795,9 @@ int main (void)
 				configuracion = false;
 				pSOH = 0;
 				pEOT = 0;
+				cola_PC_nw=0;
 			}
-		}
-		delay_ms(20);
+		delay_ms(10);
 	}
 }
 
