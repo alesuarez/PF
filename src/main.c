@@ -16,6 +16,7 @@
 
 #define BUFFER_SIZE       (15)
 #define ADDRESS 0x31
+#define BUFFER_TRAMA 20
 
 uint8_t cola_PC[tamano_cola];
 uint8_t cola_PC_nw = 0;
@@ -27,11 +28,9 @@ volatile avr32_tc_t *tc = EXAMPLE_TC;
 
 volatile uint8_t resolution = AT30TSE_CONFIG_RES_12_bit;
 
-uint8_t tx_buffer[5]="aleja";
-
-uint8_t register_value = 0;
 
 uint8_t IRQ_STATUS;
+
 uint8_t configuracion = 0;
 uint8_t pSOH = 0;
 uint8_t pEOT = 0;
@@ -166,12 +165,13 @@ static void usart_int_handler_RS232(void)
 {
 	// TDW sensor de temperatura -> RX UART2 Pin 24 MCU
 	uint8_t c;
-	if((&AVR32_USART2)->csr & AVR32_USART_CSR_TXEMPTY_MASK){
+	if((&AVR32_USART2)->csr & AVR32_USART_CSR_TXEMPTY_MASK)
+	{
 		c = (&AVR32_USART2)->rhr;
 	
 		cola_PC[cola_PC_nw] = c;
 	
-		if (c == 0x01){		
+		if (c == 0x01) {		
 			++pSOH;
 		}
 	
@@ -686,37 +686,36 @@ void setUART()
 	tc_start(tc,EXAMPLE_TC_CHANNEL);
 }
 
-uint8_t checkPack(config_package packet) //tampack es la cantidad de bytes del paquete hasta antes de EOT, para cdo lo hagamos variable
+uint8_t checkPack(config_package packet)
 {
 	uint8_t i = 0; 
 	uint8_t lrc = 0;
 
-	while(i < packet.tamPayload) {
-		lrc = lrc ^ packet.payload[i]; //este es el XOR
+	while(i <= packet.tamPayload) {
+		lrc = lrc ^ packet.payload[i]; 
 		i++;
 	}
 	
 	if (lrc == packet.lrc){
-		return 1; //el LRC del paquete y el calculado son iguales
+		return 1; 
 	}
 	
-	return 0; //el LRC del paquete y el calculado no coinciden
+	return 0;
 }
 
 void unpack()
 {
-	uint8_t p = 0;
 	uint8_t i = 0;
+	uint8_t p = pSOH+1;
 	
-	p = ++pSOH;	
-	tConfiguracion.addr = cola_PC[pSOH];
-	tConfiguracion.cmd = cola_PC[++pSOH];
-	tConfiguracion.lrc = cola_PC[--pEOT];
+	tConfiguracion.tamPayload = cola_PC[p];
+	tConfiguracion.addr = cola_PC[p+1];
+	tConfiguracion.cmd = cola_PC[p+2];
 			
-	while(p < pEOT) {
+	while( i <= tConfiguracion.tamPayload)
 		tConfiguracion.payload[i++] = cola_PC[p++];
-	}
-	tConfiguracion.tamPayload = i;
+
+	tConfiguracion.lrc=cola_PC[p];
 }
 
 void modeConfig()
@@ -739,12 +738,12 @@ void modeConfig()
 	return;
 }
 
-int main (void)
+void inciarDispositivos()
 {
-	// configuracion del clock del sistema ver archivo "conf_clock.h"	
-	sysclk_init();	
+	// configuracion del clock del sistema ver archivo "conf_clock.h"
+	sysclk_init();
 	
-	//Configuracion de los pines para los LEDS 
+	//Configuracion de los pines para los LEDS
 	led_init_pins();
 
 	//Configuracion de los pines para el RS-232
@@ -756,29 +755,35 @@ int main (void)
 	//Inicializacion del SPI
 	spi_init_module();
 	
-	//Inicializacion de la USART	
+	//Inicializacion de la USART
 	int estado_rs_232 = rs_232_init_usart();
 
-		
+	
 	//Inicializacion de las interrupciones
 	inicializar_interrupciones();
 	
 	// Inicializacion del timer
 	tc_init(tc);
 	
+/*
+	poner rutina con led por si da algun error
 	register_value = pal_trx_reg_read(RG_PART_NUM);//pedido de identificacion del modulo. Debe devolver 0x07
 	
-	if (register_value != PART_NUM_AT86RF212) 
- 		escribir_linea_pc("Modulo RF:\tFAILED\r\n"); 			
-	
+	if (register_value != PART_NUM_AT86RF212)
+	escribir_linea_pc("Modulo RF:\tFAILED\r\n");
+*/	
 	//Inicializacion del sensor de temp
 	init_i2c_pins();
 	init_i2c_module();
 	
-	// inicializacion del tran
-	//init_AT86RF212();
+	// inicializacion del transceiver
+	init_AT86RF212();
 	
-	//------------------Fin de conguracion
+}
+
+int main (void)
+{
+	inciarDispositivos();	
 	
 	while(true)
 	{
@@ -799,7 +804,6 @@ int main (void)
 				pEOT = 0;
 			}
 		}
-		//estadoPorPc();
 		delay_ms(20);
 	}
 }

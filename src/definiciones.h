@@ -156,16 +156,16 @@ enum{
 };
 
 // 
-#define MAX_PAYLOAD 0x07
+#define MAX_PAYLOAD 0x0F
 //
 typedef struct
 {
+	uint8_t tamPayload;
 	uint8_t addr;
 	uint8_t cmd;
 	uint8_t payload[MAX_PAYLOAD];	
-	uint8_t tamPayload;
 	uint8_t lrc;	
-}config_package;
+} config_package;
 
 void escribir_linea_pc (char*);
 static void inicializar_interrupciones();

@@ -1,7 +1,7 @@
 ﻿// notas de distintos registros usados
 //
 // Trama para configurar 
-//			     PAYLOAD
+//			                 PAYLOAD
 //                  /¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯\
 // --------------------------------------------------------
 //| SOH | SOH | SOH | Dir | CMD |     DATO    | LRC | EOT |
@@ -23,6 +23,13 @@
 //
 //
 ///////////////////////////////////////////////////////////////////
+//
+// baudRate <SOH><SOH><SOH>#0x06 1 1 9600 #0x09 <EOT> = <SOH><SOH><SOH><ACK>119600<HT><EOT>
+// 
+// temperatura <SOH><SOH><SOH>#0x02 1 2 #0x01 <EOT>   = <SOH><SOH><SOH><STX>12<SOH><EOT>
+//
+//
+//
 //
 //AT86RF212B
 //**************************************************
