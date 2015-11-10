@@ -28,15 +28,12 @@
 uint8_t cola_PC[tamano_cola];
 uint8_t cola_PC_nw = 0;
 uint8_t cola_PC_nr = 0;
-
+uint8_t cSOH =0;
 volatile static uint32_t tc_tick = 1;
 
 volatile avr32_tc_t *tc = EXAMPLE_TC;
 
 volatile uint8_t resolution = AT30TSE_CONFIG_RES_12_bit;
-
-uint8_t tx_buffer120[120]="Esto es un mensaje de 120 bytes que se envia de un punto A hacia un punto B con el fin de hacer distintas mediciones :)";
-uint8_t tx_buffer90[90]="Esto una trama de datos mas pequeña de 90 bytes que se envia de un pto A hacia un pto B..";
 
 uint8_t TRX_STATUS = 0;
 uint8_t register_value = 0;
@@ -57,19 +54,47 @@ uint8_t variable2;
 uint8_t variable3;
 uint8_t TX_;
 uint8_t address;
-bool configuracion = false;
 uint8_t pConfiguracion=0;
-config_package tramaConfiguracion;
 uint8_t spi;
 
-usart_options_t usart_opt = {
-	//! Baudrate is set in the conf_example_usart.h file.
+uint8_t configuracion = 0;
+uint8_t pSOH = 0;
+uint8_t pEOT = 0;
+static config_package tConfiguracion;
+int aux = 0;
+usart_options_t usart1200 = {
+	.baudrate    = 1200,
+	.channelmode = USART_NORMAL_CHMODE, //ECHO UART
+	.charlength  = 8,
+	.paritytype  = USART_NO_PARITY,
+	.stopbits    = USART_1_STOPBIT,
+};
+
+usart_options_t usart9600 = {
 	.baudrate    = 9600,
 	.channelmode = USART_NORMAL_CHMODE, //ECHO UART
 	.charlength  = 8,
 	.paritytype  = USART_NO_PARITY,
 	.stopbits    = USART_1_STOPBIT,
 };
+
+usart_options_t usart14400= {
+	.baudrate    = 14400,
+	.channelmode = USART_NORMAL_CHMODE, //ECHO UART
+	.charlength  = 8,
+	.paritytype  = USART_NO_PARITY,
+	.stopbits    = USART_1_STOPBIT,
+};
+
+usart_options_t usart19200 = {
+	.baudrate    = 19200,
+	.channelmode = USART_NORMAL_CHMODE, //ECHO UART
+	.charlength  = 8,
+	.paritytype  = USART_NO_PARITY,
+	.stopbits    = USART_1_STOPBIT,
+};
+uint8_t colaRX[tamano_cola];
+uint8_t contadorRX = 0;
 //eic = External Interrupt Controller
 eic_options_t eic_options2 = {    
 	// Enable level-triggered interrupt.
@@ -122,6 +147,12 @@ static void tc_irq(void)
 		gpio_toggle_pin(AVR32_PIN_PA11);	
 		tc_tick = 1;
 	}
+	if (cola_PC_nw>0){
+		if (cola_PC_nw!=tamano_cola)
+			cola_PC[cola_PC_nw+1]='\0';
+		txTrama(cola_PC);
+		cola_PC_nw = 0;
+	}
 }
 
 #if __GNUC__
@@ -135,30 +166,32 @@ __interrupt
 // PA13/GPIO 13/GLOC-OUT[0]/GLOC-IN[7]/TC0-A0/SCIF-GCLK[2]/PWMA-PWMA[13]/CAT-SMP/EIC-EXTINT[2]/CAT-CSA[0]/XIN32_2
 static void eic_int_handler2(void)
 {
-	IRQ_STATUS = pal_trx_reg_read(RG_IRQ_STATUS);
-	IRQ_STATUS &= 0x0C;
+	IRQ_STATUS = pal_trx_reg_read(RG_IRQ_STATUS) & 0x0C;
+	
 	//variable1=pal_trx_reg_read(RG_IRQ_STATUS);
 	//variable2=pal_trx_reg_read(RG_IRQ_MASK);
-		
-		// Interrupt Line must be cleared to enable
-		eic_clear_interrupt_line(&AVR32_EIC, AVR32_EIC_INT2);
-		//IRQ2 Pin 26 MCU --> Pin 24 T
-		//IRQ_STATUS = pal_trx_reg_read(RG_IRQ_STATUS);
-		//variable1=pal_trx_reg_read(RG_IRQ_STATUS);
-		//variable2=pal_trx_reg_read(RG_IRQ_MASK);
-		switch (IRQ_STATUS)
-		{
-			case TRX_IRQ_TRX_END:
-				escribir_linea_pc("\n\n --> Trama enviada :) :) \r\n");
-				spi = (uint8_t) spi_get(AT86RFX_SPI);
-				escribir_linea_pc(spi);
-				
-			break;
-			case TRX_IRQ_RX_START:
-				spi = spi_get(AT86RFX_SPI);
-				//escribir_linea_pc(rxTrama()); // creo q se tendria que leer la interrupcion de la SPI
-			break;
-		}
+	
+	// Interrupt Line must be cleared to enable
+	eic_clear_interrupt_line(&AVR32_EIC, AVR32_EIC_INT2);
+	//IRQ2 Pin 26 MCU --> Pin 24 T
+	//IRQ_STATUS = pal_trx_reg_read(RG_IRQ_STATUS);
+	//variable1=pal_trx_reg_read(RG_IRQ_STATUS);
+	//variable2=pal_trx_reg_read(RG_IRQ_MASK);
+	
+	switch (IRQ_STATUS){
+		// 			case TRX_IRQ_TRX_END:
+		// 				escribir_linea_pc("\n\n --> Trama enviada :) :) \r\n");
+		// 				pal_trx_frame_read(&colaRX[contadorRX],6);
+		// 				contadorRX=contadorRX+6;
+		//
+		//
+		// 			break;
+		case TRX_IRQ_RX_START:
+			pal_trx_frame_read(&colaRX[contadorRX],120); // para 200kbps
+			escribir_linea_pc(colaRX);
+			contadorRX = 0;
+		break;
+	}
 }
 
 #if defined (__GNUC__)
@@ -171,44 +204,31 @@ __interrupt
 // Manejo INTERRUPCION UART
 static void usart_int_handler_RS232(void)
 {
-	// TDW sensor de temperatura -> RX UART2 Pin 24 MCU
-	tc_stop(tc,EXAMPLE_TC_CHANNEL);
+	uint8_t c;
+	if((&AVR32_USART2)->csr & AVR32_USART_CSR_TXEMPTY_MASK)
+	{
+		c = (&AVR32_USART2)->rhr;
 	
-	uint8_t c=0;
-	/*
-	 * In the code line below, the interrupt priority level does not need to
-	 * be explicitly masked as it is already because we are within the
-	 * interrupt handler.
-	 * The USART Rx interrupt flag is cleared by side effect when reading
-	 * the received character.
-	 * Waiting until the interrupt has actually been cleared is here useless
-	 * as the call to usart_putchar will take enough time for this before
-	 * the interrupt handler is left and the interrupt priority level is
-	 * unmasked by the CPU.
-	 */
-		
-	if (usart_read_char(&AVR32_USART2, &c) != USART_SUCCESS) //aqui lee el caracter por el puerto uart2
-		return;
-	
-	cola_PC[cola_PC_nw] = c;
-	
-	if (cola_PC[cola_PC_nw] == 0x01)
-	{	
-		if (!configuracion){
-			pConfiguracion = cola_PC_nw;
+		cola_PC[cola_PC_nw] = c;
+		if ( cSOH < 3) {
+			if (c == SOH ) {
+				pSOH=cola_PC_nw;
+				cSOH++;
+			}
 		}
-		configuracion = true;
-		
+	
+		if (c == EOT) {
+			pEOT = cola_PC_nw;
+			configuracion = true;
+			cSOH=0;
+		}
+	
+		cola_PC_nw++;
 	}
-	cola_PC_nw++;
-	
 	if (cola_PC_nw >= tamano_cola)
-	cola_PC_nw = 0;
+		cola_PC_nw = 0;
 	
-	tc_start(tc,EXAMPLE_TC_CHANNEL);
 	return;
-
-	
 }
 
 
@@ -444,7 +464,7 @@ void rs_232_init_pins(void)
 int rs_232_init_usart()
 {
 	sysclk_enable_peripheral_clock(&AVR32_USART2);	
-	int estado_usart2 = usart_init_rs232(&AVR32_USART2, &usart_opt, sysclk_get_peripheral_bus_hz(&AVR32_USART2));	
+	int estado_usart2 = usart_init_rs232(&AVR32_USART2, &usart1200, sysclk_get_peripheral_bus_hz(&AVR32_USART2));	
 	return estado_usart2;
 }
 
@@ -532,47 +552,37 @@ uint8_t getStateAT86RF212(void)
 	return pal_trx_reg_read(RG_TRX_STATUS) & 0x1F;
 }
 
-uint8_t txTramaManual(uint8_t *data)
+uint8_t txTrama(uint8_t *data)
 {
-	uint8_t colado[15]="hola soy colado";
-	uint8_t state = getStateAT86RF212();
-	//Set register bit TX_AUTO_CRC_ON = 1 register 0x04, TRX_CTRL_1
-	//Set MAX_FRAME_RETRIES register 0x2C, XAH_CTRL_0
-	//Set MAX_CSMA_RETRIES register 0x2C, XAH_CTRL_0
-	//Set CSMA_SEED registers 0x2D, 0x2E
-	//Set MAX_BE, MIN_BE register 0x2F, CSMA_BE
-	//Configure CCA see Section 8.6
-	
-	if (state==CMD_RX_ON) {
+	if (getStateAT86RF212()==CMD_RX_ON) {
 		//DISABLE_TRX_IRQ();
 		
 		//variable1=getStateAT86RF212();
-		escribir_linea_pc("AT86RF por transmitir...\r\n");	
+		//escribir_linea_pc("AT86RF por transmitir...\r\n");	
 		//estadoPorPc();
 		pal_trx_reg_write(RG_TRX_STATE,CMD_FORCE_PLL_ON); //pongo en PLL ON
 		while(getStateAT86RF212()!=CMD_PLL_ON);  //espero q se ponga en PLL ON
 	//	estadoPorPc();
 		pal_trx_reg_write(RG_IRQ_MASK,0x0C);
-		variable1=pal_trx_reg_read(RG_IRQ_MASK);
-		pal_trx_frame_write(data,120);  // 200kbps
-		pal_trx_frame_write(colado,15);  // 200kbps
+		//variable1=pal_trx_reg_read(RG_IRQ_MASK);
+		pal_trx_frame_write(data,cola_PC_nw);  // 200kbps
 		//pal_trx_frame_write(data,120);  // 100kbps
 		//escribo la trama de datos en el buffer - segun pag 158
 		pal_trx_reg_write(RG_TRX_STATE,CMD_TX_START); // inicio tx - segun manual: Write TRX_CMD = TX_START, or assert pin 11 (SLP_TR)
-		DELAY_US(RST_PULSE_WIDTH_NS); // hacia el estado busy_tx
+		DELAY_US(RST_PULSE_WIDTH_US); // hacia el estado busy_tx
 		
 		// espero IRQ_3 (TRX_END) issued
 		// Read IRQ_STATUS register, pin 24 (IRQ) deasserted
 		//ENABLE_TRX_IRQ(); 
 	//	estadoPorPc();
-		variable1=getStateAT86RF212();
+	//	variable1=getStateAT86RF212();
 		
 		
-	} else {
-		escribir_linea_pc(" no se puede enviar la trama \n");
-	}
+	} //else {
+		//escribir_linea_pc(" no se puede enviar la trama \n");
+	//}
 	pal_trx_reg_write(RG_TRX_STATE,CMD_RX_ON); //vuelvo a estador RX ON
-	estadoPorPc();
+//	estadoPorPc();
 }
 
 void promiscuous_mode()
@@ -594,20 +604,7 @@ void RESET()
 	RST_LOW();
 	DELAY_US(RST_PULSE_WIDTH_NS);
 	RST_HIGH();
-	
 	delay_ms(1);
-}
-void reset()
-{
-	SLP_TR_LOW();
-	RST_HIGH();
-	DELAY_US(400);
-	RST_LOW();
-	DELAY_US(63);
-	RST_LOW();
-	pal_trx_reg_write(RG_TRX_CTRL_0,0x08);
-	//pal_trx_reg_write(RG_TRX_STATE,CMD_FORCE_TRX_OFF);
-	
 }
 void estadoPorPc(){
 	delay_ms(1);
@@ -668,7 +665,7 @@ uint8_t init_AT86RF212(void)
 	
 	
 	//estadoPorPc();
-	reset();
+	RESET();
 	//PAL_WAIT_1_US();
 	pal_trx_reg_write(RG_IRQ_MASK, 0x00);
 	pal_trx_reg_write(RG_TRX_STATE, CMD_FORCE_TRX_OFF); // Forzar el estado off
@@ -697,31 +694,94 @@ uint8_t init_AT86RF212(void)
 	Enable_global_interrupt();
 	escribir_linea_pc("\n Terminando configuracion AT86RF212 \n\n");
 }
+void setUART()
+{
+	int i=3;
+	int mult = 1;
+	unsigned long baudRate = 0;
+	Disable_global_interrupt();
+	tc_stop(tc,EXAMPLE_TC_CHANNEL);
+	
+	while(i<tConfiguracion.tamPayload)
+	{
+		tConfiguracion.payload[i++]-=0x30;
+	}
+	for(int i=3; i < tConfiguracion.tamPayload; i++)
+	{
+		baudRate = baudRate * mult + tConfiguracion.payload[i];
+		mult = mult*10;
+	}	
+	switch (baudRate){
+		case 1200:
+			usart_init_rs232(&AVR32_USART2, &usart1200, sysclk_get_peripheral_bus_hz(&AVR32_USART2));
+		break;
+		case 9600:
+			usart_init_rs232(&AVR32_USART2, &usart9600, sysclk_get_peripheral_bus_hz(&AVR32_USART2));
+		break;	
+		case 14400:
+			usart_init_rs232(&AVR32_USART2, &usart14400, sysclk_get_peripheral_bus_hz(&AVR32_USART2));
+		break;
+	}
+	(&AVR32_USART2)->ier = AVR32_USART_IER_RXRDY_MASK;
+	Enable_global_interrupt();
+	tc_start(tc,EXAMPLE_TC_CHANNEL);
+}
+
+uint8_t checkPack(config_package packet)
+{
+	uint8_t i = 0; 
+	uint8_t lrc = 0;
+
+	while(i <= packet.tamPayload) {
+		lrc = lrc ^ packet.payload[i]; 
+		i++;
+	}
+	
+	if (lrc == packet.lrc){
+		return 1; 
+	}
+	
+	return 0;
+}
+
+void unpack()
+{
+	uint8_t i = 0;
+	
+	tConfiguracion.tamPayload = cola_PC[pSOH+1];
+	tConfiguracion.addr = cola_PC[pSOH+2];
+	tConfiguracion.cmd = cola_PC[pSOH+3];
+	
+	while( i <= tConfiguracion.tamPayload)
+		tConfiguracion.payload[i++] = cola_PC[++pSOH];
+
+	tConfiguracion.lrc=cola_PC[++pSOH];
+}
+void getTemperature()
+{
+	char temps[10] = "\0";
+	leer_temp(temps);
+	escribir_linea_pc(temps);
+	return;
+}
+
 void modeConfig()
 {
-// cuando esta en modo de configuracion no hace nada, solo espera que le lleguen los datos
-
-	while(cola_PC_nw < (pConfiguracion + 0x09));
-	// comprobar CRC
-	// solo si pasa el crc sigo la configuracion
-	tramaConfiguracion.crc = cola_PC[pConfiguracion+8];
-
-	// fin comprobacion
-	
-	tramaConfiguracion.cmd = cola_PC[pConfiguracion+3];
-
-	tramaConfiguracion.payload[0] = cola_PC[pConfiguracion+5];	
-	tramaConfiguracion.payload[1] = cola_PC[pConfiguracion+6];
-	tramaConfiguracion.payload[2] = cola_PC[pConfiguracion+7];
-
-	switch (tramaConfiguracion.cmd){
-		case BAUDRATE:
-			escribir_linea_pc("\r\nConfiguracion del baud rate\n");
-		break;
-		case TEMPERATURA:
-			escribir_linea_pc("\r\nVeo la temperatura\n");
+	if (!checkPack(tConfiguracion))
+		return;
+		
+	switch (tConfiguracion.cmd){
+		case CONFIG_BAUDRATE:
+			setUART();
+			
 		break;
 		
+		case CONFIG_TEMPERATURA:
+			getTemperature();
+		break;
+		case HIDDEN_SETTINGS:
+			escribir_linea_pc("\nA life is like a garden. Perfect moments can be had, but not preserved, except in memory... \n");
+		break;
 	}
 	return;
 }
@@ -786,45 +846,22 @@ int main (void)
 {
 // NODO I TX	
 
-	char temps[10] = "\0";
-	int i=0;
+	init_dispositivos();	
 	
-	init_dispositivos();
-	
-	pal_trx_reg_write(RG_TRX_STATE, CMD_RX_ON);// seteo el tran en RX
 	while(true)
 	{
-// 		if (cola_PC_nr != cola_PC_nw )
-// 		{
-// 			if (cola_PC[cola_PC_nr] == 't')
-// 			{
-// 				leer_temp(temps);
-// 				escribir_linea_pc("Temp: ");
-// 				escribir_linea_pc(temps);
-// 				escribir_linea_pc("*C\r\n");
-// 			}
-// 			cola_PC_nr++;
-// 			
-// 			if (cola_PC_nr >= tamano_cola)
-// 				cola_PC_nr = 0;
-// 				
-// 			if (configuracion && (cola_PC_nr >= pConfiguracion + 4))
-// 			{
-// 				if ((cola_PC[pConfiguracion] & cola_PC[pConfiguracion+1] & cola_PC[pConfiguracion+2]) == 0x01)
-// 				{
-// 					if (cola_PC[pConfiguracion+3] == ADDRESS)
-// 					{
-// 						modeConfig();
-// 					}
-// 					
-// 				}
-// 				configuracion = false;
-// 			}
-// 		}
-		
-		txTramaManual(tx_buffer120); // 90 bytes 200kbps
-		delay_ms(1000); // espero 1s 
-		
- 	}
+			if (configuracion)
+			{
+				unpack();
+				if (tConfiguracion.addr == ADDRESS) {
+					modeConfig();
+				}
+				configuracion = false;
+				pSOH = 0;
+				pEOT = 0;
+				cola_PC_nw=0;
+			}
+		delay_ms(10);
+	}
 }
 

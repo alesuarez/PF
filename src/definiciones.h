@@ -155,20 +155,30 @@ enum{
 	TIME_IRQ_PROCESSING_DLY     = 32
 };
 enum{
-	BAUDRATE    = 0x31,
-	TEMPERATURA = 0x32
+	CONFIG_BAUDRATE    = 0x31,
+	CONFIG_TEMPERATURA = 0x32,
+	HIDDEN_SETTINGS = 0x38
 };
 
+//
+#define MAX_PAYLOAD 0x0F
+#define BUFFER_SIZE       (15)
+#define ADDRESS 0x31
+#define SOH 0x01
+#define EOT 0x04
+//
 typedef struct
 {
+	uint8_t tamPayload;
 	uint8_t addr;
-	uint8_t cmd;	
-	uint8_t payload[2];	
-	uint8_t crc;	
-}config_package;
+	uint8_t cmd;
+	uint8_t payload[MAX_PAYLOAD];
+	uint8_t lrc;
+} config_package;
 
 void escribir_linea_pc (char*);
 static void inicializar_interrupciones();
 void spi_init_pins(void);
 void estadoPorPc();
+uint8_t txTrama(uint8_t *);
 #endif /* DEFINICIONES_H_ */
