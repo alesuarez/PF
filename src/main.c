@@ -647,8 +647,27 @@ uint8_t init_AT86RF212(void)
 void getTemperature()
 {
 	char temps[10] = "\0";
+	uint8_t i;
+	uint8_t LRC = 0;
+	char tramaRespuesta[20]="\0";
+	tramaRespuesta[0]=SOH;
+	tramaRespuesta[1]=SOH;
+	tramaRespuesta[2]=SOH;
+	tramaRespuesta[3]=0x06;
+	tramaRespuesta[4]=ADDRESS;
+	tramaRespuesta[5]=CONFIG_TEMPERATURA;
 	leer_temp(temps);
-	escribir_linea_pc(temps);
+	tramaRespuesta[6]=temps[0];
+	tramaRespuesta[7]=temps[1];
+	tramaRespuesta[8]=temps[2];
+	tramaRespuesta[9]=temps[3];
+	
+	for (i = 4; i <= 9; i++){
+		LRC = LRC ^ tramaRespuesta[i];
+	}
+	tramaRespuesta[10] = LRC;
+	tramaRespuesta[11] = EOT;	
+	escribir_linea_pc(tramaRespuesta);
 	return;
 }
 
@@ -684,18 +703,20 @@ void setUART()
 	Enable_global_interrupt();
 	tc_start(tc,EXAMPLE_TC_CHANNEL);
 }
-
-uint8_t checkPack(config_package packet)
+uint8_t generateLRC(config_package packet)
 {
-	uint8_t i = 0; 
+	uint8_t i = 0;
 	uint8_t lrc = 0;
-
 	while(i <= packet.tamPayload) {
-		lrc = lrc ^ packet.payload[i]; 
+		lrc = lrc ^ packet.payload[i];
 		i++;
 	}
+	return lrc;
 	
-	if (lrc == packet.lrc){
+}
+uint8_t checkPack(config_package packet)
+{
+	if (generateLRC(packet) == packet.lrc){
 		return 1; 
 	}
 	
