@@ -4816,8 +4816,9 @@ __always_inline static void cpu_set_timeout(unsigned long delay, t_cpu_time *cpu
 800036c8:	f0 ca ff ff 	sub	r10,r8,-1
 800036cc:	c6 bb       	rjmp	800035a2 <init_AT86RF212+0xee>
 	PAL_WAIT_1_US();
-	pal_trx_reg_write(RG_TRX_CTRL_2, 0x68); // O-QPSK 100kb/s
-800036ce:	36 8b       	mov	r11,104
+	//pal_trx_reg_write(RG_TRX_CTRL_2, 0x68); // O-QPSK 100kb/s
+	pal_trx_reg_write(RG_TRX_CTRL_2, 0x20); // O-QPSK 200kb/s
+800036ce:	32 0b       	mov	r11,32
 800036d0:	30 cc       	mov	r12,12
 800036d2:	f0 1f 00 17 	mcall	8000372c <init_AT86RF212+0x278>
  * \param  delay:   (input) delay in CPU cycles before timeout.
@@ -4830,7 +4831,6 @@ __always_inline static void cpu_set_timeout(unsigned long delay, t_cpu_time *cpu
   cpu_time->delay_end_cycle   = cpu_time->delay_start_cycle + delay;
 800036da:	f0 ca ff ff 	sub	r10,r8,-1
 800036de:	c7 5b       	rjmp	800035c8 <init_AT86RF212+0x114>
-	//pal_trx_reg_write(RG_TRX_CTRL_2, 0x29); // O-QPSK 200kb/s
 	
 	//pal_trx_reg_write(RG_XOSC_CTRL, 0x40); // manejo del cristal externo y capacitores se muere cuando se activa
 	PAL_WAIT_1_US();

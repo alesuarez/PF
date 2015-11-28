@@ -770,8 +770,8 @@ uint8_t init_AT86RF212(void)
 	//pal_trx_reg_write(RG_RX_CTRL, 0x20);
 	pal_trx_reg_write(RG_IRQ_MASK, 0x0C);
 	PAL_WAIT_1_US();
-	pal_trx_reg_write(RG_TRX_CTRL_2, 0x68); // O-QPSK 100kb/s
-	//pal_trx_reg_write(RG_TRX_CTRL_2, 0x29); // O-QPSK 200kb/s
+	//pal_trx_reg_write(RG_TRX_CTRL_2, 0x68); // O-QPSK 100kb/s
+	pal_trx_reg_write(RG_TRX_CTRL_2, 0x20); // O-QPSK 200kb/s
 	
 	//pal_trx_reg_write(RG_XOSC_CTRL, 0x40); // manejo del cristal externo y capacitores se muere cuando se activa
 	PAL_WAIT_1_US();
