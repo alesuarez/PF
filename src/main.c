@@ -33,6 +33,7 @@ uint8_t cola_PC_nr = 0;
 uint8_t pSOH = 0;
 uint8_t pEOT = 0;
 uint8_t cSOH =0;
+uint8_t contadorRX = 0;
 volatile static uint32_t tc_tick = 1;
 static config_package tConfiguracion;
 
@@ -125,7 +126,7 @@ static void tc_irq(void)
 	}
 	if (cola_PC_nw>0){
 		if (cola_PC_nw!=tamano_cola)
-		cola_PC[cola_PC_nw]='\0';
+		cola_PC[cola_PC_nw]=0x03;
 		txTramaManual(cola_PC);
 		cola_PC_nw = 0;
 	}
@@ -142,12 +143,32 @@ __interrupt
 // PA13/GPIO 13/GLOC-OUT[0]/GLOC-IN[7]/TC0-A0/SCIF-GCLK[2]/PWMA-PWMA[13]/CAT-SMP/EIC-EXTINT[2]/CAT-CSA[0]/XIN32_2
 static void eic_int_handler2(void)
 {
+	
 	IRQ_STATUS = pal_trx_reg_read(RG_IRQ_STATUS) & 0x0C;
+	
+	//variable1=pal_trx_reg_read(RG_IRQ_STATUS);
+	//variable2=pal_trx_reg_read(RG_IRQ_MASK);
+	
+	// Interrupt Line must be cleared to enable
 	eic_clear_interrupt_line(&AVR32_EIC, AVR32_EIC_INT2);
+	//IRQ2 Pin 26 MCU --> Pin 24 T
+	//IRQ_STATUS = pal_trx_reg_read(RG_IRQ_STATUS);
+	//variable1=pal_trx_reg_read(RG_IRQ_STATUS);
+	//variable2=pal_trx_reg_read(RG_IRQ_MASK);
+	
 	switch (IRQ_STATUS){
+		// 			case TRX_IRQ_TRX_END:
+		// 				escribir_linea_pc("\n\n --> Trama enviada :) :) \r\n");
+		// 				pal_trx_frame_read(&colaRX[contadorRX],6);
+		// 				contadorRX=contadorRX+6;
+		//
+		//
+		// 			break;
 		case TRX_IRQ_RX_START:
-			pal_trx_frame_read(&colaRX,120);
-			escribir_linea_pc(colaRX);
+		pal_trx_frame_read(&colaRX[contadorRX],103); // para 200kbps
+		escribirPorPCBufferRX(colaRX);
+		contadorRX = 0;
+		
 		break;
 	}
 }
@@ -194,7 +215,10 @@ void escribir_linea_pc (char *str)
 {
 	usart_write_line(&AVR32_USART2,str);
 }
-
+void escribirPorPCBufferRX(char *str){
+	while (*str != 0x03)
+		usart_putchar(&AVR32_USART2, *str++);
+}
 
 static void inicializar_interrupciones()
 {
@@ -515,7 +539,7 @@ uint8_t txTramaManual(uint8_t *data)
 		pal_trx_reg_write(RG_TRX_STATE,CMD_FORCE_PLL_ON); //pongo en PLL ON
 		while(getStateAT86RF212()!=CMD_PLL_ON);  //espero q se ponga en PLL ON
 		pal_trx_reg_write(RG_IRQ_MASK,0x0C);
-		pal_trx_frame_write(data,cola_PC_nw);  // 200kbps
+		pal_trx_frame_write(data,cola_PC_nw+1);  // 200kbps
 		pal_trx_reg_write(RG_TRX_STATE,CMD_TX_START); // inicio tx - segun manual: Write TRX_CMD = TX_START, or assert pin 11 (SLP_TR)
 		DELAY_US(RST_PULSE_WIDTH_NS); // hacia el estado busy_tx
 	} 
@@ -599,12 +623,11 @@ uint8_t init_AT86RF212(void)
 	PAL_WAIT_1_US();
 	pal_trx_reg_write(RG_TRX_STATE, CMD_FORCE_TRX_OFF); // Forzar el estado off
 	DELAY_US(RST_PULSE_WIDTH_US); //tTR10
-	
 	while(getStateAT86RF212()!= CMD_TRX_OFF); // espero el estado off
 	PAL_WAIT_1_US();
 	pal_trx_reg_write(RG_TRX_CTRL_0, 0x08);
 	PAL_WAIT_1_US();
-	pal_trx_reg_write(RG_TRX_CTRL_1, 0x22); // 1 -> TX AUTO_CRC && 1-> IRQ_MASK_MODE
+pal_trx_reg_write(RG_TRX_CTRL_1, 0x2E); // 1 -> TX AUTO_CRC && SPI_CMD_MODE -> 3 && 1-> IRQ_MASK_MODE
 	PAL_WAIT_1_US();
 	pal_trx_reg_write(RG_IRQ_MASK, 0x0C);
 	PAL_WAIT_1_US();
@@ -614,14 +637,13 @@ uint8_t init_AT86RF212(void)
 	DELAY_US(TIME_PLL_ON_RX_ON);
 
 	while (getStateAT86RF212()!=CMD_PLL_ON);
+
 	PAL_WAIT_1_US();
 	pal_trx_reg_write(RG_TRX_STATE, CMD_RX_ON);
 	PAL_WAIT_1_US();
 	
 	cpu_irq_enable();
 	Enable_global_interrupt();
-	
-	escribir_linea_pc("\n Terminando configuracion AT86RF212 \n\n");
 }
 void getTemperature()
 {
